@@ -35,12 +35,12 @@ const Header: React.FC = () => {
 			</ul>
 			<div>
 				<div className={s.cart}>
-					<img width={24} height={24} src="img/header/cart.svg" alt="cart" />
+					<img width={27} height={27} src="img/header/cart.svg" alt="cart" />
 					<span>6</span>
 				</div>
 
 				<button>
-					<img width={24} src="img/header/login.svg" alt="login" />
+					<img width={27} src="img/header/login.svg" alt="login" />
 					<p>Login</p>
 				</button>
 			</div>

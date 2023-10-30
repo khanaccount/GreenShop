@@ -8,7 +8,7 @@
 
 	padding-bottom: 17px;
 
-	border-bottom: 0.3px solid rgba($secondaryColor, 0.5);
+	border-bottom: 0.3px solid rgba($secondaryColor, 0.3);
 
 	ul {
 		display: flex;
@@ -28,17 +28,17 @@
 			margin-right: 30px;
 			position: relative;
 			span {
+				user-select: none;
 				position: absolute;
 				top: 1px;
 				right: -4px;
 				background-color: $secondaryColor;
 				color: $tertiaryColor;
-				padding-left: 3px;
-				padding-bottom: 1px;
+				padding-left: 4px;
 				border-radius: 50%;
-				height: 12px;
-				width: 12px;
-				font-size: 10px;
+				height: 15px;
+				width: 15px;
+				font-size: 12px;
 			}
 		}
 
