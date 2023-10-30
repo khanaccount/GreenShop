@@ -1,0 +1,55 @@
+@import "variables";
+@import "normalize";
+
+html,
+body,
+#root,
+.app {
+	height: 100%;
+	width: 100%;
+	font-family: "Cera Pro", "Hanged Letters", sans-serif;
+	color: $mainColor;
+}
+
+@font-face {
+	font-family: "Cera Pro";
+	src: url("/fonts/CeraPro-Regular.woff") format("woff");
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Cera Pro";
+	src: url("/fonts/CeraPro-Bold.woff") format("woff");
+	font-weight: bold;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Cera Pro";
+	src: url("/fonts/CeraPro-Medium.woff") format("woff");
+	font-weight: 500;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Cera Pro";
+	src: url("/fonts/CeraPro-Black.woff") format("woff");
+	font-weight: 900;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Cera Pro";
+	src: url("/fonts/CeraPro-Light.woff") format("woff");
+	font-weight: 300;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Cera Pro";
+	src: url("/fonts/CeraPro-Thin.woff") format("woff");
+	font-weight: 100;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Hanged Letters";
+	src: url("/fonts/Hanged Letters.ttf") format("truetype");
+	font-weight: normal;
+	font-style: normal;
+}

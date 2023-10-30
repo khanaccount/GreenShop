@@ -1,0 +1,42 @@
+@import "../../variables.scss";
+
+.header {
+	max-width: 1220px;
+	margin: 0 auto;
+	padding: 0 10px;
+
+	padding-top: 25px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	ul {
+		display: flex;
+		li {
+			&:not(:last-child) {
+				padding-right: 50px;
+			}
+		}
+	}
+
+	div {
+		display: flex;
+		align-items: center;
+		.cart {
+			margin-right: 30px;
+		}
+		button {
+			display: flex;
+			align-items: center;
+			padding: 7px 17px;
+			border-radius: 6px;
+			background: $secondaryColor;
+			img {
+				padding-right: 4px;
+			}
+			p {
+				color: $tertiaryColor;
+			}
+		}
+	}
+}
