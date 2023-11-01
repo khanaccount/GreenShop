@@ -6,6 +6,7 @@ import Size from "./Size";
 import Sale from "./Sale";
 
 import s from "./index.module.scss";
+import Sorting from "./Sorting";
 
 const Products: React.FC = () => {
 	return (
@@ -18,7 +19,9 @@ const Products: React.FC = () => {
 				</div>
 				<Sale />
 			</div>
-			<div></div>
+			<div className={s.rightBlock}>
+				<Sorting />
+			</div>
 		</div>
 	);
 };
