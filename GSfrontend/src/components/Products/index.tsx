@@ -4,9 +4,10 @@ import PriceRange from "./PriceRange";
 import Categories from "./Categories";
 import Size from "./Size";
 import Sale from "./Sale";
+import Sorting from "./Sorting";
+import Goods from "./Goods";
 
 import s from "./index.module.scss";
-import Sorting from "./Sorting";
 
 const Products: React.FC = () => {
 	return (
@@ -21,6 +22,7 @@ const Products: React.FC = () => {
 			</div>
 			<div className={s.rightBlock}>
 				<Sorting />
+				<Goods />
 			</div>
 		</div>
 	);
