@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Category(models.Model):
@@ -17,11 +16,9 @@ class Size(models.Model):
 
 
 class Customer(models.Model):
-    first_name = models.CharField(name="Имя", max_length=50, null=True, blank=True)
-    second_name = models.CharField(name="Фамилия", max_length=50, null=True, blank=True)
-    username = models.CharField(name="Логин", max_length=25, unique=True)
-    password = models.CharField(name="Пароль", max_length=25)
-    email = models.EmailField(name="email", max_length=50, unique=True)
+    username = models.CharField(max_length=100)
+    password = models.CharField(max_length=25)
+    email = models.EmailField(max_length=50)
 
     def __str__(self):
         return self.username
@@ -29,11 +26,8 @@ class Customer(models.Model):
     def register(self):
         self.save()
 
-    def getEmail(self):
-        return self.email
 
-
-class Products(models.Model):
+class Product(models.Model):
     name = models.CharField(max_length=50)
     price = models.FloatField()
     review = models.IntegerField()
@@ -63,12 +57,12 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=200, null=True)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class OrderItem(models.Model):
     product = models.ForeignKey(
-        Products, on_delete=models.SET_NULL, blank=True, null=True
+        Product, on_delete=models.SET_NULL, blank=True, null=True
     )
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
     quantity = models.IntegerField(default=0, blank=True, null=True)
