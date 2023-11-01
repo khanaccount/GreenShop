@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from .models import *
 from .serializer import *
 from rest_framework.response import Response
+from rest_framework import serializers
 
 
 class CategoryView(APIView):
@@ -46,15 +47,15 @@ class ProductView(APIView):
         output = [
             {
                 "id": output.id,
-                "title": output.name,
+                "title": output.title,
                 "mainPrice": output.mainPrice,
                 "salePrice": output.salePrice,
                 "discount": output.discount,
                 "discountPercentage": output.discountPercentage,
                 "review": output.review,
                 "rating": output.rating,
-                "size": output.size,
-                "categories": output.categories,
+                "size": SizeSerializer(output.size).data,
+                "categories": CategorySerializer(output.categories).data,
                 "sku": output.sku,
                 "mainImg": output.mainImg,
             }
@@ -74,7 +75,7 @@ class OrderView(APIView):
         output = [
             {
                 "id": output.id,
-                "customer": output.customer,
+                "customer": CustomerSerializer(output.customer).data,
                 "firstName": output.firstName,
                 "secondName": output.secondName,
                 "phone": output.phone,
@@ -98,8 +99,8 @@ class OrderItemView(APIView):
         output = [
             {
                 "id": output.id,
-                "product": output.product,
-                "order": output.order,
+                "product": ProductSerializer(output.product).data,
+                "order": OrderSerializer(output.order).data,
                 "quantity": output.quantity,
             }
             for output in OrderItem.objects.all()
@@ -118,9 +119,9 @@ class ShippingAddressView(APIView):
         output = [
             {
                 "id": output.id,
-                "customer": output.customer,
-                "order": output.order,
-                "streetAddress": output.streetAdress,
+                "customer": CustomerSerializer(output.customer).data,
+                "order": OrderSerializer(output.order).data,
+                "streetAddress": output.streetAddress,
                 "region": output.region,
                 "city": output.city,
             }

@@ -42,7 +42,7 @@ class Product(models.Model):
         Category, on_delete=models.SET_NULL, default=1, blank=True, null=True
     )
     sku = models.BigIntegerField(unique=True)
-    mainImg = models.ImageField(blank=True, null=True)
+    mainImg = models.CharField(max_length=200)
 
     def __str__(self):
         return self.title

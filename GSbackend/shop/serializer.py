@@ -35,29 +35,19 @@ class ProductSerializer(serializers.ModelSerializer):
             "size",
             "categories",
             "sku",
-            "mainIMG",
+            "mainImg",
         ]
 
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = [
-            "id",
-            "customer",
-            "firstName",
-            "secondName",
-            "phone",
-            "date",
-            "status",
-            "transactionId",
-            "dateAdded",
-        ]
+        fields = "__all__"
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Order
+        model = OrderItem
         fields = [
             "id",
             "product",

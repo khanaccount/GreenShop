@@ -6,5 +6,5 @@ from shop.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", OrderView.as_view()),
+    path("", ShippingAddressView.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
