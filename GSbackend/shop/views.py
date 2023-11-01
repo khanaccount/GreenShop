@@ -58,7 +58,7 @@ class ProductView(APIView):
                 "sku": output.sku,
                 "mainImg": output.mainImg,
             }
-            for output in Customer.objects.all()
+            for output in Product.objects.all()
         ]
         return Response(output)
 
@@ -82,7 +82,7 @@ class OrderView(APIView):
                 "status": output.status,
                 "transactionId": output.transactionId,
             }
-            for output in Customer.objects.all()
+            for output in Order.objects.all()
         ]
         return Response(output)
 
@@ -102,7 +102,7 @@ class OrderItemView(APIView):
                 "order": output.order,
                 "quantity": output.quantity,
             }
-            for output in Customer.objects.all()
+            for output in OrderItem.objects.all()
         ]
         return Response(output)
 
@@ -124,7 +124,7 @@ class ShippingAddressView(APIView):
                 "region": output.region,
                 "city": output.city,
             }
-            for output in Customer.objects.all()
+            for output in ShippingAddress.objects.all()
         ]
         return Response(output)
 
