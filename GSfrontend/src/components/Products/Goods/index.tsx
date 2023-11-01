@@ -7,8 +7,6 @@ type Goods = {
 	mainPrice: string;
 	salePrice: string;
 	mainImg: string;
-	cartImg: string;
-	favoriteImg: string;
 	discountPercentage: string;
 	discount: boolean;
 	id: number;
@@ -21,8 +19,6 @@ const items: Goods[] = [
 		mainPrice: "$119.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/01.png",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: false,
 		discountPercentage: "11"
 	},
@@ -32,8 +28,6 @@ const items: Goods[] = [
 		mainPrice: "$169.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/02.png",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: true,
 		discountPercentage: "25"
 	},
@@ -43,8 +37,6 @@ const items: Goods[] = [
 		mainPrice: "$199.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/03.png",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: false,
 		discountPercentage: "12"
 	},
@@ -54,8 +46,6 @@ const items: Goods[] = [
 		mainPrice: "$129.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/04.jpg",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: true,
 		discountPercentage: "15"
 	},
@@ -65,8 +55,6 @@ const items: Goods[] = [
 		mainPrice: "$139.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/05.png",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: false,
 		discountPercentage: "5"
 	},
@@ -76,8 +64,6 @@ const items: Goods[] = [
 		mainPrice: "$179.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/06.png",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: true,
 		discountPercentage: "7"
 	},
@@ -87,8 +73,6 @@ const items: Goods[] = [
 		mainPrice: "$99.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/07.png",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: false,
 		discountPercentage: "15"
 	},
@@ -98,8 +82,6 @@ const items: Goods[] = [
 		mainPrice: "$59.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/08.png",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: true,
 		discountPercentage: "11"
 	},
@@ -109,8 +91,6 @@ const items: Goods[] = [
 		mainPrice: "$39.00",
 		salePrice: "$229.00",
 		mainImg: "img/goods/09.png",
-		cartImg: "img/goods/cart.svg",
-		favoriteImg: "img/goods/favorite.svg",
 		discount: false,
 		discountPercentage: "15"
 	}
@@ -127,10 +107,10 @@ const Goods: React.FC = () => {
 							{item.discount ? <p className={s.discount}>{item.discountPercentage}% OFF</p> : null}
 							<div className={s.hoverLinks}>
 								<a href="">
-									<img src={item.cartImg} alt="cart" />
+									<img src="img/goods/cart.svg" alt="cart" />
 								</a>
 								<a href="">
-									<img src={item.favoriteImg} alt="favorite" />
+									<img src="img/goods/favorite.svg" alt="favorite" />
 								</a>
 							</div>
 						</div>
