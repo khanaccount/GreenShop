@@ -82,8 +82,9 @@
 }
 
 .Carousel {
-	:global(.carousel .control-dots .dot) {
+	:global(.control-dots .dot) {
 		background-color: $secondaryColor;
 		box-shadow: none;
+		margin: 0 4px;
 	}
 }

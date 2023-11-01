@@ -51,6 +51,7 @@ const Sorting: React.FC = () => {
 					<h5 onClick={() => handleSortOptionClick("Price: Low to High")}>Price: Low to High</h5>
 					<h5 onClick={() => handleSortOptionClick("Price: High to Low")}>Price: Low to Low</h5>
 					<h5 onClick={() => handleSortOptionClick("Most popular")}>Most popular</h5>
+					<h5 onClick={() => handleSortOptionClick("Price: High to Low")}>Rating</h5>
 				</div>
 			</div>
 		</div>
