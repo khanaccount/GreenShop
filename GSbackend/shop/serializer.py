@@ -5,33 +5,37 @@ from .models import *
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ["name"]
+        fields = ["id", "name"]
 
 
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
-        fields = ["name"]
+        fields = ["id", "name"]
 
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ["username", "password", "email"]
+        fields = ["id", "username", "password", "email"]
 
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            "name",
-            "price",
+            "id",
+            "title",
+            "mainPrice",
+            "salePrice",
+            "discount",
+            "discountPercentage",
             "review",
             "rating",
             "size",
             "categories",
             "sku",
-            "image",
+            "mainIMG",
         ]
 
 
@@ -39,13 +43,15 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            "id",
             "customer",
-            "first_name",
-            "second_name",
+            "firstName",
+            "secondName",
             "phone",
             "date",
             "status",
-            "transaction_id",
+            "transactionId",
+            "dateAdded",
         ]
 
 
@@ -53,21 +59,21 @@ class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            "id",
             "product",
             "order",
             "quantity",
-            "date_added",
         ]
 
 
-class ShippingAdressesSerializer(serializers.ModelSerializer):
+class ShippingAdressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            "id",
             "customer",
             "order",
-            "street_address",
+            "streetAddress",
             "region",
             "city",
-            "date_added",
         ]

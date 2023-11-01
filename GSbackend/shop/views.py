@@ -25,6 +25,7 @@ class CustomerView(APIView):
     def get(self, request):
         output = [
             {
+                "id": output.id,
                 "username": output.username,
                 "password": output.password,
                 "email": output.email,
@@ -44,14 +45,18 @@ class ProductView(APIView):
     def get(self, request):
         output = [
             {
-                "name": output.name,
-                "price": output.price,
+                "id": output.id,
+                "title": output.name,
+                "mainPrice": output.mainPrice,
+                "salePrice": output.salePrice,
+                "discount": output.discount,
+                "discountPercentage": output.discountPercentage,
                 "review": output.review,
                 "rating": output.rating,
                 "size": output.size,
                 "categories": output.categories,
                 "sku": output.sku,
-                "image": output.image,
+                "mainImg": output.mainImg,
             }
             for output in Customer.objects.all()
         ]
@@ -68,13 +73,14 @@ class OrderView(APIView):
     def get(self, request):
         output = [
             {
+                "id": output.id,
                 "customer": output.customer,
-                "first_name": output.first_name,
-                "second_name": output.second_name,
+                "firstName": output.firstName,
+                "secondName": output.secondName,
                 "phone": output.phone,
                 "date": output.date,
                 "status": output.status,
-                "transaction_id": output.transaction_id,
+                "transactionId": output.transactionId,
             }
             for output in Customer.objects.all()
         ]
@@ -82,6 +88,48 @@ class OrderView(APIView):
 
     def post(self, request):
         serializer = OrderSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+
+
+class OrderItemView(APIView):
+    def get(self, request):
+        output = [
+            {
+                "id": output.id,
+                "product": output.product,
+                "order": output.order,
+                "quantity": output.quantity,
+            }
+            for output in Customer.objects.all()
+        ]
+        return Response(output)
+
+    def post(self, request):
+        serializer = OrderItemSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+
+
+class ShippingAddressView(APIView):
+    def get(self, request):
+        output = [
+            {
+                "id": output.id,
+                "customer": output.customer,
+                "order": output.order,
+                "streetAddress": output.streetAdress,
+                "region": output.region,
+                "city": output.city,
+            }
+            for output in Customer.objects.all()
+        ]
+        return Response(output)
+
+    def post(self, request):
+        serializer = ShippingAdressSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)

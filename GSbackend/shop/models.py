@@ -28,10 +28,13 @@ class Customer(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=50)
-    price = models.FloatField()
+    title = models.CharField(max_length=50)
+    mainPrice = models.FloatField()
+    salePrice = models.FloatField()
     review = models.IntegerField()
     rating = models.FloatField()
+    discount = models.BooleanField(default=False)
+    discountPercentage = models.IntegerField()
     size = models.ForeignKey(
         Size, on_delete=models.SET_NULL, default=1, blank=True, null=True
     )
@@ -39,22 +42,22 @@ class Product(models.Model):
         Category, on_delete=models.SET_NULL, default=1, blank=True, null=True
     )
     sku = models.BigIntegerField(unique=True)
-    image = models.ImageField(blank=True, null=True)
+    mainImg = models.ImageField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 class Order(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.SET_NULL, blank=True, null=True
     )
-    first_name = models.CharField(max_length=50)
-    second_name = models.CharField(max_length=50)
+    firstName = models.CharField(max_length=50)
+    secondName = models.CharField(max_length=50)
     phone = models.CharField(max_length=50, default="", blank=True)
     date = models.DateField(auto_now_add=True)
     status = models.BooleanField(default=False, null=True, blank=False)
-    transaction_id = models.CharField(max_length=200, null=True)
+    transactionId = models.CharField(max_length=200, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -66,7 +69,9 @@ class OrderItem(models.Model):
     )
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
     quantity = models.IntegerField(default=0, blank=True, null=True)
-    date_added = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.product}, {self.order}"
 
 
 class ShippingAddress(models.Model):
@@ -74,10 +79,9 @@ class ShippingAddress(models.Model):
         Customer, on_delete=models.SET_NULL, blank=True, null=True
     )
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
-    street_address = models.CharField(max_length=200, null=False)
+    streetAddress = models.CharField(max_length=200, null=False)
     region = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
-    date_added = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.street_address
+        return self.streetAddress
