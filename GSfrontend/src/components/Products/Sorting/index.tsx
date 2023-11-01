@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import s from "./index.module.scss";
 
 const Sorting: React.FC = () => {
 	const [activeCategory, setActiveCategory] = useState<number | null>(1);
 	const [isArrowActive, setIsArrowActive] = useState(false);
 	const [sortBy, setSortBy] = useState("Default sorting");
+
+	const menuRef = useRef(null as HTMLDivElement | null);
 
 	const handleSortOptionClick = (option: string) => {
 		setSortBy(option);
@@ -14,9 +16,23 @@ const Sorting: React.FC = () => {
 	const handleCategoryClick = (id: number) => {
 		setActiveCategory(id);
 	};
+
 	const toggleArrowStyle = () => {
 		setIsArrowActive(!isArrowActive);
 	};
+
+	const closeMenu = (event: MouseEvent) => {
+		if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+			setIsArrowActive(false);
+		}
+	};
+
+	useEffect(() => {
+		document.addEventListener("mousedown", closeMenu);
+		return () => {
+			document.removeEventListener("mousedown", closeMenu);
+		};
+	}, []);
 
 	return (
 		<div className={s.sorting}>
@@ -46,7 +62,9 @@ const Sorting: React.FC = () => {
 					alt="arrow"
 					onClick={toggleArrowStyle}
 				/>
-				<div className={isArrowActive ? `${s.sortOptions}` : `${s.sortOptionsHidden}`}>
+				<div
+					ref={(node) => (menuRef.current = node)}
+					className={isArrowActive ? `${s.sortOptions}` : `${s.sortOptionsHidden}`}>
 					<h5 onClick={() => handleSortOptionClick("Default sorting")}>Default sorting</h5>
 					<h5 onClick={() => handleSortOptionClick("Price: Low to High")}>Price: Low to High</h5>
 					<h5 onClick={() => handleSortOptionClick("Price: High to Low")}>Price: Low to Low</h5>
