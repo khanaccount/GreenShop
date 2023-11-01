@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Category(models.Model):
@@ -33,13 +34,17 @@ class Customer(models.Model):
 
 
 class Products(models.Model):
-    name = models.CharField(name="Логин", max_length=25)
-    price = models.FloatField(default=0, max=1500)
-    review = models.IntegerField(default=0)
-    rating = models.FloatField(default=0, max=5)
-    size = models.ForeignKey(Size, on_delete=models.SET_NULL, default=1)
-    categories = models.ForeignKey(Category, on_delete=models.SET_NULL, default=1)
-    sku = models.BigIntegerField(unique=True, min=1000000000000, max=9999999999999)
+    name = models.CharField(max_length=50)
+    price = models.FloatField()
+    review = models.IntegerField()
+    rating = models.FloatField()
+    size = models.ForeignKey(
+        Size, on_delete=models.SET_NULL, default=1, blank=True, null=True
+    )
+    categories = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, default=1, blank=True, null=True
+    )
+    sku = models.BigIntegerField(unique=True)
     # image
 
     def __str__(self):
@@ -47,10 +52,11 @@ class Products(models.Model):
 
 
 class Order(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET_NULL, blank=True, null=True
+    )
     first_name = models.CharField(max_length=50)
     second_name = models.CharField(max_length=50)
-    email = customer.getEmail()
     phone = models.CharField(max_length=50, default="", blank=True)
     date = models.DateField(auto_now_add=True)
     status = models.BooleanField(default=False, null=True, blank=False)
@@ -70,8 +76,10 @@ class OrderItem(models.Model):
 
 
 class ShippingAddress(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL)
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
     street_address = models.CharField(max_length=200, null=False)
     region = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
