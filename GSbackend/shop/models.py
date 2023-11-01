@@ -39,7 +39,7 @@ class Product(models.Model):
         Category, on_delete=models.SET_NULL, default=1, blank=True, null=True
     )
     sku = models.BigIntegerField(unique=True)
-    # image
+    image = models.ImageField(blank=True, null=True)
 
     def __str__(self):
         return self.name
