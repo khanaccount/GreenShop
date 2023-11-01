@@ -1,0 +1,9 @@
+@import "../../variables.scss";
+
+.products {
+	margin-top: 45px;
+	.filters {
+		max-width: 310px;
+		background: $background;
+	}
+}

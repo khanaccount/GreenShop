@@ -84,5 +84,6 @@
 .Carousel {
 	:global(.carousel .control-dots .dot) {
 		background-color: $secondaryColor;
+		box-shadow: none;
 	}
 }
