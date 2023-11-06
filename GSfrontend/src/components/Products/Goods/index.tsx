@@ -49,8 +49,8 @@ const Goods: React.FC = () => {
 						<div className={s.goodsInfo}>
 							<p className={s.goodsName}>{item.title}</p>
 							<div className={s.goodsPrices}>
-								<p className={s.main}>{item.mainPrice}</p>
-								{item.discount ? <p className={s.sale}>{item.salePrice}</p> : null}
+								<p className={s.main}>{item.salePrice}</p>
+								{item.discount ? <p className={s.sale}>{item.mainPrice}</p> : null}
 							</div>
 						</div>
 					</div>

@@ -42,12 +42,6 @@ class CustomerView(APIView):
 
 
 class ProductView(APIView):
-    def plusDataNull(data):
-        price = "$" + str(data)
-        if len(price.split(".")[1]) == 1:
-            price += "0"
-        return price
-
     def get(self, request):
         output = [
             {
