@@ -1,4 +1,5 @@
 from django.db import models
+import random
 
 
 class Category(models.Model):
@@ -30,9 +31,9 @@ class Customer(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=50)
     mainPrice = models.FloatField()
-    salePrice = models.FloatField()
-    review = models.IntegerField()
-    rating = models.FloatField()
+    salePrice = models.FloatField(editable=False)
+    review = models.IntegerField(default=0, editable=False)
+    rating = models.FloatField(default=0, editable=False)
     discount = models.BooleanField(default=False)
     discountPercentage = models.IntegerField()
     size = models.ForeignKey(
@@ -41,11 +42,27 @@ class Product(models.Model):
     categories = models.ForeignKey(
         Category, on_delete=models.SET_NULL, default=1, blank=True, null=True
     )
-    sku = models.BigIntegerField(unique=True)
+    sku = models.CharField(max_length=13, unique=True, editable=False)
     mainImg = models.CharField(max_length=200)
 
     def __str__(self):
         return self.title
+
+    def save(self):
+        while True:
+            random_num = str(random.randint(10**12, 10**13 - 1))
+
+            if not Product.objects.filter(sku=random_num).exists():
+                self.sku = random_num
+                break
+        if self.discount:
+            self.salePrice = round(
+                self.mainPrice * (1 - (self.discountPercentage / 100)), 2
+            )
+        else:
+            self.salePrice = self.mainPrice
+
+        super(Product, self).save(self)
 
 
 class Order(models.Model):
