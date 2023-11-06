@@ -42,13 +42,19 @@ class CustomerView(APIView):
 
 
 class ProductView(APIView):
+    def plusDataNull(data):
+        price = "$" + str(data)
+        if len(price.split(".")[1]) == 1:
+            price += "0"
+        return price
+
     def get(self, request):
         output = [
             {
                 "id": output.id,
                 "title": output.title,
-                "mainPrice": output.mainPrice,
-                "salePrice": output.salePrice,
+                "mainPrice": "$" + str(round(output.mainPrice, 2)),
+                "salePrice": "$" + str(round(output.salePrice, 2)),
                 "discount": output.discount,
                 "discountPercentage": output.discountPercentage,
                 "review": output.review,

@@ -38,14 +38,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "mainImg",
         ]
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-
-        data["mainPrice"] = "$" + str(round(data["mainPrice"], 2))
-        data["salePrice"] = "$" + str(round(data["salePrice"], 2))
-
-        return data
-
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
