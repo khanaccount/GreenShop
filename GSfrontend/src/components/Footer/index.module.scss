@@ -1,0 +1,130 @@
+@import "../../variables.scss";
+
+.footer {
+	margin-top: 150px;
+	background: $background;
+	&Top {
+		display: flex;
+		padding: 25px;
+		.info {
+			display: flex;
+			.card {
+				position: relative;
+				&:not(:last-child) {
+					margin-right: 62px;
+					padding-right: 34px;
+					border-right: 1px solid rgba($secondaryColor, 0.1);
+				}
+				.cyrcle {
+					top: 46px;
+					left: 23px;
+					position: absolute;
+				}
+				.topPlant {
+					top: 25px;
+					left: 39px;
+					position: absolute;
+				}
+				.pot {
+					top: 70px;
+					left: 42px;
+					position: absolute;
+				}
+
+				h5 {
+					margin-top: 135px;
+					padding-bottom: 9px;
+					color: $mainColor;
+					font-size: 17px;
+					font-weight: 700;
+					line-height: 16px;
+				}
+				p {
+					max-width: 204px;
+					padding-bottom: 23px;
+					color: $smallTextColor;
+					font-size: 14px;
+					font-weight: 400;
+					line-height: 22px;
+				}
+			}
+		}
+		.formBlock {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding-left: 62px;
+			h4 {
+				padding-top: 6px;
+				padding-bottom: 18px;
+				color: $mainColor;
+				font-size: 18px;
+				font-weight: 700;
+				line-height: 16px;
+			}
+			form {
+				display: flex;
+			}
+			.input {
+				width: 269px;
+				height: 40px;
+				padding: 12px;
+				border-radius: 6px 0px 0px 6px;
+				background: #fff;
+				border: none;
+				outline: none;
+			}
+			.inputBtn {
+				cursor: pointer;
+				padding: 12px 25px;
+				border-radius: 0px 6px 6px 0px;
+				background: $secondaryColor;
+				border: none;
+				color: $tertiaryColor;
+				font-size: 18px;
+				font-weight: 700;
+				line-height: 16px;
+			}
+			label {
+				color: #acacac;
+				font-family: Cera Pro;
+				font-size: 14px;
+				font-style: normal;
+				font-weight: 400;
+				line-height: 16px;
+			}
+
+			p {
+				padding-top: 17px;
+				color: $mainColor;
+				font-size: 13px;
+				font-weight: 400;
+				line-height: 22px;
+				max-width: 354px;
+			}
+		}
+	}
+	&Middle {
+		display: flex;
+		align-items: center;
+		justify-content: space-evenly;
+		height: 88px;
+		background: rgba($secondaryColor, 0.1);
+
+		div {
+			padding-left: 87px;
+			display: flex;
+			align-items: center;
+			img {
+				padding-right: 9px;
+			}
+			p {
+				max-width: 176px;
+				color: $mainColor;
+				font-size: 14px;
+				font-weight: 400;
+				line-height: 22px;
+			}
+		}
+	}
+}
