@@ -49,12 +49,14 @@ class Product(models.Model):
         return self.title
 
     def save(self):
-        while True:
-            random_num = str(random.randint(10**12, 10**13 - 1))
+        if self.sku == "":
+            while True:
+                random_num = str(random.randint(10**12, 10**13 - 1))
 
-            if not Product.objects.filter(sku=random_num).exists():
-                self.sku = random_num
-                break
+                if not Product.objects.filter(sku=random_num).exists():
+                    self.sku = random_num
+                    break
+
         if self.discount:
             self.salePrice = round(
                 self.mainPrice * (1 - (self.discountPercentage / 100)), 2
@@ -62,7 +64,7 @@ class Product(models.Model):
         else:
             self.salePrice = self.mainPrice
 
-        super(Product, self).save(self)
+        super(Product, self).save()
 
 
 class Order(models.Model):
