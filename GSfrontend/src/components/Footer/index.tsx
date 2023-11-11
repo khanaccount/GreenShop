@@ -58,7 +58,87 @@ const itemsMiddle: MiddleItems[] = [
 	}
 ];
 
+type BottomItems = {
+	title: string;
+	links: {
+		info: string;
+		url: string;
+	}[];
+	id: number;
+};
+
+const itemsBottom: BottomItems[] = [
+	{
+		title: "My Account",
+		links: [
+			{ info: "My Account", url: "/account" },
+			{ info: "Our Stores", url: "/stores" },
+			{ info: "Contact us", url: "/contact" },
+			{ info: "Career", url: "/career" },
+			{ info: "Specials", url: "/specials" }
+		],
+		id: 1
+	},
+	{
+		title: "Help & Guide",
+		links: [
+			{ info: "Help Center", url: "/account" },
+			{ info: "	How to Buy", url: "/stores" },
+			{ info: "Shipping & Delivery", url: "/contact" },
+			{ info: "Product Policy", url: "/career" },
+			{ info: "How to Return", url: "/specials" }
+		],
+		id: 2
+	},
+	{
+		title: "Categories",
+		links: [
+			{ info: "House Plants", url: "/account" },
+			{ info: "Potter Plants", url: "/stores" },
+			{ info: "Seeds", url: "/contact" },
+			{ info: "Small Plants", url: "/career" },
+			{ info: "Accessories", url: "/specials" }
+		],
+		id: 3
+	}
+];
+
+type SocialMedia = {
+	img: string;
+	id: number;
+	href: string;
+};
+
+const itemsSocialMedia: SocialMedia[] = [
+	{
+		img: "img/footer/bottom/facebook.png",
+		id: 1,
+		href: "/buythisweb"
+	},
+	{
+		img: "img/footer/bottom/instagram.png",
+		id: 2,
+		href: "/buythisweb"
+	},
+	{
+		img: "img/footer/bottom/telegram.png",
+		id: 3,
+		href: "/buythisweb"
+	},
+	{
+		img: "img/footer/bottom/twitter.png",
+		id: 4,
+		href: "/buythisweb"
+	},
+	{
+		img: "img/footer/bottom/whatsapp.png",
+		id: 5,
+		href: "/buythisweb"
+	}
+];
+
 const Footer: React.FC = () => {
+	const currentYear = new Date().getFullYear();
 	return (
 		<div className={s.footer}>
 			<div className={s.footerTop}>
@@ -102,6 +182,44 @@ const Footer: React.FC = () => {
 					</div>
 				))}
 			</div>
+			<div className={s.footerBottom}>
+				<div className={s.leftBlock}>
+					{itemsBottom.map((item) => (
+						<div className={s.blockLinks} key={item.id}>
+							<h5 className={s.titleText}>{item.title}</h5>
+							{item.links.map((link) => (
+								<div className={s.links} key={link.url}>
+									<a href={link.url}>{link.info}</a>
+								</div>
+							))}
+						</div>
+					))}
+				</div>
+				<div className={s.rightBlock}>
+					<div>
+						<h5>Social Media</h5>
+						<div className={s.mediaLinks}>
+							{itemsSocialMedia.map((item) => (
+								<a key={item.id} href={item.href}>
+									{" "}
+									<img
+										className={s.social}
+										width={30}
+										height={30}
+										src={item.img}
+										alt="social media"
+									/>
+								</a>
+							))}
+						</div>
+					</div>
+					<div>
+						<h5>We accept</h5>
+						<img src="img/footer/bottom/accept.png" alt="we accpet" />
+					</div>
+				</div>
+			</div>
+			<p>© {currentYear} GreenShop. All Rights Reserved.</p>
 		</div>
 	);
 };
