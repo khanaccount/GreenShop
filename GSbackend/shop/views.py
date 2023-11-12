@@ -50,7 +50,6 @@ class ProductView(APIView):
         if len(objectPrice.split(".")[1]) == 1:
             objectPrice += "0"
 
-        return objectPrice
 
     def get(self, request):
         output = [
