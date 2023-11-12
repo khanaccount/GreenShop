@@ -10,7 +10,7 @@ type Goods = {
 	mainImg: string;
 	discountPercentage: string;
 	discount: boolean;
-	id: number;
+	id: number;	
 };
 
 const Goods: React.FC = () => {
@@ -22,7 +22,7 @@ const Goods: React.FC = () => {
 	const [items, setItems] = React.useState<Goods[]>([]);
 
 	React.useEffect(() => {
-		axios.get("http://127.0.0.1:8000/").then((response) => {
+		axios.get("http://127.0.0.1:8000/shop/product/").then((response) => {
 			setItems(response.data);
 		});
 	}, []);

@@ -1,5 +1,41 @@
 from django.db import models
+import jwt
+
+from django.conf import settings
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 import random
+
+from datetime import datetime, timedelta
+
+
+class CustomerManager(BaseUserManager):
+    def create_user(self, username, email, password):
+        if username is None:
+            raise TypeError("Users must have a username.")
+
+        if email is None:
+            raise TypeError("Users must have an email address.")
+
+        if password is None:
+            raise TypeError("Users must have a password")
+
+        user = self.model(username=username, email=self.normalize_email(email))
+        user.set_password(password)
+        user.save()
+
+        return user
+
+    def create_superuser(self, username, email, password):
+        user = self.create_user(username, email, password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+
+        return user
 
 
 class Category(models.Model):
@@ -16,16 +52,41 @@ class Size(models.Model):
         return self.name
 
 
-class Customer(models.Model):
-    username = models.CharField(max_length=100)
+class Customer(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=25)
-    email = models.EmailField(max_length=50)
+    email = models.EmailField(max_length=50, unique=True)
+
+    is_staff = models.BooleanField(default=False)
+
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
+
+    objects = CustomerManager()
 
     def __str__(self):
         return self.username
 
-    def register(self):
-        self.save()
+    @property
+    def token(self):
+        return self._generate_jwt_token()
+
+    def get_full_name(self):
+        return self.username
+
+    def get_short_name(self):
+        return self.username
+
+    def _generate_jwt_token(self):
+        dt = datetime.now() + timedelta(days=1)
+
+        token = jwt.encode(
+            {"id": self.id, "exp": int(dt.strftime("%S"))},
+            settings.SECRET_KEY,
+            algorithm="HS256",
+        )
+
+        return token
 
 
 class Product(models.Model):
