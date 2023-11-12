@@ -10,7 +10,7 @@ type Goods = {
 	mainImg: string;
 	discountPercentage: string;
 	discount: boolean;
-	id: number;
+	id: number;	
 };
 
 const Goods: React.FC = () => {
