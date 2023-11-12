@@ -44,33 +44,6 @@ class CustomerView(APIView):
             return Response(serializer.data)
 
 
-class RegistrationView(APIView):
-    permission_classes = (AllowAny,)
-    serializer_class = RegistrationSerializer
-
-    def post(self, request):
-        user = request.data.get("user", {})
-
-        serializer = self.serializer_class(data=user)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class LoginView(APIView):
-    permission_classes = (AllowAny,)
-    serializer_class = LoginSerializer
-
-    def post(self, request):
-        user = request.data.get("user", {})
-
-        serializer = self.serializer_class(data=user)
-        serializer.is_valid(raise_exception=True)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 class ProductView(APIView):
     def twoNulls(NULL, object, string):
         objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
@@ -173,3 +146,25 @@ class ShippingAddressView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+
+
+class RegistrationView(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = RegistrationSerializer(data=request.data.get("user", {}))
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class LoginView(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data.get("user", {}))
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)

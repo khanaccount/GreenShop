@@ -4,7 +4,4 @@ from django.contrib import admin
 from django.urls import path, include
 from shop.views import *
 
-urlpatterns = [
-    path("registration/", RegistrationView.as_view()),
-    path("login/", LoginView.as_view()),
-]
+urlpatterns = []

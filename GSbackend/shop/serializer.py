@@ -21,46 +21,6 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "email"]
 
 
-class RegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=128, min_length=8, write_only=True)
-
-    token = serializers.CharField(max_length=255, read_only=True)
-
-    class Meta:
-        model = Customer
-
-        fields = ["username", "email", "password", "token"]
-
-    def create(self, validated_data):
-        return Customer.objects.create_user(**validated_data)
-
-
-class LoginSerializer(serializers.Serializer):
-    email = serializers.CharField(max_length=255, read_only=True)
-    username = serializers.CharField(max_length=255)
-    password = serializers.CharField(max_length=128, write_only=True)
-    token = serializers.CharField(max_length=255, read_only=True)
-
-    def validate(self, data):
-        username = data.get("username", None)
-        password = data.get("password", None)
-
-        if username is None:
-            raise serializers.ValidationError("An username is required to log in")
-
-        if password is None:
-            raise serializers.ValidationError("A password is required to log in.")
-
-        user = authenticate(username=username, password=password)
-
-        if user is None:
-            raise serializers.ValidationError(
-                "A user with this username and password was not found."
-            )
-
-        return {"username": user.username, "email": user.email, "token": user.token}
-
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -117,3 +77,43 @@ class ShippingAdressSerializer(serializers.ModelSerializer):
             "region",
             "city",
         ]
+
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=128, min_length=8, write_only=True)
+
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    class Meta:
+        model = Customer
+
+        fields = ["username", "email", "password", "token"]
+
+    def create(self, validated_data):
+        return Customer.objects.create_user(**validated_data)
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=255, read_only=True)
+    username = serializers.CharField(max_length=255)
+    password = serializers.CharField(max_length=128, write_only=True)
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    def validate(self, data):
+        username = data.get("username", None)
+        password = data.get("password", None)
+
+        if username is None:
+            raise serializers.ValidationError("An username is required to log in")
+
+        if password is None:
+            raise serializers.ValidationError("A password is required to log in.")
+
+        user = authenticate(username=username, password=password)
+
+        if user is None:
+            raise serializers.ValidationError(
+                "A user with this username and password was not found."
+            )
+
+        return {"username": user.username, "email": user.email, "token": user.token}
