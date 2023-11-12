@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "shop",
+    "rest_framework.authtoken",
     "corsheaders",
+    "shop",
 ]
 
 MIDDLEWARE = [
@@ -139,3 +140,5 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = "/var/www/example.com/static/"
+
+AUTH_USER_MODEL = "shop.Customer"

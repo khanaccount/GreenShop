@@ -6,5 +6,11 @@ from shop.views import *
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", ProductView.as_view()),
+    path("shop/size/", SizeView.as_view()),
+    path("shop/customer/", CustomerView.as_view()),
+    path("shop/product/", ProductView.as_view()),
+    path("shop/order/", OrderView.as_view()),
+    path("shop/orderItem/", OrderItemView.as_view()),
+    path("shop/shippingAddress/", ShippingAddressView.as_view()),
+    path("api/", include("shop.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
