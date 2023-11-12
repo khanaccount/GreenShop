@@ -73,3 +73,182 @@
 		background: $secondaryColor;
 	}
 }
+
+.authBg {
+	position: relative;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	flex: 1;
+	background: rgba(10, 13, 18, 0.25);
+	z-index: 98;
+
+	.auth {
+		display: flex;
+		flex-direction: column;
+		position: absolute;
+		z-index: 99;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 500px;
+		height: 600px;
+		background: #fff;
+	}
+
+	.imgCross {
+		cursor: pointer;
+		margin-top: 12px;
+		margin-left: 458px;
+	}
+
+	.loginMethod {
+		padding-top: 21px;
+		position: relative;
+		display: flex;
+		align-items: center;
+		&::after {
+			position: absolute;
+			content: "";
+			border-left: 1px solid $mainColor;
+			height: 12px;
+			right: 88px;
+		}
+		.method {
+			cursor: pointer;
+
+			color: $mainColor;
+			font-size: 20px;
+			font-weight: 500;
+			line-height: 16px;
+			&:not(:last-child) {
+				padding-right: 27px;
+			}
+		}
+		.methodActive {
+			cursor: pointer;
+			color: $secondaryColor;
+			font-size: 20px;
+			font-weight: 500;
+			line-height: 16px;
+			&:not(:last-child) {
+				padding-right: 27px;
+			}
+		}
+	}
+
+	.login {
+		max-width: 300px;
+		padding-top: 52px;
+		display: flex;
+		flex-direction: column;
+		p {
+			color: $mainColor;
+			font-size: 14px;
+			font-weight: 400;
+			line-height: 16px;
+		}
+		.form {
+			padding-top: 14px;
+			display: flex;
+			flex-direction: column;
+		}
+		input {
+			width: 300px;
+			padding: 12px;
+			outline: none;
+			border-radius: 5px;
+			border: 1px solid #eaeaea;
+			&:not(:last-child) {
+				margin-bottom: 12px;
+			}
+			&:focus {
+				border: 1px solid $secondaryColor;
+			}
+		}
+		.forgot {
+			color: $secondaryColor;
+			font-size: 16px;
+			font-weight: 400;
+			line-height: 16px;
+			padding-bottom: 27px;
+			text-align: end;
+		}
+		button {
+			height: 45px;
+			display: flex;
+			justify-content: center;
+			color: $tertiaryColor;
+			font-size: 16px;
+			font-weight: 700;
+			line-height: 16px;
+		}
+		.passwordContainer {
+			position: relative;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			img {
+				position: absolute;
+				right: 10px;
+				top: 10px;
+				cursor: pointer;
+			}
+		}
+
+		.loginOption {
+			max-width: 300px;
+			position: relative;
+			color: $mainColor;
+			font-size: 15px;
+			font-weight: 400;
+			line-height: 16px;
+			margin: 46px 0 27px 0;
+			&::before,
+			&::after {
+				flex: 1;
+				content: "";
+				position: absolute;
+				top: 50%;
+				width: 105%;
+				height: 1px;
+				background-color: #eaeaea;
+			}
+
+			&::before {
+				left: 100px;
+			}
+
+			&::after {
+				right: 100px;
+			}
+		}
+		.anotherMethods {
+			display: flex;
+			flex-direction: column;
+			button {
+				display: flex;
+				width: 300px;
+				background: none;
+				border-radius: 5px;
+				border: 1px solid #eaeaea;
+
+				color: $smallTextColor;
+				text-align: center;
+				font-size: 13px;
+				font-weight: 500;
+				line-height: 16px;
+
+				img {
+					padding-right: 10px;
+				}
+				&:not(:last-child) {
+					margin-bottom: 15px;
+				}
+			}
+		}
+	}
+}
