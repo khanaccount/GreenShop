@@ -2,8 +2,9 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import *
 from .serializer import *
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 from .renderers import CustomerJSONRenderer
 
@@ -164,6 +165,24 @@ class LoginView(APIView):
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data.get("user", {}))
+
+        if serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CustomerEditSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        serializer = CustomerEditSerializer(request.user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        serializer = CustomerEditSerializer(
+            request.user, data=request.data.get("user", {}), partial=True
+        )
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()

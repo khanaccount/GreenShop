@@ -14,4 +14,5 @@ urlpatterns = [
     path("shop/shippingAddress/", ShippingAddressView.as_view()),
     path("shop/registration/", RegistrationView.as_view()),
     path("shop/login/", LoginView.as_view()),
+    path("shop/edit/", CustomerRetrieveUpdateView.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
