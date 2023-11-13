@@ -57,7 +57,9 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
-    ]
+    ],
+    "EXCEPTION_HANDLER": "GSbackend.exceptions.core_exception_handler",
+    "NON_FIELD_ERRORS_KEY": "error",
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
