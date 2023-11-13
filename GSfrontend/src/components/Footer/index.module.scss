@@ -12,7 +12,6 @@
 				position: relative;
 				&:not(:last-child) {
 					margin-right: 62px;
-					padding-right: 34px;
 					border-right: 1px solid rgba($secondaryColor, 0.1);
 				}
 				.cyrcle {
@@ -40,6 +39,7 @@
 					line-height: 16px;
 				}
 				p {
+					text-align: start;
 					max-width: 204px;
 					padding-bottom: 23px;
 					color: $smallTextColor;
@@ -95,6 +95,7 @@
 			}
 
 			p {
+				text-align: start;
 				padding-top: 17px;
 				color: $mainColor;
 				font-size: 13px;
