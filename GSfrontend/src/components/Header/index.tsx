@@ -29,7 +29,7 @@ const Header: React.FC = () => {
 			</Link>
 			<ul>
 				<li>
-					<Link className={location.pathname === "/" ? s.active : ""} to="">
+					<Link className={location.pathname === "/" ? s.active : ""} to="/">
 						Home
 					</Link>
 				</li>
