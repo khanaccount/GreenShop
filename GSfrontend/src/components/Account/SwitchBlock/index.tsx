@@ -1,37 +1,43 @@
 import React, { useState } from "react";
+
 import s from "./index.module.scss";
+
+import UserSvg from "./UserSvg";
+import FavoriteSvg from "./FavoriteSvg";
+import OrderSvg from "./OrderSvg";
+import LocationSvg from "./LocationSvg";
 
 type Card = {
 	title: string;
-	icon: string;
+	icon: React.ReactNode;
 	id: number;
 };
 
 const items: Card[] = [
 	{
 		title: "Account Details",
-		icon: "img/account/user.svg",
+		icon: <UserSvg />,
 		id: 1
 	},
 	{
 		title: "Address",
-		icon: "img/account/location.svg",
+		icon: <LocationSvg />,
 		id: 2
 	},
 	{
 		title: "Orders",
-		icon: "img/account/order.svg",
+		icon: <OrderSvg />,
 		id: 3
 	},
 	{
 		title: "Wishlist",
-		icon: "img/account/favorite.svg",
+		icon: <FavoriteSvg />,
 		id: 4
 	}
 ];
 
 const SwitchBlock: React.FC = () => {
-	const [active, setActive] = useState<number | null>(null);
+	const [active, setActive] = useState<number | null>(1);
 
 	const handleActive = (id: number) => {
 		setActive(id === active ? null : id);
@@ -45,7 +51,7 @@ const SwitchBlock: React.FC = () => {
 					key={item.id}
 					onClick={() => handleActive(item.id)}
 					className={`${s.card} ${active === item.id ? s.cardActive : ""}`}>
-					<img src={item.icon} alt={item.title} width={20} height={20} />
+					{item.icon}
 					<p>{item.title}</p>
 				</div>
 			))}
