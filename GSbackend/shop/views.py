@@ -9,19 +9,27 @@ from rest_framework import status
 
 
 class CategoryView(APIView):
-    def post(self, request):
-        serializer = CategorySerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+    def get(self, request):
+        output = [
+            {
+                "id": output.id,
+                "name": output.username,
+            }
+            for output in Customer.objects.all()
+        ]
+        return Response(output)
 
 
 class SizeView(APIView):
-    def post(self, request):
-        serializer = SizeSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+    def get(self, request):
+        output = [
+            {
+                "id": output.id,
+                "name": output.username,
+            }
+            for output in Customer.objects.all()
+        ]
+        return Response(output)
 
 
 class CustomerView(APIView):
@@ -30,18 +38,11 @@ class CustomerView(APIView):
             {
                 "id": output.id,
                 "username": output.username,
-                "password": output.password,
                 "email": output.email,
             }
             for output in Customer.objects.all()
         ]
         return Response(output)
-
-    def post(self, request):
-        serializer = CustomerSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
 
 
 class ProductView(APIView):
