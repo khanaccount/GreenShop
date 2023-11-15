@@ -3,7 +3,7 @@
 .switchBlock {
 	background: $background;
 	width: 310px;
-
+	height: 100%;
 	h5 {
 		padding: 18px 0 18px 18px;
 		color: $mainColor;
@@ -27,7 +27,9 @@
 			line-height: 45px;
 		}
 
-		img {
+		svg {
+			width: 22px;
+			height: 22px;
 			margin-left: 18px;
 			margin-right: 11px;
 		}
@@ -39,8 +41,8 @@
 		p {
 			color: $secondaryColor;
 		}
-		img {
-			fill: green;
+		svg path {
+			fill: $secondaryColor;
 		}
 	}
 	.logOut {
