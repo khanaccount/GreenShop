@@ -6,7 +6,6 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
-from .renderers import CustomerJSONRenderer
 
 
 class CategoryView(APIView):
@@ -153,21 +152,21 @@ class RegistrationView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        serializer = RegistrationSerializer(data=request.data.get("user", {}))
+        serializer = RegistrationSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class LoginView(APIView):
-    permission_classes = (AllowAny,)
+# class LoginView(APIView):
+#     permission_classes = (AllowAny,)
 
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data.get("user", {}))
+#     def post(self, request):
+#         serializer = LoginSerializer(data=request.data)
 
-        if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_200_OK)
+#         if serializer.is_valid(raise_exception=True):
+#             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
@@ -181,7 +180,7 @@ class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         serializer = CustomerEditSerializer(
-            request.user, data=request.data.get("user", {}), partial=True
+            request.user, data=request.data, partial=True
         )
 
         if serializer.is_valid(raise_exception=True):

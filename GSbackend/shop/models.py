@@ -67,26 +67,26 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-    @property
-    def token(self):
-        return self._generate_jwt_token()
+    # @property
+    # def token(self):
+    #     return self._generate_jwt_token()
 
-    def get_full_name(self):
-        return self.username
+    # def get_full_name(self):
+    #     return self.username
 
-    def get_short_name(self):
-        return self.username
+    # def get_short_name(self):
+    #     return self.username
 
-    def _generate_jwt_token(self):
-        dt = datetime.now() + timedelta(days=1)
+    # def _generate_jwt_token(self):
+    #     dt = datetime.now() + timedelta(days=1)
 
-        token = jwt.encode(
-            {"id": self.id, "exp": int(dt.strftime("%S"))},
-            settings.SECRET_KEY,
-            algorithm="HS256",
-        )
+    #     token = jwt.encode(
+    #         {"id": self.pk, "exp": int((dt - datetime(1970, 1, 1)).total_seconds())},
+    #         settings.SECRET_KEY,
+    #         algorithm="HS256",
+    #     )
 
-        return token
+    #     return token
 
 
 class Product(models.Model):

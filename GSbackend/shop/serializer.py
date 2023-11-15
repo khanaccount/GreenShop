@@ -82,41 +82,38 @@ class ShippingAdressSerializer(serializers.ModelSerializer):
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
 
-    token = serializers.CharField(max_length=255, read_only=True)
-
     class Meta:
         model = Customer
 
-        fields = ["username", "email", "password", "token"]
+        fields = ["username", "email", "password"]
 
     def create(self, validated_data):
         return Customer.objects.create_user(**validated_data)
 
 
-class LoginSerializer(serializers.ModelSerializer):
-    email = serializers.CharField(max_length=255, read_only=True)
-    username = serializers.CharField(max_length=255)
-    password = serializers.CharField(min_length=8, max_length=128, write_only=True)
-    token = serializers.CharField(max_length=255, read_only=True)
+# class LoginSerializer(serializers.Serializer):
+#     username = serializers.CharField(max_length=255)
+#     password = serializers.CharField(min_length=8, max_length=128, write_only=True)
+#     token = serializers.CharField(max_length=255, read_only=True)
 
-    def validate(self, data):
-        username = data.get("username", None)
-        password = data.get("password", None)
+#     def validate(self, data):
+#         username = data.get("username", None)
+#         password = data.get("password", None)
 
-        if username is None:
-            raise serializers.ValidationError("An username is required to log in")
+#         if username is None:
+#             raise serializers.ValidationError("An username is required to log in")
 
-        if password is None:
-            raise serializers.ValidationError("A password is required to log in.")
+#         if password is None:
+#             raise serializers.ValidationError("A password is required to log in.")
 
-        user = authenticate(username=username, password=password)
+#         user = authenticate(username=username, password=password)
 
-        if user is None:
-            raise serializers.ValidationError(
-                "A user with this username and password was not found."
-            )
+#         if user is None:
+#             raise serializers.ValidationError(
+#                 "A user with this username and password was not found."
+#             )
 
-        return {"username": user.username, "email": user.email, "token": user.token}
+#         return {"username": user.username, "token": user.token}
 
 
 class CustomerEditSerializer(serializers.ModelSerializer):
