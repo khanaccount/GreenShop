@@ -61,8 +61,8 @@ class ProductView(APIView):
             {
                 "id": output.id,
                 "name": output.name,
-                "mainPrice": output.mainPrice,
-                "salePrice": output.salePrice,
+                "mainPrice": ProductSerializer(output).data.get("mainPrice"),
+                "salePrice": ProductSerializer(output).data.get("salePrice"),
                 "discount": output.discount,
                 "discountPercentage": output.discountPercentage,
                 "review": output.review,
