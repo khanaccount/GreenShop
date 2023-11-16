@@ -26,7 +26,7 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             "id",
-            "title",
+            "name",
             "mainPrice",
             "salePrice",
             "discount",
@@ -39,6 +39,24 @@ class ProductSerializer(serializers.ModelSerializer):
             "mainImg",
         ]
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        # Если очень хочется в одну строчку:
+        # representation["mainPrice"] = "$" + str(representation["mainPrice"]) + "0" if len(str(representation["mainPrice"]).split(".")[1]) == 1 else "$" + str(representation["mainPrice"])
+        mainPrice = "$" + str(representation["mainPrice"])
+        salePrice = "$" + str(representation["salePrice"])
+
+        if len(mainPrice.split(".")[1]) == 1:
+            mainPrice += "0"
+
+        if len(mainPrice.split(".")[1]) == 1:
+            mainPrice += "0"
+
+        representation["mainPrice"] = mainPrice
+        representation["salePrice"] = salePrice
+
+        return representation
+
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,7 +68,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "secondName",
             "phone",
             "date",
-            "status",
+            "isCompleted",
             "transactionId",
         ]
 
@@ -121,7 +139,7 @@ class CustomerEditSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ("username", "email", "password", "token")
+        fields = ("email", "password")
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)

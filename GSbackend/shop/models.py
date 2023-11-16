@@ -90,7 +90,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
 
 class Product(models.Model):
-    title = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
     mainPrice = models.FloatField()
     salePrice = models.FloatField(editable=False)
     review = models.IntegerField(default=0, editable=False)
@@ -107,7 +107,7 @@ class Product(models.Model):
     mainImg = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     def save(self):
         if self.sku == "":
@@ -132,11 +132,11 @@ class Order(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.SET_NULL, blank=True, null=True
     )
-    firstName = models.CharField(max_length=50)
-    secondName = models.CharField(max_length=50)
-    phone = models.CharField(max_length=50, default="", blank=True)
+    firstName = models.CharField(max_length=50, blank=True, null=True)
+    secondName = models.CharField(max_length=50, blank=True, null=True)
+    phone = models.CharField(max_length=50, default="", blank=True, null=True)
     date = models.DateField(auto_now_add=True)
-    status = models.BooleanField(default=False, null=True, blank=False)
+    isCompleted = models.BooleanField(default=False, blank=False)
     transactionId = models.CharField(max_length=200, null=True)
 
     def __str__(self):

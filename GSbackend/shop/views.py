@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import *
 from .serializer import *
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
@@ -46,23 +46,23 @@ class CustomerView(APIView):
 
 
 class ProductView(APIView):
-    def twoNulls(NULL, object, string):
-        objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
+    # def twoNulls(NULL, object, string):
+    #     objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
 
-        objectPrice = "$" + str(objectPrice)
+    #     objectPrice = "$" + str(objectPrice)
 
-        if len(objectPrice.split(".")[1]) == 1:
-            objectPrice += "0"
+    #     if len(objectPrice.split(".")[1]) == 1:
+    #         objectPrice += "0"
 
-        return objectPrice
+    #     return objectPrice
 
     def get(self, request):
         output = [
             {
                 "id": output.id,
-                "title": output.title,
-                "mainPrice": self.twoNulls(output, "mainPrice"),
-                "salePrice": self.twoNulls(output, "salePrice"),
+                "name": output.name,
+                "mainPrice": output.mainPrice,
+                "salePrice": output.salePrice,
                 "discount": output.discount,
                 "discountPercentage": output.discountPercentage,
                 "review": output.review,
@@ -84,6 +84,8 @@ class ProductView(APIView):
 
 
 class OrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         output = [
             {
@@ -93,7 +95,7 @@ class OrderView(APIView):
                 "secondName": output.secondName,
                 "phone": output.phone,
                 "date": output.date,
-                "status": output.status,
+                "isCompleted": output.isCompleted,
                 "transactionId": output.transactionId,
             }
             for output in Order.objects.all()
@@ -105,6 +107,27 @@ class OrderView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+
+
+class CartView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        customer = request.user
+        order, created = Order.objects.get_or_create(
+            customer=customer, isCompleted=False
+        )
+        orderItem = order.orderitem_set.all()
+        output = [
+            {
+                "id": output.id,
+                "name": ProductSerializer(output.product).data.get("name"),
+                "price": ProductSerializer(output.product).data.get("salePrice"),
+                "quantity": output.quantity,
+            }
+            for output in orderItem
+        ]
+        return Response(output)
 
 
 class OrderItemView(APIView):

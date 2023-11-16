@@ -16,9 +16,11 @@ urlpatterns = [
     path("shop/product/", ProductView.as_view()),
     path("shop/order/", OrderView.as_view()),
     path("shop/orderItem/", OrderItemView.as_view()),
+    path("shop/cart/", CartView.as_view()),
     path("shop/shippingAddress/", ShippingAddressView.as_view()),
     path("shop/registration/", RegistrationView.as_view()),
     path("shop/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("shop/edit/", CustomerRetrieveUpdateView.as_view()),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
