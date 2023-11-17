@@ -20,7 +20,7 @@ urlpatterns = [
     path("shop/shippingAddress/", ShippingAddressView.as_view()),
     path("shop/edit/", CustomerRetrieveUpdateView.as_view()),
     path("shop/registration/", RegistrationView.as_view()),
-    path("shop/login/", СustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("shop/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("shop/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("shop/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
