@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import s from "./index.module.scss";
-import axios from "axios"; // Импортируем axios или другую библиотеку для отправки запросов
+import { register } from "../../../api/auth";
 
 interface RegisterProps {
 	passwordVisible: boolean;
@@ -8,31 +8,57 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ passwordVisible, handleTogglePasswordVisibility }) => {
-	const [usernameOrEmail, setUsernameOrEmail] = useState("");
+	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
+	const [emailError, setEmailError] = useState(false);
+	const [usernameError, setUsernameError] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		if (password !== confirmPassword) {
 			alert("Passwords do not match!");
+		} else if (password.length < 8) {
+			alert("Password should be at least 8 characters long!");
 		} else {
 			try {
-				const response = await axios.post("http://localhost:8000/shop/registration/", {
-					usernameOrEmail,
-					email,
-					password
-				});
-				const token = response.data.token; // Предполагается, что сервер вернет токен в ответе
-				alert("Registration successful. Token received: " + token);
-				// Здесь можно сохранить токен в localStorage или использовать в приложении
-			} catch (error) {
-				console.error("Registration failed:", error);
-				alert("Registration failed. Please try again.");
-				// Обработка ошибок регистрации
+				await register({ username, email, password });
+				console.log(register);
+			} catch (error: any) {
+				if (error.response && error.response.data && error.response.data.errors) {
+					const errors = error.response.data.errors;
+					if (errors.username) {
+						setUsernameError(true);
+					}
+					if (errors.email) {
+						setEmailError(true);
+					}
+				}
 			}
+		}
+	};
+
+	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setUsername(e.target.value);
+		setUsernameError(false);
+	};
+
+	const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setEmail(e.target.value);
+		setEmailError(false);
+	};
+
+	const handleUsernameBlur = () => {
+		if (usernameError) {
+			setUsernameError(false);
+		}
+	};
+
+	const handleEmailBlur = () => {
+		if (emailError) {
+			setEmailError(false);
 		}
 	};
 
@@ -40,19 +66,26 @@ const Register: React.FC<RegisterProps> = ({ passwordVisible, handleTogglePasswo
 		<div className={s.register}>
 			<p>Enter your email and password to register.</p>
 			<form className={s.form} onSubmit={handleSubmit}>
+				{usernameError && <p className={s.errorText}>Invalid username</p>}
 				<input
 					type="text"
-					name="usernameOrEmail"
+					name="username"
 					placeholder="Username"
-					value={usernameOrEmail}
-					onChange={(e) => setUsernameOrEmail(e.target.value)}
+					value={username}
+					onBlur={handleUsernameBlur}
+					className={usernameError ? s.inputErr : ""}
+					onChange={handleUsernameChange}
 				/>
+
+				{emailError && <p className={s.errorText}>Invalid email</p>}
 				<input
 					type="text"
 					name="Email"
 					placeholder="Enter your email address"
 					value={email}
-					onChange={(e) => setEmail(e.target.value)}
+					onBlur={handleEmailBlur}
+					onChange={handleEmailChange}
+					className={emailError ? s.inputErr : ""}
 				/>
 				<div className={s.passwordContainer}>
 					<input

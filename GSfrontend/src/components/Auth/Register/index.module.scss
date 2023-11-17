@@ -19,7 +19,7 @@
 	input {
 		width: 300px;
 		padding: 12px;
-		outline: none;
+		outline: $secondaryColor;
 		border-radius: 5px;
 		border: 1px solid #eaeaea;
 		&:not(:last-child) {
@@ -57,6 +57,15 @@
 			top: 10px;
 			cursor: pointer;
 		}
+	}
+	.inputErr {
+		border: 1px solid red;
+		outline: red !important;
+		margin-bottom: 5px !important;
+	}
+
+	.errorText {
+		color: red;
 	}
 
 	.loginOption {

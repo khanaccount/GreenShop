@@ -57,6 +57,10 @@ const Header: React.FC = () => {
 					<span>6</span>
 				</div>
 
+				<div>
+					<img width={27} src="img/header/user.svg" alt="user" />
+				</div>
+
 				<button onClick={handleToggleAuthModal}>
 					<img width={27} src="img/header/login.svg" alt="login" />
 					<p>Login</p>
