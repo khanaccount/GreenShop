@@ -239,7 +239,7 @@ class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CustomTokenObtainPairView(TokenObtainPairView):
+class СustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         response = super.post(request, *args, **kwargs)
 
