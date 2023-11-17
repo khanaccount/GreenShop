@@ -1,5 +1,6 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { isUserLoggedIn } from "./api/auth";
 
 import { Home } from "./pages/Home";
 import { Account } from "./pages/Account";
@@ -9,7 +10,10 @@ const App: React.FC = () => {
 		<>
 			<Routes>
 				<Route index path="/" element={<Home />} />
-				<Route index path="/account" element={<Account />} />
+				<Route
+					path="/account"
+					element={isUserLoggedIn() ? <Account /> : <Navigate to="/" replace={true} />}
+				/>
 			</Routes>
 		</>
 	);

@@ -50,6 +50,7 @@ export const login = async (userData: LoginData): Promise<void> => {
 		if (access && refresh) {
 			localStorage.setItem("accessToken", access);
 			localStorage.setItem("refreshToken", refresh);
+			console.log(`accsess JWT Токен=${access}`, `refresh JWT Токен=${refresh}`);
 			// Другая логика после сохранения токенов, например, перенаправление на другую страницу
 			// history.push("/dashboard");
 		} else {
@@ -67,4 +68,9 @@ export const isUserLoggedIn = (): boolean => {
 	const accessToken = localStorage.getItem("accessToken");
 	const refreshToken = localStorage.getItem("refreshToken");
 	return !!accessToken && !!refreshToken;
+};
+
+export const logout = (): void => {
+	localStorage.removeItem("accessToken");
+	localStorage.removeItem("refreshToken");
 };
