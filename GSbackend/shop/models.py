@@ -1,6 +1,6 @@
 from django.db import models
 import jwt
-
+from django.core.validators import RegexValidator
 from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -53,8 +53,27 @@ class Size(models.Model):
 
 
 class Customer(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=100, unique=True)
-    password = models.CharField(max_length=25)
+    username = models.CharField(
+        max_length=100,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r"^[a-zA-Z0-9][a-zA-Z0-9_]*$",
+                message=("Invalid username"),
+                code="invalid_username",
+            ),
+        ],
+    )
+    password = models.CharField(
+        max_length=25,
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Za-z\d!@#$%^&*()_+]+$",
+                message=("Invalid password"),
+                code="invalid_password",
+            ),
+        ],
+    )
     email = models.EmailField(max_length=50, unique=True)
 
     is_staff = models.BooleanField(default=False)
