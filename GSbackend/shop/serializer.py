@@ -74,6 +74,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    quantity = serializers.IntegerField(default=1)
+
     class Meta:
         model = OrderItem
         fields = [
@@ -82,6 +84,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "order",
             "quantity",
         ]
+
+    def update(self, instance, validated_data):
+        instance.quantity = validated_data.quantity
+        instance.save()
+        return instance
 
 
 class ShippingAdressSerializer(serializers.ModelSerializer):

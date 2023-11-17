@@ -33,16 +33,22 @@ class SizeView(APIView):
 
 
 class CustomerView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # def get(self, request):
+    #     output = [
+    #         {
+    #             "id": output.id,
+    #             "username": output.username,
+    #             "email": output.email,
+    #         }
+    #         for output in Customer.objects.all()
+    #     ]
+    #     return Response(output)
+
     def get(self, request):
-        output = [
-            {
-                "id": output.id,
-                "username": output.username,
-                "email": output.email,
-            }
-            for output in Customer.objects.all()
-        ]
-        return Response(output)
+        customer = request.user
+        return Response(CustomerSerializer(customer).data)
 
 
 class ProductView(APIView):
@@ -131,6 +137,8 @@ class CartView(RetrieveUpdateDestroyAPIView):
 
 
 class OrderItemView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         output = [
             {
@@ -144,10 +152,29 @@ class OrderItemView(APIView):
         return Response(output)
 
     def post(self, request):
-        serializer = OrderItemSerializer(data=request.data)
+        customer = request.user
+        product = Product.objects.get(id=request.idProduct)
+        order, created = Order.objects.get_or_create(
+            customer=customer, isCompleted=False
+        )
+
+        data = {
+            "product": product.pk,
+            "order": order.pk,
+        }
+
+        serializer = OrderItemSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(serializer.data)
+            return Response(data)
+
+    def put(self, request):
+        instance = OrderItem.objects.get(id=request.idItem)
+        serializer = OrderItemSerializer(data=request.data, instance=instance)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ShippingAddressView(APIView):
@@ -194,8 +221,7 @@ class RegistrationView(APIView):
 
 
 class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = CustomerEditSerializer
+    permission_classes = [IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
         serializer = CustomerEditSerializer(request.user)
