@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../../api/auth";
 
 import s from "./index.module.scss";
 
@@ -44,6 +46,8 @@ type SwitchBlockProps = {
 const SwitchBlock: React.FC<SwitchBlockProps> = ({ showAddress, showDetails }) => {
 	const [active, setActive] = useState<number | null>(1);
 
+	const navigate = useNavigate();
+
 	const handleActive = (id: number) => {
 		setActive(id);
 		if (id === 1) {
@@ -53,6 +57,10 @@ const SwitchBlock: React.FC<SwitchBlockProps> = ({ showAddress, showDetails }) =
 		}
 	};
 
+	const handleLogout = () => {
+		logout(); // Выход из аккаунта
+		navigate("/"); // Перенаправление на главную страницу
+	};
 	return (
 		<div className={s.switchBlock}>
 			<h5>My Account</h5>
@@ -67,7 +75,7 @@ const SwitchBlock: React.FC<SwitchBlockProps> = ({ showAddress, showDetails }) =
 			))}
 
 			<div className={s.logOut}>
-				<button>
+				<button onClick={handleLogout}>
 					<img width={20} height={20} src="img/account/logout.svg" alt="logOut" />
 					<p>Logout</p>
 				</button>

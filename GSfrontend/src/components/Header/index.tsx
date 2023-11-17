@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { isUserLoggedIn } from "../../api/auth";
 
 import s from "./index.module.scss";
 import Login from "../Auth/Login";
@@ -22,6 +23,9 @@ const Header: React.FC = () => {
 
 	const handleToggleAuthModal = () => {
 		setAuthModalVisible((prev) => !prev);
+	};
+	const handleLoginSuccess = () => {
+		setAuthModalVisible(false); // Закрыть модальное окно при успешном входе
 	};
 
 	return (
@@ -56,15 +60,16 @@ const Header: React.FC = () => {
 					<img width={27} height={27} src="img/header/cart.svg" alt="cart" />
 					<span>6</span>
 				</div>
-
-				<div>
-					<img width={27} src="img/header/user.svg" alt="user" />
-				</div>
-
-				<button onClick={handleToggleAuthModal}>
-					<img width={27} src="img/header/login.svg" alt="login" />
-					<p>Login</p>
-				</button>
+				{isUserLoggedIn() ? (
+					<Link to="/account">
+						<img width={27} src="img/header/user.svg" alt="user" />
+					</Link>
+				) : (
+					<button onClick={handleToggleAuthModal}>
+						<img width={27} src="img/header/login.svg" alt="login" />
+						<p>Login</p>
+					</button>
+				)}
 
 				{authModalVisible && (
 					<div className={s.authBg}>
@@ -91,6 +96,7 @@ const Header: React.FC = () => {
 							</div>
 							{activeMethod === "login" && (
 								<Login
+									onLoginSuccess={handleLoginSuccess}
 									passwordVisible={passwordVisible}
 									handleTogglePasswordVisibility={handleTogglePasswordVisibility}
 								/>

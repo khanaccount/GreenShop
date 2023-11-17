@@ -25,10 +25,20 @@ export const register = async (userData: RegisterData): Promise<void> => {
 			password
 		});
 		// Обработка успешной регистрации, если необходимо
-	} catch (error) {
-		// Обработка ошибок регистрации
-		console.error("Registration error:", error);
-		throw new Error("Registration failed");
+	} catch (error: any) {
+		if (error.response && error.response.data && error.response.data.errors) {
+			const { errors } = error.response.data;
+			if (errors.username && errors.username.length > 0) {
+				const usernameError = errors.username[0];
+				alert(`Error - Username: ${usernameError}`);
+			}
+			if (errors.email && errors.email.length > 0) {
+				const emailError = errors.email[0];
+				alert(`Error - Email: ${emailError}`);
+			}
+		} else {
+			console.error("Unexpected error occurred:", error);
+		}
 	}
 };
 
@@ -40,6 +50,7 @@ export const login = async (userData: LoginData): Promise<void> => {
 		if (access && refresh) {
 			localStorage.setItem("accessToken", access);
 			localStorage.setItem("refreshToken", refresh);
+			console.log(`accsess JWT Токен=${access}`, `refresh JWT Токен=${refresh}`);
 			// Другая логика после сохранения токенов, например, перенаправление на другую страницу
 			// history.push("/dashboard");
 		} else {
@@ -57,4 +68,9 @@ export const isUserLoggedIn = (): boolean => {
 	const accessToken = localStorage.getItem("accessToken");
 	const refreshToken = localStorage.getItem("refreshToken");
 	return !!accessToken && !!refreshToken;
+};
+
+export const logout = (): void => {
+	localStorage.removeItem("accessToken");
+	localStorage.removeItem("refreshToken");
 };

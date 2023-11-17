@@ -1,14 +1,18 @@
 import React, { useState } from "react";
-import axios from "axios";
-
 import s from "./index.module.scss";
+import { login } from "../../../api/auth";
 
 interface LoginProps {
 	passwordVisible: boolean;
 	handleTogglePasswordVisibility: () => void;
+	onLoginSuccess: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ passwordVisible, handleTogglePasswordVisibility }) => {
+const Login: React.FC<LoginProps> = ({
+	passwordVisible,
+	handleTogglePasswordVisibility,
+	onLoginSuccess
+}) => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -16,23 +20,12 @@ const Login: React.FC<LoginProps> = ({ passwordVisible, handleTogglePasswordVisi
 		e.preventDefault();
 
 		try {
-			const response = await axios.post("http://localhost:8000/shop/login/", {
-				username,
-				password
-			});
+			// Используйте функцию login из вашего файла auth.ts
+			await login({ username, password });
 
-			const { access, refresh } = response.data; // Получение обоих токенов из ответа сервера
-			console.log(access, refresh);
-
-			if (access && refresh) {
-				localStorage.setItem("accessToken", access);
-				localStorage.setItem("refreshToken", refresh);
-
-				// Другая логика после сохранения токенов, например, перенаправление на другую страницу
-				// history.push("/dashboard");
-			} else {
-				console.error("Tokens are missing in the response");
-			}
+			// Логика после успешного входа, например, перенаправление на другую страницу
+			// history.push("/dashboard");
+			onLoginSuccess();
 		} catch (error) {
 			console.error("Login error:", error);
 			// Обработка ошибок входа в систему
