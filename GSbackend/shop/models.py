@@ -67,30 +67,30 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-    @property
-    def token(self):
-        return self._generate_jwt_token()
+    # @property
+    # def token(self):
+    #     return self._generate_jwt_token()
 
-    def get_full_name(self):
-        return self.username
+    # def get_full_name(self):
+    #     return self.username
 
-    def get_short_name(self):
-        return self.username
+    # def get_short_name(self):
+    #     return self.username
 
-    def _generate_jwt_token(self):
-        dt = datetime.now() + timedelta(days=1)
+    # def _generate_jwt_token(self):
+    #     dt = datetime.now() + timedelta(days=1)
 
-        token = jwt.encode(
-            {"id": self.id, "exp": int(dt.strftime("%S"))},
-            settings.SECRET_KEY,
-            algorithm="HS256",
-        )
+    #     token = jwt.encode(
+    #         {"id": self.pk, "exp": int((dt - datetime(1970, 1, 1)).total_seconds())},
+    #         settings.SECRET_KEY,
+    #         algorithm="HS256",
+    #     )
 
-        return token
+    #     return token
 
 
 class Product(models.Model):
-    title = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
     mainPrice = models.FloatField()
     salePrice = models.FloatField(editable=False)
     review = models.IntegerField(default=0, editable=False)
@@ -107,7 +107,7 @@ class Product(models.Model):
     mainImg = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     def save(self):
         if self.sku == "":
@@ -132,11 +132,11 @@ class Order(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.SET_NULL, blank=True, null=True
     )
-    firstName = models.CharField(max_length=50)
-    secondName = models.CharField(max_length=50)
-    phone = models.CharField(max_length=50, default="", blank=True)
+    firstName = models.CharField(max_length=50, blank=True, null=True)
+    secondName = models.CharField(max_length=50, blank=True, null=True)
+    phone = models.CharField(max_length=50, default="", blank=True, null=True)
     date = models.DateField(auto_now_add=True)
-    status = models.BooleanField(default=False, null=True, blank=False)
+    isCompleted = models.BooleanField(default=False, blank=False)
     transactionId = models.CharField(max_length=200, null=True)
 
     def __str__(self):

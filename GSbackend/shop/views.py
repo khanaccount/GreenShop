@@ -2,27 +2,34 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import *
 from .serializer import *
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
-from .renderers import CustomerJSONRenderer
 
 
 class CategoryView(APIView):
-    def post(self, request):
-        serializer = CategorySerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+    def get(self, request):
+        output = [
+            {
+                "id": output.id,
+                "name": output.username,
+            }
+            for output in Customer.objects.all()
+        ]
+        return Response(output)
 
 
 class SizeView(APIView):
-    def post(self, request):
-        serializer = SizeSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+    def get(self, request):
+        output = [
+            {
+                "id": output.id,
+                "name": output.username,
+            }
+            for output in Customer.objects.all()
+        ]
+        return Response(output)
 
 
 class CustomerView(APIView):
@@ -31,38 +38,31 @@ class CustomerView(APIView):
             {
                 "id": output.id,
                 "username": output.username,
-                "password": output.password,
                 "email": output.email,
             }
             for output in Customer.objects.all()
         ]
         return Response(output)
 
-    def post(self, request):
-        serializer = CustomerSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
-
 
 class ProductView(APIView):
-    def twoNulls(NULL, object, string):
-        objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
+    # def twoNulls(NULL, object, string):
+    #     objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
 
-        objectPrice = "$" + str(objectPrice)
+    #     objectPrice = "$" + str(objectPrice)
 
-        if len(objectPrice.split(".")[1]) == 1:
-            objectPrice += "0"
+    #     if len(objectPrice.split(".")[1]) == 1:
+    #         objectPrice += "0"
 
-        return objectPrice
+    #     return objectPrice
 
     def get(self, request):
         output = [
             {
                 "id": output.id,
-                "title": output.title,
-                "mainPrice": self.twoNulls(output, "mainPrice"),
-                "salePrice": self.twoNulls(output, "salePrice"),
+                "name": output.name,
+                "mainPrice": ProductSerializer(output).data.get("mainPrice"),
+                "salePrice": ProductSerializer(output).data.get("salePrice"),
                 "discount": output.discount,
                 "discountPercentage": output.discountPercentage,
                 "review": output.review,
@@ -84,6 +84,8 @@ class ProductView(APIView):
 
 
 class OrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         output = [
             {
@@ -93,7 +95,7 @@ class OrderView(APIView):
                 "secondName": output.secondName,
                 "phone": output.phone,
                 "date": output.date,
-                "status": output.status,
+                "isCompleted": output.isCompleted,
                 "transactionId": output.transactionId,
             }
             for output in Order.objects.all()
@@ -105,6 +107,27 @@ class OrderView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+
+
+class CartView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        customer = request.user
+        order, created = Order.objects.get_or_create(
+            customer=customer, isCompleted=False
+        )
+        orderItem = order.orderitem_set.all()
+        output = [
+            {
+                "id": output.id,
+                "name": ProductSerializer(output.product).data.get("name"),
+                "price": ProductSerializer(output.product).data.get("salePrice"),
+                "quantity": output.quantity,
+            }
+            for output in orderItem
+        ]
+        return Response(output)
 
 
 class OrderItemView(APIView):
@@ -153,21 +176,21 @@ class RegistrationView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        serializer = RegistrationSerializer(data=request.data.get("user", {}))
+        serializer = RegistrationSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class LoginView(APIView):
-    permission_classes = (AllowAny,)
+# class LoginView(APIView):
+#     permission_classes = (AllowAny,)
 
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data.get("user", {}))
+#     def post(self, request):
+#         serializer = LoginSerializer(data=request.data)
 
-        if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_200_OK)
+#         if serializer.is_valid(raise_exception=True):
+#             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
@@ -181,7 +204,7 @@ class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         serializer = CustomerEditSerializer(
-            request.user, data=request.data.get("user", {}), partial=True
+            request.user, data=request.data, partial=True
         )
 
         if serializer.is_valid(raise_exception=True):

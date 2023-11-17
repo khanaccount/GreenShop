@@ -1,23 +1,19 @@
-import json
+# import json
 
-from rest_framework.renderers import JSONRenderer
+# from rest_framework.renderers import JSONRenderer
 
 
-class CustomerJSONRenderer(JSONRenderer):
-    charset = "utf-8"
+# class CustomerJSONRenderer(JSONRenderer):
+#     charset = "utf-8"
 
-    def render(self, data, media_type=None, renderer_context=None):
-        errors = data.get("errors", None)
-        token = data.get("token", None)
+#     def render(self, data, media_type=None, renderer_context=None):
+#         errors = data.get("errors", None)
+#         token = data.get("token", None)
 
-        if errors is not None:
-            return super(CustomerJSONRenderer, self).render(data)
+#         if errors is not None:
+#             return super(CustomerJSONRenderer, self).render(data)
 
-        if token is not None and isinstance(token, bytes):
-            data["token"] = token.decode("utf-8")
+#         if token is not None and isinstance(token, bytes):
+#             data["token"] = token.decode("utf-8")
 
-        return json.dumps(
-            {
-                "user": data,
-            }
-        )
+#         return json.dumps(data)
