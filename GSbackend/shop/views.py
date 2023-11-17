@@ -6,6 +6,7 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveUpdateDestroy
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class CategoryView(APIView):
@@ -33,16 +34,22 @@ class SizeView(APIView):
 
 
 class CustomerView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # def get(self, request):
+    #     output = [
+    #         {
+    #             "id": output.id,
+    #             "username": output.username,
+    #             "email": output.email,
+    #         }
+    #         for output in Customer.objects.all()
+    #     ]
+    #     return Response(output)
+
     def get(self, request):
-        output = [
-            {
-                "id": output.id,
-                "username": output.username,
-                "email": output.email,
-            }
-            for output in Customer.objects.all()
-        ]
-        return Response(output)
+        customer = request.user
+        return Response(CustomerSerializer(customer).data)
 
 
 class ProductView(APIView):
@@ -131,6 +138,8 @@ class CartView(RetrieveUpdateDestroyAPIView):
 
 
 class OrderItemView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         output = [
             {
@@ -144,10 +153,29 @@ class OrderItemView(APIView):
         return Response(output)
 
     def post(self, request):
-        serializer = OrderItemSerializer(data=request.data)
+        customer = request.user
+        product = Product.objects.get(id=request.idProduct)
+        order, created = Order.objects.get_or_create(
+            customer=customer, isCompleted=False
+        )
+
+        data = {
+            "product": product.pk,
+            "order": order.pk,
+        }
+
+        serializer = OrderItemSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(serializer.data)
+            return Response(data)
+
+    def put(self, request):
+        instance = OrderItem.objects.get(id=request.idItem)
+        serializer = OrderItemSerializer(data=request.data, instance=instance)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ShippingAddressView(APIView):
@@ -194,8 +222,7 @@ class RegistrationView(APIView):
 
 
 class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = CustomerEditSerializer
+    permission_classes = [IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
         serializer = CustomerEditSerializer(request.user)
@@ -210,3 +237,20 @@ class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class СustomTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        response = super.post(request, *args, **kwargs)
+
+        if response.status_code == status.HTTP_200_OK:
+            return response
+
+        if "non_field_errors" in response.data:
+            error_message = "Неверный username или password"
+            return Response(
+                {"errors": [{"error": error_message}]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return response
