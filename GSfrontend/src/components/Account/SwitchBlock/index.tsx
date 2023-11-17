@@ -36,11 +36,21 @@ const items: Card[] = [
 	}
 ];
 
-const SwitchBlock: React.FC = () => {
+type SwitchBlockProps = {
+	showDetails: () => void;
+	showAddress: () => void;
+};
+
+const SwitchBlock: React.FC<SwitchBlockProps> = ({ showAddress, showDetails }) => {
 	const [active, setActive] = useState<number | null>(1);
 
 	const handleActive = (id: number) => {
-		setActive(id === active ? null : id);
+		setActive(id);
+		if (id === 1) {
+			showDetails(); // Show Details when Account Details is clicked
+		} else if (id === 2) {
+			showAddress(); // Show Address when Address is clicked
+		}
 	};
 
 	return (

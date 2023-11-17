@@ -2,6 +2,8 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import s from "./index.module.scss";
+import Login from "../Auth/Login";
+import Register from "../Auth/Register";
 
 const Header: React.FC = () => {
 	const location = useLocation();
@@ -84,79 +86,16 @@ const Header: React.FC = () => {
 								</h5>
 							</div>
 							{activeMethod === "login" && (
-								<div className={s.login}>
-									<p>Enter your username and password to login.</p>
-									<form className={s.form}>
-										<input type="text" name="usernameOrEmail" placeholder="Enter your login" />
-										<div className={s.passwordContainer}>
-											<input
-												type={passwordVisible ? "text" : "password"}
-												name="password"
-												placeholder="Password"
-											/>
-											<img
-												src={passwordVisible ? "img/header/eyeClose.svg" : "img/header/eye.svg"}
-												width={24}
-												alt="eye"
-												onClick={handleTogglePasswordVisibility}
-											/>
-										</div>
-										<a href="///" className={s.forgot}>
-											Forgot Password?
-										</a>
-										<button type="submit">Login</button>
-									</form>
-									<p className={s.loginOption}>Or login with</p>
-									<div className={s.anotherMethods}>
-										<button>
-											<img src="img/header/google.svg" alt="google" />
-											<p>Login with Google</p>
-										</button>
-										<button>
-											<img src="img/header/facebook.svg" alt="facebook" />
-											<p>Login with Facebook</p>
-										</button>
-									</div>
-								</div>
+								<Login
+									passwordVisible={passwordVisible}
+									handleTogglePasswordVisibility={handleTogglePasswordVisibility}
+								/>
 							)}
 							{activeMethod === "register" && (
-								<div className={s.login}>
-									<p>Enter your email and password to register.</p>
-									<form className={s.form}>
-										<input type="text" name="usernameOrEmail" placeholder="Username" />
-										<input type="text" name="Email" placeholder="Enter your email address" />
-										<div className={s.passwordContainer}>
-											<input
-												type={passwordVisible ? "text" : "password"}
-												name="password"
-												placeholder="Password"
-											/>
-											<img
-												src={passwordVisible ? "img/header/eyeClose.svg" : "img/header/eye.svg"}
-												width={24}
-												alt="eye"
-												onClick={handleTogglePasswordVisibility}
-											/>
-										</div>
-										<input
-											type={passwordVisible ? "text" : "password"}
-											name="сonfirmPassword"
-											placeholder="Confirm Password"
-										/>
-										<button type="submit">Register</button>
-									</form>
-									<p className={s.loginOption}>Or login with</p>
-									<div className={s.anotherMethods}>
-										<button>
-											<img src="img/header/google.svg" alt="google" />
-											<p>Login with Google</p>
-										</button>
-										<button>
-											<img src="img/header/facebook.svg" alt="facebook" />
-											<p>Login with Facebook</p>
-										</button>
-									</div>
-								</div>
+								<Register
+									passwordVisible={passwordVisible}
+									handleTogglePasswordVisibility={handleTogglePasswordVisibility}
+								/>
 							)}
 						</div>
 					</div>
