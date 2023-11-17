@@ -25,17 +25,11 @@ const Register: React.FC<RegisterProps> = ({ passwordVisible, handleTogglePasswo
 		} else {
 			try {
 				await register({ username, email, password });
-				console.log(register);
-			} catch (error: any) {
-				if (error.response && error.response.data && error.response.data.errors) {
-					const errors = error.response.data.errors;
-					if (errors.username) {
-						setUsernameError(true);
-					}
-					if (errors.email) {
-						setEmailError(true);
-					}
-				}
+				// Очистка ошибок, если регистрация прошла успешно
+				setUsernameError(false);
+				setEmailError(false);
+			} catch (error) {
+				alert(error);
 			}
 		}
 	};
@@ -51,15 +45,12 @@ const Register: React.FC<RegisterProps> = ({ passwordVisible, handleTogglePasswo
 	};
 
 	const handleUsernameBlur = () => {
-		if (usernameError) {
-			setUsernameError(false);
-		}
+		setUsernameError(username.trim() === "");
 	};
 
 	const handleEmailBlur = () => {
-		if (emailError) {
-			setEmailError(false);
-		}
+		const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+		setEmailError(!isValidEmail);
 	};
 
 	return (
@@ -84,8 +75,8 @@ const Register: React.FC<RegisterProps> = ({ passwordVisible, handleTogglePasswo
 					placeholder="Enter your email address"
 					value={email}
 					onBlur={handleEmailBlur}
-					onChange={handleEmailChange}
 					className={emailError ? s.inputErr : ""}
+					onChange={handleEmailChange}
 				/>
 				<div className={s.passwordContainer}>
 					<input

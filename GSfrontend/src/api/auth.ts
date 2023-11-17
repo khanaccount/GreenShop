@@ -25,10 +25,20 @@ export const register = async (userData: RegisterData): Promise<void> => {
 			password
 		});
 		// Обработка успешной регистрации, если необходимо
-	} catch (error) {
-		// Обработка ошибок регистрации
-		console.error("Registration error:", error);
-		throw new Error("Registration failed");
+	} catch (error: any) {
+		if (error.response && error.response.data && error.response.data.errors) {
+			const { errors } = error.response.data;
+			if (errors.username && errors.username.length > 0) {
+				const usernameError = errors.username[0];
+				alert(`Error - Username: ${usernameError}`);
+			}
+			if (errors.email && errors.email.length > 0) {
+				const emailError = errors.email[0];
+				alert(`Error - Email: ${emailError}`);
+			}
+		} else {
+			console.error("Unexpected error occurred:", error);
+		}
 	}
 };
 
