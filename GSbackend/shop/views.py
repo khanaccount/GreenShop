@@ -46,23 +46,23 @@ class CustomerView(APIView):
 
 
 class ProductView(APIView):
-    # def twoNulls(NULL, object, string):
-    #     objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
+    def twoNulls(NULL, object, string):
+        objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
 
-    #     objectPrice = "$" + str(objectPrice)
+        objectPrice = "$" + str(objectPrice)
 
-    #     if len(objectPrice.split(".")[1]) == 1:
-    #         objectPrice += "0"
+        if len(objectPrice.split(".")[1]) == 1:
+            objectPrice += "0"
 
-    #     return objectPrice
+        return objectPrice
 
     def get(self, request):
         output = [
             {
                 "id": output.id,
                 "name": output.name,
-                "mainPrice": ProductSerializer(output).data.get("mainPrice"),
-                "salePrice": ProductSerializer(output).data.get("salePrice"),
+                "mainPrice": self.twoNulls(output, "mainPrice"),
+                "salePrice": self.twoNulls(output, "salePrice"),
                 "discount": output.discount,
                 "discountPercentage": output.discountPercentage,
                 "review": output.review,
