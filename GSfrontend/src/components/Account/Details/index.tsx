@@ -60,14 +60,6 @@ const Details: React.FC = () => {
 				</form>
 			</div>
 			<div className={s.userImgBlock}>
-				<form className={s.userName}>
-					<label htmlFor="username">
-						<p>
-							Username <span>*</span>
-						</p>
-						<input type="text" id="username" name="username" />
-					</label>
-				</form>
 				<div className={s.imgBlock}>
 					<p>
 						Photo <span>*</span>
