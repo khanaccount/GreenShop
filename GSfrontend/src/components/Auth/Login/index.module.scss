@@ -19,7 +19,7 @@
 	input {
 		width: 300px;
 		padding: 12px;
-		outline: none;
+		outline: $secondaryColor;
 		border-radius: 5px;
 		border: 1px solid #eaeaea;
 		&:not(:last-child) {
