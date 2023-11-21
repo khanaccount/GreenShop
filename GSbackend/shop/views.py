@@ -245,17 +245,17 @@ class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
 class TransactionViews(APIView):
     permission_classes = [IsAuthenticated]
 
-    # def get(self, request):
-    #     output = [
-    #         {
-    #             "order": OrderSerializer(output.order).data,
-    #             "shippingAddress": ShippingAdressSerializer(
-    #                 output.shippingAddress
-    #             ).data,
-    #         }
-    #         for output in Order.objects.filter(id=request.user["id"])
-    #     ]
-    #     return Response(output)
+    def get(self, request):
+        output = [
+            {
+                "order": OrderSerializer(output.order).data,
+                "shippingAddress": ShippingAdressSerializer(
+                    output.shippingAddress
+                ).data,
+            }
+            for output in Order.objects.filter(customer=request.user)
+        ]
+        return Response(output)
 
     def post(self, request):
         serializer = TransactionSerializer(data=request.data)
