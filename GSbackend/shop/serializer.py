@@ -86,7 +86,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        instance.quantity = validated_data.quantity
+        instance.quantity = validated_data.get("quantity")
         instance.save()
         return instance
 

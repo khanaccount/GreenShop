@@ -147,16 +147,31 @@ class Product(models.Model):
         super(Product, self).save()
 
 
-class Order(models.Model):
+class ShippingAddress(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.SET_NULL, blank=True, null=True
     )
     firstName = models.CharField(max_length=50, blank=True, null=True)
     secondName = models.CharField(max_length=50, blank=True, null=True)
+    streetAddress = models.CharField(max_length=200, null=False)
+    region = models.CharField(max_length=200, null=False)
+    city = models.CharField(max_length=200, null=False)
+
+    def __str__(self):
+        return self.streetAddress
+
+
+class Order(models.Model):
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET_NULL, blank=True, null=True
+    )
     phone = models.CharField(max_length=50, default="", blank=True, null=True)
     date = models.DateField(auto_now_add=True)
     isCompleted = models.BooleanField(default=False, blank=False)
-    transactionId = models.CharField(max_length=200, null=True)
+    transactionId = models.CharField(max_length=200, blank=True, null=True)
+    shippingAddress = models.ForeignKey(
+        ShippingAddress, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     def __str__(self):
         return str(self.id)
@@ -173,14 +188,12 @@ class OrderItem(models.Model):
         return f"{self.product}, {self.order}"
 
 
-class ShippingAddress(models.Model):
-    customer = models.ForeignKey(
-        Customer, on_delete=models.SET_NULL, blank=True, null=True
+class Transaction(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    shippingAddress = models.ForeignKey(
+        ShippingAddress, on_delete=models.SET_NULL, null=True
     )
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
-    streetAddress = models.CharField(max_length=200, null=False)
-    region = models.CharField(max_length=200, null=False)
-    city = models.CharField(max_length=200, null=False)
+    isComplete = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.streetAddress
+        return self.id

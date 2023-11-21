@@ -154,7 +154,7 @@ class OrderItemView(APIView):
 
     def post(self, request):
         customer = request.user
-        product = Product.objects.get(id=request.idProduct)
+        product = Product.objects.get(id=request.data["idProduct"])
         order, created = Order.objects.get_or_create(
             customer=customer, isCompleted=False
         )
@@ -169,12 +169,17 @@ class OrderItemView(APIView):
             serializer.save()
             return Response(data)
 
-    def put(self, request):
-        instance = OrderItem.objects.get(id=request.idItem)
-        serializer = OrderItemSerializer(data=request.data, instance=instance)
+    def put(self, request, *args, **kwargs):
+        try:
+            instance = OrderItem.objects.get(id=request.data["idOrderItem"])
+        except:
+            return Response({"error": "Object does not exists"})
 
+        serializer = OrderItemSerializer(
+            data=request.data, instance=instance, partial=True
+        )
         serializer.is_valid(raise_exception=True)
-        serializer.save
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
