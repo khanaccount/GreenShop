@@ -64,12 +64,8 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "customer",
-            "firstName",
-            "secondName",
-            "phone",
             "date",
             "isCompleted",
-            "transactionId",
         ]
 
 
@@ -94,14 +90,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class ShippingAdressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = [
-            "id",
-            "customer",
-            "order",
-            "streetAddress",
-            "region",
-            "city",
-        ]
+        fields = "__all__"
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -160,3 +149,9 @@ class CustomerEditSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = "__all__"

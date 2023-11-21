@@ -23,4 +23,5 @@ urlpatterns = [
     path("shop/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("shop/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("shop/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    path("shop/transaction/", TransactionViews.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

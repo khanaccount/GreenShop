@@ -98,12 +98,8 @@ class OrderView(APIView):
             {
                 "id": output.id,
                 "customer": CustomerSerializer(output.customer).data,
-                "firstName": output.firstName,
-                "secondName": output.secondName,
-                "phone": output.phone,
                 "date": output.date,
                 "isCompleted": output.isCompleted,
-                "transactionId": output.transactionId,
             }
             for output in Order.objects.all()
         ]
@@ -154,7 +150,7 @@ class OrderItemView(APIView):
 
     def post(self, request):
         customer = request.user
-        product = Product.objects.get(id=request.data["idProduct"])
+        product = Product.objects.get(id=request.data["product"])
         order, created = Order.objects.get_or_create(
             customer=customer, isCompleted=False
         )
@@ -163,6 +159,9 @@ class OrderItemView(APIView):
             "product": product.pk,
             "order": order.pk,
         }
+
+        if "quantity" in request.data:
+            data["quantity"] = request.data["quantity"]
 
         serializer = OrderItemSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
@@ -189,7 +188,6 @@ class ShippingAddressView(APIView):
             {
                 "id": output.id,
                 "customer": CustomerSerializer(output.customer).data,
-                "order": OrderSerializer(output.order).data,
                 "streetAddress": output.streetAddress,
                 "region": output.region,
                 "city": output.city,
@@ -242,3 +240,33 @@ class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TransactionViews(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # def get(self, request):
+    #     output = [
+    #         {
+    #             "order": OrderSerializer(output.order).data,
+    #             "shippingAddress": ShippingAdressSerializer(
+    #                 output.shippingAddress
+    #             ).data,
+    #         }
+    #         for output in Order.objects.filter(id=request.user["id"])
+    #     ]
+    #     return Response(output)
+
+    def post(self, request):
+        serializer = TransactionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            order = Order.objects.get(isCompleted=False, customer=request.user)
+            order.isCompleted = True
+            order.save()
+
+            serializer.save(order=order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Order.DoesNotExist:
+            return Response({"order": "Order not found"})
