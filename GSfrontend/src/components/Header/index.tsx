@@ -25,7 +25,7 @@ const Header: React.FC = () => {
 		setAuthModalVisible((prev) => !prev);
 	};
 	const handleLoginSuccess = () => {
-		setAuthModalVisible(false); // Закрыть модальное окно при успешном входе
+		setAuthModalVisible(false);
 	};
 
 	return (
