@@ -115,7 +115,7 @@ class Product(models.Model):
     review = models.IntegerField(default=0, editable=False)
     rating = models.FloatField(default=0, editable=False)
     discount = models.BooleanField(default=False)
-    discountPercentage = models.IntegerField()
+    discountPercentage = models.IntegerField(default=0)
     size = models.ForeignKey(
         Size, on_delete=models.SET_NULL, default=1, blank=True, null=True
     )
@@ -156,6 +156,7 @@ class ShippingAddress(models.Model):
     streetAddress = models.CharField(max_length=200, null=False)
     region = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
+    phone = models.CharField(max_length=50, default="", blank=True, null=True)
 
     def __str__(self):
         return self.streetAddress
@@ -165,13 +166,8 @@ class Order(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.SET_NULL, blank=True, null=True
     )
-    phone = models.CharField(max_length=50, default="", blank=True, null=True)
     date = models.DateField(auto_now_add=True)
     isCompleted = models.BooleanField(default=False, blank=False)
-    transactionId = models.CharField(max_length=200, blank=True, null=True)
-    shippingAddress = models.ForeignKey(
-        ShippingAddress, on_delete=models.SET_NULL, blank=True, null=True
-    )
 
     def __str__(self):
         return str(self.id)
@@ -193,7 +189,7 @@ class Transaction(models.Model):
     shippingAddress = models.ForeignKey(
         ShippingAddress, on_delete=models.SET_NULL, null=True
     )
-    isComplete = models.BooleanField(default=False)
+    isCompleted = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
