@@ -4,6 +4,7 @@ import { isUserLoggedIn } from "./api/auth";
 
 import { Home } from "./pages/Home";
 import { Account } from "./pages/Account";
+import { Shop } from "./pages/Shop";
 
 const App: React.FC = () => {
 	return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
 					path="/account"
 					element={isUserLoggedIn() ? <Account /> : <Navigate to="/" replace={true} />}
 				/>
+				<Route index path="/shop" element={<Shop />} />
 			</Routes>
 		</>
 	);

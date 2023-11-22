@@ -4,13 +4,13 @@ import Pagination from "../Pagination";
 import axios from "axios";
 
 type Goods = {
-	title: string;
+	name: string;
 	mainPrice: string;
 	salePrice: string;
 	mainImg: string;
 	discountPercentage: string;
 	discount: boolean;
-	id: number;	
+	id: number;
 };
 
 const Goods: React.FC = () => {
@@ -28,6 +28,7 @@ const Goods: React.FC = () => {
 	}, []);
 
 	const displayedItems = items.slice(startIndex, endIndex);
+	console.log(displayedItems);
 
 	return (
 		<div className={s.goods}>
@@ -35,7 +36,7 @@ const Goods: React.FC = () => {
 				{displayedItems.map((item) => (
 					<div key={item.id} className={s.card}>
 						<div className={s.cardImg}>
-							<img src={item.mainImg} alt={item.title} />{" "}
+							<img src={item.mainImg} alt={item.name} />{" "}
 							{item.discount ? <p className={s.discount}>{item.discountPercentage}% OFF</p> : null}
 							<div className={s.hoverLinks}>
 								<a href="">
@@ -47,7 +48,7 @@ const Goods: React.FC = () => {
 							</div>
 						</div>
 						<div className={s.goodsInfo}>
-							<p className={s.goodsName}>{item.title}</p>
+							<p className={s.goodsName}>{item.name}</p>
 							<div className={s.goodsPrices}>
 								<p className={s.main}>{item.salePrice}</p>
 								{item.discount ? <p className={s.sale}>{item.mainPrice}</p> : null}

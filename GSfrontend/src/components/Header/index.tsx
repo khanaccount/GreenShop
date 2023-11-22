@@ -40,7 +40,7 @@ const Header: React.FC = () => {
 					</Link>
 				</li>
 				<li>
-					<Link className={location.pathname === "/shop" ? s.active : ""} to="">
+					<Link className={location.pathname === "/shop" ? s.active : ""} to="/shop">
 						Shop
 					</Link>
 				</li>
@@ -62,7 +62,7 @@ const Header: React.FC = () => {
 				</div>
 				{isUserLoggedIn() ? (
 					<Link to="/account">
-						<img width={27} src="img/header/user.svg" alt="user" />
+						<img width={28} src="img/header/user.svg" alt="user" />
 					</Link>
 				) : (
 					<button onClick={handleToggleAuthModal}>
