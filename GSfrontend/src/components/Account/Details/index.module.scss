@@ -33,6 +33,7 @@
 
 	.emailNumberBlock {
 		display: flex;
+		align-items: center;
 
 		.email {
 			margin-right: 28px;
@@ -41,7 +42,6 @@
 
 	.userImgBlock {
 		display: flex;
-		margin-top: 30px;
 
 		.userImg {
 			top: 0;

@@ -29,6 +29,7 @@ const Details: React.FC = () => {
 						// Здесь можно добавить другую логику, например, сбросить ввод или показать сообщение об ошибке.
 					}
 				};
+				setImageSrc(imageSrc);
 			};
 			reader.readAsDataURL(file);
 		}
@@ -50,54 +51,47 @@ const Details: React.FC = () => {
 						<input type="text" id="email" name="email" />
 					</label>
 				</form>
-				<form className={s.number}>
-					<label htmlFor="phoneNumber">
+				<div className={s.userImgBlock}>
+					<div className={s.imgBlock}>
 						<p>
-							Phone Number <span>*</span>
+							Photo <span>*</span>
 						</p>
-						<input type="text" id="phoneNumber" name="phoneNumber" />
-					</label>
-				</form>
-			</div>
-			<div className={s.userImgBlock}>
-				<div className={s.imgBlock}>
-					<p>
-						Photo <span>*</span>
-					</p>
-					<div className={s.imgBtnBlock}>
-						<div className={s.img}>
-							{imageSrc ? (
-								<div className={s.img}>
-									<img src="img/account/cyrcle.svg" alt="cyrcle" />
-									<img src="img/account/border.svg" alt="border" />
-									<img className={s.userImg} src={imageSrc} alt="User" />
-								</div>
-							) : (
-								<div className={s.img}>
-									<img src="img/account/cyrcle.svg" alt="cyrcle" />
-									<img src="img/account/border.svg" alt="border" />
-									<img className={s.choiceImg} src="img/account/img.svg" alt="img" />
-								</div>
-							)}
-						</div>
-						<div className={s.choiceBtn}>
-							<label htmlFor="upload-photo" className={s.changeBtn}>
-								Change
-							</label>
-							<input
-								type="file"
-								accept="image/*"
-								id="upload-photo"
-								style={{ display: "none" }}
-								onChange={handleImageChange}
-							/>
-							<button className={s.removeBtn} onClick={handleImageRemove}>
-								Remove
-							</button>
+						<div className={s.imgBtnBlock}>
+							<div className={s.img}>
+								{imageSrc ? (
+									<div className={s.img}>
+										<img src="img/account/cyrcle.svg" alt="cyrcle" />
+										<img src="img/account/border.svg" alt="border" />
+										<img className={s.userImg} src={imageSrc} alt="User" />
+									</div>
+								) : (
+									<div className={s.img}>
+										<img src="img/account/cyrcle.svg" alt="cyrcle" />
+										<img src="img/account/border.svg" alt="border" />
+										<img className={s.choiceImg} src="img/account/img.svg" alt="img" />
+									</div>
+								)}
+							</div>
+							<div className={s.choiceBtn}>
+								<label htmlFor="upload-photo" className={s.changeBtn}>
+									Change
+								</label>
+								<input
+									type="file"
+									accept="image/*"
+									id="upload-photo"
+									style={{ display: "none" }}
+									onChange={handleImageChange}
+								/>
+								<button className={s.removeBtn} onClick={handleImageRemove}>
+									Remove
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+
 			<div className={s.passwordBlock}>
 				<h5 className={s.password}>Password change</h5>
 				<form className={s.form}>
