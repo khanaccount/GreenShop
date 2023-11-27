@@ -119,7 +119,7 @@ class ProductCardView(APIView):
                 "id": product.id,
                 "name": product.name,
                 "salePrice": self.twoNulls(product, "salePrice"),
-                "review": product.reviewCount,
+                "reviewCount": product.reviewCount,
                 "rating": product.rating,
                 "size": SizeSerializer(product.size).data,
                 "categories": CategorySerializer(product.categories).data,

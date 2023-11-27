@@ -31,7 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "salePrice",
             "discount",
             "discountPercentage",
-            "review",
+            "reviewCount",
             "rating",
             "size",
             "categories",
