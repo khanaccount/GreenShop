@@ -37,6 +37,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "categories",
             "sku",
             "mainImg",
+            "newArriwals",
         ]
 
     def to_representation(self, instance):
@@ -154,4 +155,10 @@ class CustomerEditSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
+        fields = "__all__"
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
         fields = "__all__"
