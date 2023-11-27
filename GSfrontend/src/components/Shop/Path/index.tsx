@@ -1,12 +1,15 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import s from "./index.module.scss";
 
 const Path: React.FC = () => {
 	return (
 		<div className={s.path}>
-			<p className={s.home}>Home</p>
+			<Link to={"/"} className={s.home}>
+				Home
+			</Link>
 			<p>/</p>
-			<p>Shop</p>
+			<Link to={"/shop"}>Shop</Link>
 		</div>
 	);
 };

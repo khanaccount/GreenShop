@@ -9,15 +9,15 @@ type CategoriesItems = {
 };
 
 const item: CategoriesItems[] = [
-	{ title: "House Plants", id: 1, number: "(33)" },
-	{ title: "Potter Plants", id: 2, number: "(12)" },
-	{ title: "Seeds", id: 3, number: "(65)" },
-	{ title: "Small Plants", id: 4, number: "(39)" },
-	{ title: "Big Plants", id: 5, number: "(23)" },
-	{ title: "Succulents", id: 6, number: "(17)" },
-	{ title: "Trerrariums", id: 7, number: "(19)" },
-	{ title: "Gardening", id: 8, number: "(13)" },
-	{ title: "Accessories", id: 9, number: "(18)" }
+	{ title: "House Plants", id: 1, number: "33" },
+	{ title: "Potter Plants", id: 2, number: "12" },
+	{ title: "Seeds", id: 3, number: "65" },
+	{ title: "Small Plants", id: 4, number: "39" },
+	{ title: "Big Plants", id: 5, number: "23" },
+	{ title: "Succulents", id: 6, number: "17" },
+	{ title: "Trerrariums", id: 7, number: "19" },
+	{ title: "Gardening", id: 8, number: "13" },
+	{ title: "Accessories", id: 9, number: "18" }
 ];
 
 const Categories: React.FC = () => {
@@ -36,7 +36,7 @@ const Categories: React.FC = () => {
 					onClick={() => handleCategoryClick(category.id)}
 					className={category.id === activeCategory ? s.active : ""}>
 					<p>{category.title}</p>
-					<p>{category.number}</p>
+					<p>({category.number})</p>
 				</div>
 			))}
 		</div>

@@ -3,6 +3,8 @@
 .goods {
 	margin-top: 31px;
 	max-width: 838px;
+	min-height: 1465px;
+	margin-bottom: 180px;
 	.cards {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);

@@ -1,7 +1,9 @@
 @import "../../../variables.scss";
 
 .pagination {
-	margin: 90px 0;
+	position: absolute;
+	top: 1555px;
+	right: 0;
 	display: flex;
 	justify-content: end;
 	button {
