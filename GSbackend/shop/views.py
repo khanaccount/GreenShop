@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.http import Http404
 
 
 class CategoryView(APIView):
@@ -72,12 +73,13 @@ class ProductView(APIView):
                 "salePrice": self.twoNulls(output, "salePrice"),
                 "discount": output.discount,
                 "discountPercentage": output.discountPercentage,
-                "review": output.review,
+                "review": output.reviewCount,
                 "rating": output.rating,
                 "size": SizeSerializer(output.size).data,
                 "categories": CategorySerializer(output.categories).data,
                 "sku": output.sku,
                 "mainImg": output.mainImg,
+                "newArriwals": output.newArriwals,
             }
             for output in Product.objects.all()
         ]
@@ -88,6 +90,45 @@ class ProductView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+
+
+class ProductCardView(APIView):
+    def twoNulls(NULL, object, string):
+        objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
+
+        objectPrice = "$" + str(objectPrice)
+
+        if len(objectPrice.split(".")[1]) == 1:
+            objectPrice += "0"
+
+        return objectPrice
+
+    def get(self, request, id):
+        try:
+            reviews = ReviewSerializer(
+                Review.objects.filter(product=id), many=True
+            ).data
+        except:
+            reviews = None
+        try:
+            product = Product.objects.get(id=id)
+        except:
+            return Http404("Product not Found")
+        data = [
+            {
+                "id": product.id,
+                "name": product.name,
+                "salePrice": self.twoNulls(product, "salePrice"),
+                "review": product.reviewCount,
+                "rating": product.rating,
+                "size": SizeSerializer(product.size).data,
+                "categories": CategorySerializer(product.categories).data,
+                "sku": product.sku,
+                "mainImg": product.mainImg,
+                "reviews": reviews,
+            }
+        ]
+        return Response(data)
 
 
 class OrderView(APIView):
@@ -270,3 +311,12 @@ class TransactionViews(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Order.DoesNotExist:
             return Response({"order": "Order not found"})
+
+
+class ReviewViews(APIView):
+    def post(self, request):
+        serializer = ReviewSerializer(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response(serializer.data)
