@@ -14,6 +14,8 @@ const Products: React.FC<ProductsProps> = () => {
 	const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
 	const [sizesData, setSizesData] = useState<{ [key: string]: number }>({});
 	const [selectedSize, setSelectedSize] = useState<string | null>(null);
+	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+	const [categoriesData, setCategoriesData] = useState<{ [key: string]: number }>({});
 
 	const handleFilterChange = (newPriceRange: number[]) => {
 		setPriceRange(newPriceRange);
@@ -23,7 +25,7 @@ const Products: React.FC<ProductsProps> = () => {
 		<div className={s.products}>
 			<div className={s.leftBlock}>
 				<div className={s.filters}>
-					<Categories />
+					<Categories categoriesData={categoriesData} setSelectedCategory={setSelectedCategory} />
 					<PriceRange onFilterChange={handleFilterChange} />
 					<Size sizesData={sizesData} setSelectedSize={setSelectedSize} />
 				</div>
@@ -31,7 +33,13 @@ const Products: React.FC<ProductsProps> = () => {
 			</div>
 			<div className={s.rightBlock}>
 				<Sorting />
-				<Goods priceRange={priceRange} setSizesData={setSizesData} selectedSize={selectedSize} />
+				<Goods
+					priceRange={priceRange}
+					selectedCategory={selectedCategory}
+					setCategoriesData={setCategoriesData}
+					setSizesData={setSizesData}
+					selectedSize={selectedSize}
+				/>
 			</div>
 		</div>
 	);
