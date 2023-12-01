@@ -77,7 +77,6 @@ class ProductView(APIView):
                 "rating": output.rating,
                 "size": SizeSerializer(output.size).data,
                 "categories": CategorySerializer(output.categories).data,
-                "sku": output.sku,
                 "mainImg": output.mainImg,
                 "newArriwals": output.newArriwals,
             }
@@ -126,6 +125,8 @@ class ProductCardView(APIView):
                 "sku": product.sku,
                 "mainImg": product.mainImg,
                 "reviews": reviews,
+                "shortDescriptionInfo": product.shortDescriptionInfo,
+                "descriptionInfo": product.descriptionInfo,
             }
         ]
         return Response(data)
