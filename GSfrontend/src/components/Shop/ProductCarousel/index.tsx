@@ -1,5 +1,5 @@
 import React from "react";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 
 import s from "./index.module.scss";
@@ -15,31 +15,31 @@ const carts: Items[] = [
 	{
 		name: "Beach Spider Lily",
 		price: "$129.00",
-		img: "img/goods/01.png",
+		img: "/img/goods/01.png",
 		id: "1"
 	},
 	{
 		name: "Beach Spider Lily",
 		price: "$129.00",
-		img: "img/goods/01.png",
+		img: "/img/goods/01.png",
 		id: "2"
 	},
 	{
 		name: "Beach Spider Lily",
 		price: "$129.00",
-		img: "img/goods/01.png",
+		img: "/img/goods/01.png",
 		id: "3"
 	},
 	{
 		name: "Beach Spider Lily",
 		price: "$129.00",
-		img: "img/goods/01.png",
+		img: "/img/goods/01.png",
 		id: "4"
 	},
 	{
 		name: "Beach Spider Lily",
 		price: "$129.00",
-		img: "img/goods/01.png",
+		img: "/img/goods/01.png",
 		id: "5"
 	}
 ];
@@ -53,8 +53,8 @@ const ProductCarousel: React.FC = () => {
 				showArrows={false}
 				showStatus={false}
 				showThumbs={false}
-				infiniteLoop={false}
-				autoPlay={false}
+				infiniteLoop={true}
+				autoPlay={true}
 				interval={5000}>
 				<div className={s.carouselItems}>
 					{carts.map((item) => (

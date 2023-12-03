@@ -1,15 +1,23 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import s from "./index.module.scss";
 
 const Path: React.FC = () => {
+	const { id } = useParams<{ id: string }>();
+
 	return (
 		<div className={s.path}>
 			<Link to={"/"} className={s.home}>
 				Home
 			</Link>
 			<p>/</p>
-			<Link to={"/shop"}>Shop</Link>
+			<p>Shop</p>
+			{id && (
+				<>
+					<p>/</p>
+					<p>{id}</p>
+				</>
+			)}
 		</div>
 	);
 };

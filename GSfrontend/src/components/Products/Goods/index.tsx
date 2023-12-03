@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import s from "./index.module.scss";
 import Pagination from "../Pagination";
 import axios from "axios";
@@ -21,7 +22,6 @@ interface Goods {
 	};
 }
 
-// Определяем свойства компонента Goods
 interface GoodsProps {
 	priceRange: number[];
 	setSizesData: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
@@ -30,7 +30,6 @@ interface GoodsProps {
 	setCategoriesData: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
 }
 
-// Сопоставляем полные названия размеров и их сокращенные обозначения
 const sizeMap: { [key: string]: string } = {
 	Small: "s",
 	Medium: "m",
@@ -50,28 +49,23 @@ const Goods: React.FC<GoodsProps> = ({
 	const startIndex = (currentPage - 1) * itemsPerPage;
 	const endIndex = startIndex + itemsPerPage;
 
-	// Состояние для хранения полученных товаров
 	const [items, setItems] = React.useState<Goods[]>([]);
-
 	useEffect(() => {
-		// Получаем данные с сервера
 		axios
 			.get("http://127.0.0.1:8000/shop/product/")
 			.then((response) => {
 				setItems(response.data);
-
-				// Вычисляем информацию о размерах
 				const sizes: { [key: string]: number } = {};
-				const categories: { [key: string]: number } = {}; // Новый объект для категорий
+				const categories: { [key: string]: number } = {};
 				response.data.forEach((item: Goods) => {
 					const sizeName = item.size.name;
 					sizes[sizeName] = (sizes[sizeName] || 0) + 1;
 
-					const categoryName = item.categories.name; // Получаем название категории
-					categories[categoryName] = (categories[categoryName] || 0) + 1; // Увеличиваем счетчик категории
+					const categoryName = item.categories.name;
+					categories[categoryName] = (categories[categoryName] || 0) + 1;
 				});
 				setSizesData(sizes);
-				setCategoriesData(categories); // Устанавливаем данные категорий
+				setCategoriesData(categories);
 			})
 			.catch((error) => {
 				console.error("Ошибка при получении данных: ", error);
@@ -118,7 +112,9 @@ const Goods: React.FC<GoodsProps> = ({
 				{displayedItems.map((item) => (
 					<div key={item.id} className={s.card}>
 						<div className={s.cardImg}>
-							<img src={item.mainImg} alt={item.name} />
+							<Link to={`/shop/${item.id}/`}>
+								<img src={item.mainImg} alt={item.name} />
+							</Link>
 							{item.discount ? <p className={s.discount}>{item.discountPercentage}% OFF</p> : null}
 							<div className={s.hoverLinks}>
 								<a href="">
@@ -139,7 +135,6 @@ const Goods: React.FC<GoodsProps> = ({
 					</div>
 				))}
 			</div>
-			{/* Отображение пагинации */}
 			<Pagination
 				currentPage={currentPage}
 				totalPages={Math.ceil(filteredItems.length / itemsPerPage)}

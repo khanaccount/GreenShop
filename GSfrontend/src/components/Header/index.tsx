@@ -31,7 +31,7 @@ const Header: React.FC = () => {
 	return (
 		<div className={s.header}>
 			<Link to="/">
-				<img src="img/header/logo.svg" alt="logo" />
+				<img src="/img/header/logo.svg" alt="logo" />
 			</Link>
 			<ul>
 				<li>
@@ -57,16 +57,16 @@ const Header: React.FC = () => {
 			</ul>
 			<div>
 				<div className={s.cart}>
-					<img width={27} height={27} src="img/header/cart.svg" alt="cart" />
+					<img width={27} height={27} src="/img/header/cart.svg" alt="cart" />
 					<span>6</span>
 				</div>
 				{isUserLoggedIn() ? (
 					<Link to="/account">
-						<img width={28} src="img/header/user.svg" alt="user" />
+						<img width={28} src="/img/header/user.svg" alt="user" />
 					</Link>
 				) : (
 					<button onClick={handleToggleAuthModal}>
-						<img width={27} src="img/header/login.svg" alt="login" />
+						<img width={27} src="/img/header/login.svg" alt="login" />
 						<p>Login</p>
 					</button>
 				)}
@@ -78,7 +78,7 @@ const Header: React.FC = () => {
 								className={s.imgCross}
 								width={20}
 								height={20}
-								src="img/header/cross.svg"
+								src="/img/header/cross.svg"
 								alt="cross"
 								onClick={handleToggleAuthModal}
 							/>
