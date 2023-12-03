@@ -126,6 +126,8 @@ class Product(models.Model):
     sku = models.CharField(max_length=13, unique=True, editable=False)
     mainImg = models.CharField(max_length=200)
     newArriwals = models.BooleanField(default=0)
+    shortDescriptionInfo = models.TextField(max_length=1000, null=True)
+    descriptionInfo = models.TextField(null=True)
 
     def __str__(self):
         return self.name
@@ -199,9 +201,9 @@ class Transaction(models.Model):
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-    title = models.CharField(null=True, max_length=200)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     text = models.TextField(null=True)
     rating = models.IntegerField(validators=[MaxValueValidator(5)])
 
     def __str__(self):
-        return self.title
+        return self.customer.username
