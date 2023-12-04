@@ -15,7 +15,7 @@ const App: React.FC = () => {
 					path="/account"
 					element={isUserLoggedIn() ? <Account /> : <Navigate to="/" replace={true} />}
 				/>
-				<Route index path="/shop" element={<Shop />} />
+				<Route index path="/shop/:id" element={<Shop />} />
 			</Routes>
 		</>
 	);

@@ -4,12 +4,15 @@ import "rc-slider/assets/index.css";
 
 import s from "./index.module.scss";
 
-const PriceRange: React.FC = () => {
+interface PriceRangeProps {
+	onFilterChange: (priceRange: number[]) => void;
+}
+
+const PriceRange: React.FC<PriceRangeProps> = ({ onFilterChange }) => {
 	const [priceRange, setPriceRange] = React.useState([0, 1000]);
 
 	const handleFilterClick = () => {
-		// Здесь вы можете выполнить логику фильтрации товаров
-		console.log(`Filtering products with price range: $${priceRange[0]} - $${priceRange[1]}`);
+		onFilterChange(priceRange);
 	};
 
 	return (

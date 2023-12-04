@@ -8,6 +8,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 import random
+from django.core.validators import MaxValueValidator
 
 from datetime import datetime, timedelta
 
@@ -112,7 +113,7 @@ class Product(models.Model):
     name = models.CharField(max_length=50)
     mainPrice = models.FloatField()
     salePrice = models.FloatField(editable=False)
-    review = models.IntegerField(default=0, editable=False)
+    reviewCount = models.IntegerField(default=0, editable=False)
     rating = models.FloatField(default=0, editable=False)
     discount = models.BooleanField(default=False)
     discountPercentage = models.IntegerField(default=0)
@@ -124,6 +125,9 @@ class Product(models.Model):
     )
     sku = models.CharField(max_length=13, unique=True, editable=False)
     mainImg = models.CharField(max_length=200)
+    newArriwals = models.BooleanField(default=0)
+    shortDescriptionInfo = models.TextField(max_length=1000, null=True)
+    descriptionInfo = models.TextField(null=True)
 
     def __str__(self):
         return self.name
@@ -193,3 +197,13 @@ class Transaction(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    text = models.TextField(null=True)
+    rating = models.IntegerField(validators=[MaxValueValidator(5)])
+
+    def __str__(self):
+        return self.customer.username

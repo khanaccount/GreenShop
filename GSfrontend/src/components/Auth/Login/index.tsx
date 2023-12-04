@@ -52,7 +52,7 @@ const Login: React.FC<LoginProps> = ({
 						onChange={(e) => setPassword(e.target.value)}
 					/>
 					<img
-						src={passwordVisible ? "img/header/eyeClose.svg" : "img/header/eye.svg"}
+						src={passwordVisible ? "/img/header/eyeClose.svg" : "/img/header/eye.svg"}
 						width={24}
 						alt="eye"
 						onClick={handleTogglePasswordVisibility}
@@ -68,11 +68,11 @@ const Login: React.FC<LoginProps> = ({
 			<p className={s.loginOption}>Or login with</p>
 			<div className={s.anotherMethods}>
 				<button>
-					<img src="img/header/google.svg" alt="google" />
+					<img src="/img/header/google.svg" alt="google" />
 					<p>Login with Google</p>
 				</button>
 				<button>
-					<img src="img/header/facebook.svg" alt="facebook" />
+					<img src="/img/header/facebook.svg" alt="facebook" />
 					<p>Login with Facebook</p>
 				</button>
 			</div>

@@ -14,22 +14,22 @@ const itemsTop: Card[] = [
 	{
 		title: "Garden Care",
 		info: "We are an online plant shop offering a wide range of cheap and trendy plants.",
-		imgPot: "img/footer/top/1pot.svg",
-		imgPlant: "img/footer/top/1plant.svg",
+		imgPot: "/img/footer/top/1pot.svg",
+		imgPlant: "/img/footer/top/1plant.svg",
 		id: 1
 	},
 	{
 		title: "Plant Renovation",
 		info: "We are an online plant shop offering a wide range of cheap and trendy plants.",
-		imgPot: "img/footer/top/2pot.svg",
-		imgPlant: "img/footer/top/2plant.svg",
+		imgPot: "/img/footer/top/2pot.svg",
+		imgPlant: "/img/footer/top/2plant.svg",
 		id: 2
 	},
 	{
 		title: "Watering Graden",
 		info: "We are an online plant shop offering a wide range of cheap and trendy plants.",
-		imgPot: "img/footer/top/1pot.svg",
-		imgPlant: "img/footer/top/1plant.svg",
+		imgPot: "/img/footer/top/1pot.svg",
+		imgPlant: "/img/footer/top/1plant.svg",
 		id: 3
 	}
 ];
@@ -43,17 +43,17 @@ type MiddleItems = {
 const itemsMiddle: MiddleItems[] = [
 	{
 		title: "70 West Buckingham Ave. Farmingdale, NY 11735",
-		img: "img/footer/middle/location.svg",
+		img: "/img/footer/middle/location.svg",
 		id: 1
 	},
 	{
 		title: "contact@greenshop.com ",
-		img: "img/footer/middle/message.svg",
+		img: "/img/footer/middle/message.svg",
 		id: 2
 	},
 	{
 		title: "+88 01911 717 490",
-		img: "img/footer/middle/calling.svg",
+		img: "/img/footer/middle/calling.svg",
 		id: 3
 	}
 ];
@@ -111,27 +111,27 @@ type SocialMedia = {
 
 const itemsSocialMedia: SocialMedia[] = [
 	{
-		img: "img/footer/bottom/facebook.png",
+		img: "/img/footer/bottom/facebook.png",
 		id: 1,
 		href: "/buythisweb"
 	},
 	{
-		img: "img/footer/bottom/instagram.png",
+		img: "/img/footer/bottom/instagram.png",
 		id: 2,
 		href: "/buythisweb"
 	},
 	{
-		img: "img/footer/bottom/telegram.png",
+		img: "/img/footer/bottom/telegram.png",
 		id: 3,
 		href: "/buythisweb"
 	},
 	{
-		img: "img/footer/bottom/twitter.png",
+		img: "/img/footer/bottom/twitter.png",
 		id: 4,
 		href: "/buythisweb"
 	},
 	{
-		img: "img/footer/bottom/whatsapp.png",
+		img: "/img/footer/bottom/whatsapp.png",
 		id: 5,
 		href: "/buythisweb"
 	}
@@ -145,7 +145,7 @@ const Footer: React.FC = () => {
 				<div className={s.info}>
 					{itemsTop.map((item) => (
 						<div key={item.id} className={s.card}>
-							<img className={s.cyrcle} src="img/footer/top/01.png" alt="cyrcle" />
+							<img className={s.cyrcle} src="/img/footer/top/01.png" alt="cyrcle" />
 							<img className={s.topPlant} width={60} height={45} src={item.imgPlant} alt="plant" />
 							<img className={s.pot} width={60} src={item.imgPot} alt="pot" />
 							<h5>{item.title}</h5>
@@ -175,7 +175,7 @@ const Footer: React.FC = () => {
 				<div className={s.join}></div>
 			</div>
 			<div className={s.footerMiddle}>
-				<img width={170} src="img/footer/middle/logo.svg" alt="logo" />
+				<img width={170} src="/img/footer/middle/logo.svg" alt="logo" />
 				{itemsMiddle.map((item) => (
 					<div key={item.id}>
 						<img width={25} height={25} src={item.img} alt="location" /> <p>{item.title}</p>
@@ -215,7 +215,7 @@ const Footer: React.FC = () => {
 					</div>
 					<div>
 						<h5>We accept</h5>
-						<img src="img/footer/bottom/accept.png" alt="we accpet" />
+						<img src="/img/footer/bottom/accept.png" alt="we accpet" />
 					</div>
 				</div>
 			</div>
