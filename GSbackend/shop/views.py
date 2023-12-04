@@ -319,13 +319,12 @@ class ReviewViews(APIView):
 
     def post(self, request, id):
         serializer = ReviewSerializer(data=request.data)
-        review = Review.objects.get(customer=request.user, product=serializer.product)
-
-        if review is None:
+        product = Product.objects.get(id=id)
+        review = Review.objects.filter(customer=request.user, product=id)
+        if review.count() == 0:
             if serializer.is_valid(raise_exception=True):
-                serializer.save(customer=request.user)
+                serializer.save(customer=request.user, product=product)
 
-                product = serializer.validated_data["product"]
                 product.update_reviews_info()
 
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -337,7 +336,7 @@ class ReviewViews(APIView):
 
     def delete(self, request, id):
         try:
-            review = Review.objects.get(id=id)
+            review = Review.objects.get(customer=request.user, product=id)
         except:
             return Response(
                 {"error": "Review not found"}, status=status.HTTP_404_NOT_FOUND
