@@ -50,17 +50,66 @@ export const login = async (userData: LoginData): Promise<void> => {
 		if (access && refresh) {
 			localStorage.setItem("accessToken", access);
 			localStorage.setItem("refreshToken", refresh);
-			console.log(`accsess JWT Токен=${access}`, `refresh JWT Токен=${refresh}`);
-			// Другая логика после сохранения токенов, например, перенаправление на другую страницу
-			// history.push("/dashboard");
+			console.log(`access JWT Token=${access}`, `refresh JWT Token=${refresh}`);
+
+			// Инициализация обновления токена
+			startTokenRefresh();
 		} else {
 			console.error("Tokens are missing in the response");
 			throw new Error("Tokens are missing");
 		}
 	} catch (error) {
-		// Обработка ошибок входа
 		console.error("Login error:", error);
 		throw new Error("Login failed");
+	}
+};
+
+let refreshTimer: NodeJS.Timeout | null = null;
+
+export const startTokenRefresh = (): void => {
+	if (refreshTimer) {
+		clearInterval(refreshTimer);
+	}
+
+	// Время в миллисекундах для 180 дней
+	const interval60Minutes = 25 * 60 * 1000; // Обновление access токена каждый час
+	const interval180Days = 29 * 24 * 60 * 60 * 1000; // Обновление refresh токена раз в 180 дней
+
+	// Обновление access токена каждый час
+	refreshTimer = setInterval(async () => {
+		try {
+			const refreshToken = localStorage.getItem("refreshToken");
+
+			if (refreshToken) {
+				const response = await axios.post("http://localhost:8000/shop/token/refresh/", {
+					refresh: refreshToken
+				});
+
+				const newAccessToken = response.data.access;
+				localStorage.setItem("accessToken", newAccessToken);
+			} else {
+				console.error("Refresh token not found");
+				throw new Error("Refresh token not found");
+			}
+		} catch (error) {
+			console.error("Token refresh error:", error);
+		}
+	}, interval60Minutes); // Обновление access токена каждый час
+
+	// Обновление refresh токена каждые 180 дней
+	setInterval(async () => {
+		try {
+			// ... (ваш код для обновления refresh токена)
+		} catch (error) {
+			console.error("Refresh token error:", error);
+		}
+	}, interval180Days); // Обновление refresh токена раз в 180 дней
+};
+
+export const stopTokenRefresh = (): void => {
+	if (refreshTimer) {
+		clearInterval(refreshTimer);
+		refreshTimer = null;
 	}
 };
 
@@ -71,6 +120,7 @@ export const isUserLoggedIn = (): boolean => {
 };
 
 export const logout = (): void => {
+	stopTokenRefresh();
 	localStorage.removeItem("accessToken");
 	localStorage.removeItem("refreshToken");
 };
