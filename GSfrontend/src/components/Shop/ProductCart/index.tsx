@@ -118,7 +118,7 @@ const ProductCart: React.FC = () => {
 		e.preventDefault();
 
 		try {
-			const response = await axios.post(`http://127.0.0.1:8000/shop/product/${id}/review/`, {
+			const response = await axios.post(`http://127.0.0.1:8000/shop/product/reviews/${id}/`, {
 				rating: starsSelected,
 				text: reviewText
 			});
@@ -256,7 +256,7 @@ const ProductCart: React.FC = () => {
 						{product.shortDescriptionInfo ? (
 							product.shortDescriptionInfo
 						) : (
-							<p>Описание товара отсутствует.</p>
+							<span>Описание товара отсутствует.</span>
 						)}
 					</p>
 
@@ -323,7 +323,7 @@ const ProductCart: React.FC = () => {
 							{product.shortDescriptionInfo ? (
 								product.shortDescriptionInfo
 							) : (
-								<p>Описание товара отсутствует.</p>
+								<span>Описание товара отсутствует.</span>
 							)}
 						</p>
 					</div>
