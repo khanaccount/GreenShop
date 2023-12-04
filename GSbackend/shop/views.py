@@ -315,9 +315,42 @@ class TransactionViews(APIView):
 
 
 class ReviewViews(APIView):
-    def post(self, request):
-        serializer = ReviewSerializer(data=request.data)
+    permission_classes = [IsAuthenticated]
 
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        return Response(serializer.data)
+    def post(self, request, id):
+        serializer = ReviewSerializer(data=request.data)
+        review = Review.objects.get(customer=request.user, product=serializer.product)
+
+        if review is None:
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(customer=request.user)
+
+                product = serializer.validated_data["product"]
+                product.update_reviews_info()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "This user already has a review for this product"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def delete(self, request, id):
+        try:
+            review = Review.objects.get(id=id)
+        except:
+            return Response(
+                {"error": "Review not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not request.user == review.customer:
+            return Response(
+                {"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        product = review.product
+        review.delete()
+
+        product.update_reviews_info()
+
+        return Response({"message": "Review deleted"}, status=status.HTTP_200_OK)

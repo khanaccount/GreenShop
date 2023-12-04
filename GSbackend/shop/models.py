@@ -150,6 +150,15 @@ class Product(models.Model):
 
         super(Product, self).save()
 
+    def update_reviews_info(self):
+        reviews = Review.objects.filter(product=self)
+        reviewCount = reviews.count()
+        averageRating = reviews.aggregate(models.Avg("rating"))["rating__avg"]
+
+        self.reviewCount = reviewCount
+        self.rating = round(averageRating, 2) if averageRating is not None else 0
+        self.save()
+
 
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(
