@@ -315,9 +315,15 @@ class TransactionViews(APIView):
 
 
 class ReviewViews(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         serializer = ReviewSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            serializer.save(customer=request.user)
+
+            product = serializer.validated_data["product"]
+            product.update_reviews_info()
+
         return Response(serializer.data)
