@@ -222,10 +222,13 @@
 
 				.quantity {
 					color: $mainColor;
-					font-size: 20px;
+					font-size: 22px;
 					font-weight: 400;
 					line-height: 10px;
-					padding: 0 23px;
+					margin: 0 20px;
+					width: 40px;
+					display: inline-block;
+					text-align: center;
 				}
 
 				.buyNow,
@@ -394,6 +397,62 @@
 					max-width: 100%;
 					overflow-wrap: break-word;
 					word-wrap: break-word;
+				}
+			}
+			.reviewForm {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+
+				.stars {
+					display: flex;
+					margin-bottom: 20px;
+
+					.star {
+						cursor: pointer;
+						margin-right: 5px;
+
+						svg {
+							path {
+								fill: #ccc;
+							}
+							width: 20px;
+							height: 20px;
+						}
+
+						&.starSelected {
+							svg {
+								path {
+									fill: #ffac0c;
+								}
+							}
+						}
+					}
+				}
+
+				.reviewText {
+					width: 100%;
+					height: 100px;
+					padding: 10px;
+					margin-bottom: 20px;
+					border: 1px solid #ccc;
+					border-radius: 5px;
+					resize: none;
+					font-size: 14px;
+				}
+
+				.submitButton {
+					padding: 10px 20px;
+					background-color: $secondaryColor;
+					color: white;
+					border: none;
+					border-radius: 5px;
+					cursor: pointer;
+					transition: background-color 0.3s;
+
+					&:hover {
+						background-color: $secondaryColor;
+					}
 				}
 			}
 		}

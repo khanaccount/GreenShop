@@ -65,7 +65,7 @@ const hollowCyrcle: Cyrcle[] = [
 
 interface Review {
 	id: number;
-	title: string;
+	customer: string;
 	rating: number;
 	text: string;
 }
@@ -76,6 +76,7 @@ interface Product {
 	mainImg: string;
 	rating: number;
 	id: number;
+	shortDescriptionInfo: string;
 	size: {
 		id: number;
 		name: string;
@@ -84,15 +85,67 @@ interface Product {
 		id: number;
 		name: string;
 	};
+	sku: string;
 	reviews: Review[];
 }
+
+const calculateAverageRating = (reviews: Review[]) => {
+	if (reviews.length === 0) {
+		return 0;
+	}
+
+	const totalRating = reviews.reduce((acc, curr) => acc + curr.rating, 0);
+	return totalRating / reviews.length;
+};
 
 const ProductCart: React.FC = () => {
 	const [activeTab, setActiveTab] = useState("description");
 	const [product, setProduct] = useState<Product | null>(null);
-	const [selectedImage, setSelectedImage] = useState("/img/goods/01.png");
+	const [selectedImage, setSelectedImage] = useState("");
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalImage, setModalImage] = useState<string>("");
+	const [quantity, setQuantity] = useState<number>(1);
+	const [reviewText, setReviewText] = useState("");
+	const [starsSelected, setStarsSelected] = useState(0);
+
+	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
+
+	const handleStarClick = (id: number) => {
+		setStarsSelected(id);
+	};
+
+	const handleSubmitReview = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		try {
+			const response = await axios.post(`http://127.0.0.1:8000/shop/product/${id}/review/`, {
+				rating: starsSelected,
+				text: reviewText
+			});
+
+			console.log("Ответ от сервера:", response.data);
+			// Дополнительная логика после успешной отправки отзыва
+
+			// Очищаем поля после успешной отправки отзыва
+			setReviewText("");
+			setStarsSelected(0);
+		} catch (error) {
+			console.error("Ошибка при отправке отзыва:", error);
+			// Обработка ошибок при отправке запроса
+		}
+	};
+
+	const decreaseQuantity = () => {
+		if (quantity > 1) {
+			setQuantity(quantity - 1);
+		}
+	};
+
+	const increaseQuantity = () => {
+		if (quantity < 99) {
+			setQuantity(quantity + 1);
+		}
+	};
 
 	const handleModalOpen = () => {
 		setModalImage(selectedImage);
@@ -108,19 +161,20 @@ const ProductCart: React.FC = () => {
 	};
 
 	const { id } = useParams();
-	console.log(product);
+
 	useEffect(() => {
 		if (id) {
 			axios
 				.get(`http://127.0.0.1:8000/shop/product/${id}/`)
 				.then((response) => {
 					setProduct(response.data[0]);
+					setSelectedImage(`/${response.data[0].mainImg}`);
 				})
 				.catch((error) => {
 					console.error("Ошибка при получении данных о товаре: ", error);
 				});
 		}
-	}, [id]);
+	}, []);
 
 	if (!product) {
 		return <div className={s.Loading}>Loading...</div>;
@@ -131,24 +185,33 @@ const ProductCart: React.FC = () => {
 				<div className={s.carouselBlock}>
 					<div className={s.smallImgBlock}>
 						<div
-							className={selectedImage === "/img/goods/01.png" ? s.bgImgSmallActive : s.bgImgSmall}
-							onClick={() => handleImageClick("/img/goods/01.png")}>
-							<img className={s.smallImg} src="/img/goods/01.png" />
+							className={
+								selectedImage === `/${product.mainImg}` ? s.bgImgSmallActive : s.bgImgSmall
+							}
+							onClick={() => handleImageClick(`/${product.mainImg}`)}>
+							<img className={s.smallImg} src={`/${product.mainImg}`} />
+						</div>
+
+						<div
+							className={
+								selectedImage === "/img/product/01.png" ? s.bgImgSmallActive : s.bgImgSmall
+							}
+							onClick={() => handleImageClick("/img/product/01.png")}>
+							<img className={s.smallImg} src="/img/product/01.png" />
 						</div>
 						<div
-							className={selectedImage === "/img/goods/02.png" ? s.bgImgSmallActive : s.bgImgSmall}
-							onClick={() => handleImageClick("/img/goods/02.png")}>
-							<img className={s.smallImg} src="/img/goods/02.png" />
+							className={
+								selectedImage === "/img/product/02.png" ? s.bgImgSmallActive : s.bgImgSmall
+							}
+							onClick={() => handleImageClick("/img/product/02.png")}>
+							<img className={s.smallImg} src="/img/product/02.png" />
 						</div>
 						<div
-							className={selectedImage === "/img/goods/03.png" ? s.bgImgSmallActive : s.bgImgSmall}
-							onClick={() => handleImageClick("/img/goods/03.png")}>
-							<img className={s.smallImg} src="/img/goods/03.png" />
-						</div>
-						<div
-							className={selectedImage === "/img/goods/05.png" ? s.bgImgSmallActive : s.bgImgSmall}
-							onClick={() => handleImageClick("/img/goods/05.png")}>
-							<img className={s.smallImg} src="/img/goods/05.png" />
+							className={
+								selectedImage === "/img/product/03.png" ? s.bgImgSmallActive : s.bgImgSmall
+							}
+							onClick={() => handleImageClick("/img/product/03.png")}>
+							<img className={s.smallImg} src="/img/product/03.png" />
 						</div>
 					</div>
 					<div className={s.bgImgBig}>
@@ -179,18 +242,22 @@ const ProductCart: React.FC = () => {
 						<p className={s.price}>{product.salePrice}</p>
 						<div className={s.stars}>
 							{rating.map((star) => (
-								<div className={s.starSvgActive} key={star.id}>
+								<div
+									className={star.id <= Math.round(averageRating) ? s.starSvgActive : s.starSvg}
+									key={star.id}>
 									{star.icon}
 								</div>
 							))}
-							<p className={s.review}>19 Customer Review</p>
+							<p className={s.review}>{product.reviews.length} Customer Review</p>
 						</div>
 					</div>
 					<p className={s.descriptionTitle}>Short Description:</p>
 					<p className={s.descriptionInfo}>
-						The ceramic cylinder planters come with a wooden stand to help elevate your plants off
-						the ground. The ceramic cylinder planters come with a wooden stand to help elevate your
-						plants off the ground.{" "}
+						{product.shortDescriptionInfo ? (
+							product.shortDescriptionInfo
+						) : (
+							<p>Описание товара отсутствует.</p>
+						)}
 					</p>
 
 					<p className={s.sizeTitle}>Size:</p>
@@ -203,9 +270,13 @@ const ProductCart: React.FC = () => {
 						))}
 					</div>
 					<div className={s.buying}>
-						<button className={s.minus}>-</button>
-						<span className={s.quantity}>1</span>
-						<button className={s.plus}>+</button>
+						<button className={s.minus} onClick={decreaseQuantity}>
+							-
+						</button>
+						<span className={s.quantity}>{quantity}</span>
+						<button className={s.plus} onClick={increaseQuantity}>
+							+
+						</button>
 
 						<button className={s.buyNow}>Buy NOW</button>
 						<button className={s.addToCart}>Add to cart</button>
@@ -214,10 +285,10 @@ const ProductCart: React.FC = () => {
 						</button>
 					</div>
 					<p className={s.productInfoSku}>
-						SKU: <span> 1995751877966</span>
+						SKU: <span> {product.sku}</span>
 					</p>
 					<p className={s.productInfoCategory}>
-						Categories:<span> Potter Plants</span>
+						Categories:<span> {product.categories.name}</span>
 					</p>
 					<div className={s.links}>
 						<p className={s.share}>Share this products:</p>
@@ -243,45 +314,17 @@ const ProductCart: React.FC = () => {
 					<h5
 						className={`${s.title} ${activeTab === "reviews" ? s.titleActive : ""}`}
 						onClick={() => handleTabClick("reviews")}>
-						Reviews <span>(19)</span>
+						Reviews <span>({product.reviews.length})</span>
 					</h5>
 				</div>
 				{activeTab === "description" ? (
 					<div className={s.description}>
 						<p className={s.descriptionInfo}>
-							The ceramic cylinder planters come with a wooden stand to help elevate your plants off
-							the ground. The ceramic cylinder planters come with a wooden stand to help elevate
-							your plants off the ground. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-							Nam fringilla augue nec est tristique auctor. Donec non est at libero vulputate
-							rutrum. Morbi ornare lectus quis justo gravida semper. Nulla tellus mi, vulputate
-							adipiscing cursus eu, suscipit id nulla. Pellentesque aliquet, sem eget laoreet
-							ultrices, ipsum metus feugiat sem, quis fermentum turpis eros eget velit. Donec ac
-							tempus ante. Fusce ultricies massa massa. Fusce aliquam, purus eget sagittis
-							vulputate, sapien libero hendrerit est, sed commodo augue nisi non neque. Lorem ipsum
-							dolor sit amet, consectetur adipiscing elit. Sed tempor, lorem et placerat vestibulum,
-							metus nisi posuere nisl, in accumsan elit odio quis mi. Cras neque metus, consequat et
-							blandit et, luctus a nunc. Etiam gravida vehicula tellus, in imperdiet ligula euismod
-							eget. The ceramic cylinder planters come with a wooden stand to help elevate your
-							plants off the ground.{" "}
-						</p>
-						<h5 className={s.descriptionTitle}>Living Room:</h5>
-						<p className={s.descriptionInfo}>
-							The ceramic cylinder planters come with a wooden stand to help elevate your plants off
-							the ground. The ceramic cylinder planters come with a wooden stand to help elevate
-							your plants off the ground. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-						</p>
-						<h5 className={s.descriptionTitle}>Dining Room:</h5>
-						<p className={s.descriptionInfo}>
-							The benefits of houseplants are endless. In addition to cleaning the air of harmful
-							toxins, they can help to improve your mood, reduce stress and provide you with better
-							sleep. Fill every room of your home with houseplants and their restorative qualities
-							will improve your life.
-						</p>
-						<h5 className={s.descriptionTitle}>Office:</h5>
-						<p className={s.descriptionInfo}>
-							The ceramic cylinder planters come with a wooden stand to help elevate your plants off
-							the ground. The ceramic cylinder planters come with a wooden stand to help elevate
-							your plants off the ground. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+							{product.shortDescriptionInfo ? (
+								product.shortDescriptionInfo
+							) : (
+								<p>Описание товара отсутствует.</p>
+							)}
 						</p>
 					</div>
 				) : (
@@ -289,7 +332,9 @@ const ProductCart: React.FC = () => {
 						{product.reviews && product.reviews.length > 0 ? (
 							product.reviews.map((review) => (
 								<div key={review.id} className={s.review}>
-									<h5 className={s.reviewUserName}>{review.title}</h5>
+									<h5 className={s.reviewUserName}>
+										{review.customer ? review.customer : "customer"}
+									</h5>
 									<div className={s.stars}>
 										{rating.map((star) => (
 											<div
@@ -305,6 +350,29 @@ const ProductCart: React.FC = () => {
 						) : (
 							<p>No reviews available</p>
 						)}
+						<div className={s.reviewForm}>
+							<h3>Добавить отзыв</h3>
+							<form onSubmit={handleSubmitReview}>
+								<div className={s.stars}>
+									{[1, 2, 3, 4, 5].map((id) => (
+										<div
+											key={id}
+											className={`${s.star} ${id <= starsSelected ? s.starSelected : ""}`}
+											onClick={() => handleStarClick(id)}>
+											<Star />
+										</div>
+									))}
+								</div>
+								<textarea
+									className={s.reviewText}
+									placeholder="Напишите свой отзыв здесь..."
+									value={reviewText}
+									onChange={(e) => setReviewText(e.target.value)}></textarea>
+								<button className={s.submitButton} type="submit">
+									Отправить
+								</button>
+							</form>
+						</div>
 					</div>
 				)}
 			</div>
