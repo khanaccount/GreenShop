@@ -37,16 +37,14 @@ class SizeView(APIView):
 class CustomerView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # def get(self, request):
-    #     output = [
-    #         {
-    #             "id": output.id,
-    #             "username": output.username,
-    #             "email": output.email,
-    #         }
-    #         for output in Customer.objects.all()
-    #     ]
-    #     return Response(output)
+    def get(self, request):
+        user = Customer.objects.get(id=request.user)
+        output = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+        }
+        return Response(output)
 
     def get(self, request):
         customer = request.user
