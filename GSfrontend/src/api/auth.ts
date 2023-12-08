@@ -11,6 +11,8 @@ interface LoginData {
 	password: string;
 }
 
+const apiBaseUrl = "http://localhost:8000/shop/";
+
 export const register = async (userData: RegisterData): Promise<void> => {
 	const { username, email, password } = userData;
 
@@ -24,7 +26,6 @@ export const register = async (userData: RegisterData): Promise<void> => {
 			email,
 			password
 		});
-		// Обработка успешной регистрации, если необходимо
 	} catch (error: any) {
 		if (error.response && error.response.data && error.response.data.errors) {
 			const { errors } = error.response.data;
@@ -50,9 +51,7 @@ export const login = async (userData: LoginData): Promise<void> => {
 		if (access && refresh) {
 			localStorage.setItem("accessToken", access);
 			localStorage.setItem("refreshToken", refresh);
-			console.log(`access JWT Token=${access}`, `refresh JWT Token=${refresh}`);
 
-			// Инициализация обновления токена
 			startTokenRefresh();
 		} else {
 			console.error("Tokens are missing in the response");
@@ -64,46 +63,59 @@ export const login = async (userData: LoginData): Promise<void> => {
 	}
 };
 
+export const getAuthHeaders = () => {
+	const accessToken = localStorage.getItem("accessToken");
+
+	if (accessToken) {
+		return {
+			headers: {
+				Authorization: `Token ${accessToken}`
+			}
+		};
+	}
+
+	return {};
+};
+
+export const someApiRequest = async () => {
+	try {
+		const headers = getAuthHeaders(); // Получение заголовков авторизации
+		const response = await axios.get(`${apiBaseUrl}some-endpoint/`, headers);
+		// Обработка ответа
+	} catch (error) {
+		console.log(`error ${error}`);
+	}
+};
+
 let refreshTimer: NodeJS.Timeout | null = null;
 
 export const startTokenRefresh = (): void => {
-	if (refreshTimer) {
-		clearInterval(refreshTimer);
-	}
+	stopTokenRefresh();
 
-	// Время в миллисекундах для 180 дней
-	const interval60Minutes = 25 * 60 * 1000; // Обновление access токена каждый час
-	const interval180Days = 29 * 24 * 60 * 60 * 1000; // Обновление refresh токена раз в 180 дней
-
-	// Обновление access токена каждый час
 	refreshTimer = setInterval(async () => {
 		try {
 			const refreshToken = localStorage.getItem("refreshToken");
-
-			if (refreshToken) {
-				const response = await axios.post("http://localhost:8000/shop/token/refresh/", {
-					refresh: refreshToken
-				});
-
-				const newAccessToken = response.data.access;
-				localStorage.setItem("accessToken", newAccessToken);
-			} else {
-				console.error("Refresh token not found");
+			if (!refreshToken) {
 				throw new Error("Refresh token not found");
+			}
+
+			const response = await axios.post(`${apiBaseUrl}token/refresh/`, {
+				refresh: refreshToken
+			});
+
+			const { access } = response.data;
+
+			if (access) {
+				localStorage.setItem("accessToken", access);
+			} else {
+				console.error("Access token not found in the refresh response");
 			}
 		} catch (error) {
 			console.error("Token refresh error:", error);
+			// Остановка таймера при возникновении ошибки
+			stopTokenRefresh();
 		}
-	}, interval60Minutes); // Обновление access токена каждый час
-
-	// Обновление refresh токена каждые 180 дней
-	setInterval(async () => {
-		try {
-			// ... (ваш код для обновления refresh токена)
-		} catch (error) {
-			console.error("Refresh token error:", error);
-		}
-	}, interval180Days); // Обновление refresh токена раз в 180 дней
+	}, 29 * 60 * 1000);
 };
 
 export const stopTokenRefresh = (): void => {

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { isUserLoggedIn } from "../../api/auth";
 
 import s from "./index.module.scss";
 import Login from "../Auth/Login";
 import Register from "../Auth/Register";
+import axios from "axios";
 
 const Header: React.FC = () => {
 	const location = useLocation();
@@ -12,6 +13,22 @@ const Header: React.FC = () => {
 	const [activeMethod, setActiveMethod] = React.useState("login");
 	const [passwordVisible, setPasswordVisible] = React.useState(false);
 	const [authModalVisible, setAuthModalVisible] = React.useState(false);
+	const [userData, setUserData] = React.useState(null);
+
+	useEffect(() => {
+		const fetchUserData = () => {
+			axios
+				.get("http://127.0.0.1:8000/shop/customer/")
+				.then((response) => {
+					setUserData(response.data);
+				})
+				.catch((error) => {
+					console.error("Ошибка при получении данных: ", error);
+				});
+		};
+
+		fetchUserData();
+	}, []);
 
 	const handleMethodClick = (method: string) => {
 		setActiveMethod(method);
@@ -66,6 +83,7 @@ const Header: React.FC = () => {
 					</Link>
 				) : (
 					<button onClick={handleToggleAuthModal}>
+						<p>{userData.customer}</p>
 						<img width={27} src="/img/header/login.svg" alt="login" />
 						<p>Login</p>
 					</button>
