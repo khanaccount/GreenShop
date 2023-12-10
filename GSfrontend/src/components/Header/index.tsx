@@ -1,11 +1,18 @@
 import React, { useEffect } from "react";
+import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import { isUserLoggedIn } from "../../api/auth";
+import { getAuthHeaders } from "../../api/auth";
 
 import s from "./index.module.scss";
 import Login from "../Auth/Login";
 import Register from "../Auth/Register";
-import axios from "axios";
+
+interface UserData {
+	id: number;
+	username: string;
+	email: string;
+}
 
 const Header: React.FC = () => {
 	const location = useLocation();
@@ -13,12 +20,15 @@ const Header: React.FC = () => {
 	const [activeMethod, setActiveMethod] = React.useState("login");
 	const [passwordVisible, setPasswordVisible] = React.useState(false);
 	const [authModalVisible, setAuthModalVisible] = React.useState(false);
-	const [userData, setUserData] = React.useState(null);
+	const [userData, setUserData] = React.useState<UserData | null>(null);
 
+	console.log(userData);
 	useEffect(() => {
 		const fetchUserData = () => {
+			const token = getAuthHeaders(); // Получение токена авторизации
+
 			axios
-				.get("http://127.0.0.1:8000/shop/customer/")
+				.get(`http://127.0.0.1:8000/shop/customer/`, token)
 				.then((response) => {
 					setUserData(response.data);
 				})
@@ -78,12 +88,12 @@ const Header: React.FC = () => {
 					<span>6</span>
 				</div>
 				{isUserLoggedIn() ? (
-					<Link to="/account">
+					<Link className={s.account} to="/account">
 						<img width={28} src="/img/header/user.svg" alt="user" />
+						{userData && <p>{userData.username}</p>}
 					</Link>
 				) : (
 					<button onClick={handleToggleAuthModal}>
-						<p>{userData.customer}</p>
 						<img width={27} src="/img/header/login.svg" alt="login" />
 						<p>Login</p>
 					</button>
