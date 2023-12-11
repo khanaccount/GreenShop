@@ -40,14 +40,16 @@ const Wishlist: React.FC = () => {
 	const handleRemoveFromFavorites = async (productId: string) => {
 		try {
 			const authHeaders = getAuthHeaders();
-			await axios.delete(`http://127.0.0.1:8000/shop/product/favourite/${productId}`, {
+			await axios.delete(`http://127.0.0.1:8000/shop/product/favourite/${productId}/`, {
 				headers: {
 					Authorization: authHeaders?.headers?.Authorization
 				}
 			});
 			console.log(productId);
 
-			setCardData((prevCardData) => prevCardData?.filter((item) => item.id !== productId) || null);
+			setCardData(
+				(prevCardData) => prevCardData?.filter((item) => item.product.id !== productId) || null
+			);
 		} catch (error) {
 			console.error("Error while removing card from favorites:", error);
 		}
@@ -57,7 +59,7 @@ const Wishlist: React.FC = () => {
 		<div className={s.wishlist}>
 			{cardData &&
 				cardData.map((item) => (
-					<div className={s.card} key={item.id}>
+					<div className={s.card} key={item.product.id}>
 						<div className={s.cardImg}>
 							<img src={item.product.mainImg} alt={item.product.name} />
 							<div className={s.hoverLinks}>

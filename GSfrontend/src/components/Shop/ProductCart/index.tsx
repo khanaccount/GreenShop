@@ -112,7 +112,6 @@ const ProductCart: React.FC = () => {
 	const [isFavoriteActive, setIsFavoriteActive] = useState(false);
 
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
-
 	const { id } = useParams();
 
 	const handleStarClick = (id: number) => {
@@ -154,13 +153,12 @@ const ProductCart: React.FC = () => {
 		try {
 			const authHeaders = getAuthHeaders();
 			const response = await axios.post(
-				`http://127.0.0.1:8000/shop/product/favourite/${id}`,
+				`http://127.0.0.1:8000/shop/product/favourite/${id}/`,
 				{},
 				authHeaders
 			);
 
 			if (response.status === 200) {
-				setIsFavoriteActive((prevState) => !prevState);
 				console.log("Product favorite status updated");
 			}
 		} catch (error) {
@@ -172,6 +170,23 @@ const ProductCart: React.FC = () => {
 		setIsFavoriteActive((prevState) => !prevState);
 		toggleFavorite();
 	};
+
+	useEffect(() => {
+		const fetchFavoriteStatus = async () => {
+			try {
+				const authHeaders = getAuthHeaders();
+				const response = await axios.get(
+					`http://127.0.0.1:8000/shop/product/favourite/${id}/`,
+					authHeaders
+				);
+				setIsFavoriteActive(response.data.isFavorite);
+			} catch (error) {
+				console.error("Error fetching favorite status:", error);
+			}
+		};
+
+		fetchFavoriteStatus();
+	}, [id]);
 
 	const decreaseQuantity = () => {
 		if (quantity > 1) {
