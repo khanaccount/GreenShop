@@ -2,7 +2,10 @@
 
 .wishlist {
 	margin-left: 28px;
-
+	width: 100%;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+	gap: 20px;
 	.card {
 		.cardImg {
 			display: flex;
@@ -63,20 +66,48 @@
 				position: absolute;
 				bottom: 10px;
 
-				a {
+				button {
 					display: flex;
 					padding: 8px;
 					background-color: $tertiaryColor;
 					border-radius: 4px;
-
-					&:not(:last-child) {
-						margin-right: 25px;
+					cursor: pointer;
+					img {
+						fill: #ffc0cb;
 					}
 				}
 			}
 
 			&:hover .hoverLinks {
 				opacity: 1;
+			}
+		}
+	}
+	.goodsInfo {
+		padding-top: 13px;
+		.goodsName {
+			color: $mainColor;
+			font-size: 16px;
+			font-weight: 400;
+			line-height: 16px;
+		}
+		.goodsPrices {
+			display: flex;
+			align-items: center;
+			padding-top: 6px;
+			.main {
+				padding-right: 16px;
+				color: $secondaryColor;
+				font-size: 18px;
+				font-weight: 700;
+				line-height: 16px;
+			}
+			.sale {
+				text-decoration: line-through;
+				color: $saleColor;
+				font-size: 18px;
+				font-weight: 400;
+				line-height: 16px;
 			}
 		}
 	}
