@@ -5,6 +5,7 @@ import s from "./index.module.scss";
 import Star from "./svg/Star";
 import Cyrcle from "./svg/Cyrcle";
 import Heart from "./svg/Heart";
+import { getAuthHeaders } from "../../../api/auth";
 
 type Rating = {
 	icon: React.ReactNode;
@@ -107,31 +108,44 @@ const ProductCart: React.FC = () => {
 	const [quantity, setQuantity] = useState<number>(1);
 	const [reviewText, setReviewText] = useState("");
 	const [starsSelected, setStarsSelected] = useState(0);
+	const [showReviewLimitMessage, setShowReviewLimitMessage] = useState(false);
 
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
 
+	const { id } = useParams();
+
 	const handleStarClick = (id: number) => {
 		setStarsSelected(id);
+	};
+
+	const handleCloseMessage = () => {
+		setShowReviewLimitMessage(false);
 	};
 
 	const handleSubmitReview = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		try {
-			const response = await axios.post(`http://127.0.0.1:8000/shop/product/reviews/${id}/`, {
-				rating: starsSelected,
-				text: reviewText
-			});
+			const authHeaders = getAuthHeaders();
+			const response = await axios.post(
+				`http://127.0.0.1:8000/shop/product/reviews/${id}/`,
+				{
+					rating: starsSelected,
+					text: reviewText
+				},
+				authHeaders
+			);
 
 			console.log("Ответ от сервера:", response.data);
-			// Дополнительная логика после успешной отправки отзыва
 
-			// Очищаем поля после успешной отправки отзыва
+			const updatedProductResponse = await axios.get(`http://127.0.0.1:8000/shop/product/${id}/`);
+			setProduct(updatedProductResponse.data[0]);
+
 			setReviewText("");
 			setStarsSelected(0);
 		} catch (error) {
 			console.error("Ошибка при отправке отзыва:", error);
-			// Обработка ошибок при отправке запроса
+			setShowReviewLimitMessage(true);
 		}
 	};
 
@@ -159,8 +173,6 @@ const ProductCart: React.FC = () => {
 	const handleTabClick = (tab: string) => {
 		setActiveTab(tab);
 	};
-
-	const { id } = useParams();
 
 	useEffect(() => {
 		if (id) {
@@ -263,7 +275,7 @@ const ProductCart: React.FC = () => {
 					<p className={s.sizeTitle}>Size:</p>
 					<div className={s.sizeBlock}>
 						{hollowCyrcle.map((item) => (
-							<div className={s.sizeActive} key={item.id}>
+							<div className={s.size} key={item.id}>
 								<p>{item.title}</p>
 								{item.icon}
 							</div>
@@ -372,6 +384,16 @@ const ProductCart: React.FC = () => {
 									Отправить
 								</button>
 							</form>
+						</div>
+					</div>
+				)}
+				{showReviewLimitMessage && (
+					<div className={s.reviewLimitOverlay}>
+						<div className={s.messageBox}>
+							<span className={s.text}>You can only leave a review once.</span>
+							<span className={s.closeButton} onClick={handleCloseMessage}>
+								&times;
+							</span>
 						</div>
 					</div>
 				)}
