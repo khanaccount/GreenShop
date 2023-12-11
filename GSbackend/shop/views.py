@@ -356,12 +356,23 @@ class ReviewViews(APIView):
 class FavouritesViews(APIView):
     permission_classes = [IsAuthenticated]
 
+    def get(self, request, id):
+        try:
+            favourite = Favourite.objects.get(customer=request.user, product=id)
+            return Response(
+                {"message": "Product in favourite"}, status=status.HTTP_200_OK
+            )
+        except:
+            return Response(
+                {"error": "Product not in favourite"}, status=status.HTTP_404_NOT_FOUND
+            )
+
     def post(self, request, id):
         try:
             product = Product.objects.get(id=id)
         except:
             return Response(
-                {"error": "Product not found"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
             )
         customer = request.user
 
@@ -385,7 +396,7 @@ class FavouritesViews(APIView):
         except:
             return Response(
                 {"error": "Product is not exists"},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         try:
@@ -393,7 +404,7 @@ class FavouritesViews(APIView):
         except:
             return Response(
                 {"error": "Product not in favourites"},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         favourites.delete()
