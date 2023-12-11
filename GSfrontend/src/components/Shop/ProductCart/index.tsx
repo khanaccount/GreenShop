@@ -154,7 +154,7 @@ const ProductCart: React.FC = () => {
 		try {
 			const authHeaders = getAuthHeaders();
 			const response = await axios.post(
-				`http://127.0.0.1:8000/shop/product/favorite/`,
+				`http://127.0.0.1:8000/shop/product/favourite/${id}`,
 				{ product },
 				authHeaders
 			);
@@ -207,7 +207,7 @@ const ProductCart: React.FC = () => {
 					setSelectedImage(`/${response.data[0].mainImg}`);
 				})
 				.catch((error) => {
-					console.error("Ошибка при получении данных о товаре: ", error);
+					console.error("Error while receiving card data: ", error);
 				});
 		}
 	}, []);

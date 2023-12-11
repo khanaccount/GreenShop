@@ -26,7 +26,6 @@ const Details: React.FC = () => {
 						setImageSrc(dataURL);
 					} else {
 						alert("Please select an image with dimensions 50x50 pixels.");
-						// Здесь можно добавить другую логику, например, сбросить ввод или показать сообщение об ошибке.
 					}
 				};
 				setImageSrc(imageSrc);

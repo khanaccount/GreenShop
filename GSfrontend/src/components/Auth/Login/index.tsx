@@ -20,15 +20,11 @@ const Login: React.FC<LoginProps> = ({
 		e.preventDefault();
 
 		try {
-			// Используйте функцию login из вашего файла auth.ts
 			await login({ username, password });
 
-			// Логика после успешного входа, например, перенаправление на другую страницу
-			// history.push("/dashboard");
 			onLoginSuccess();
 		} catch (error) {
 			console.error("Login error:", error);
-			// Обработка ошибок входа в систему
 		}
 	};
 

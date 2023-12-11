@@ -22,7 +22,6 @@ const Header: React.FC = () => {
 	const [authModalVisible, setAuthModalVisible] = React.useState(false);
 	const [userData, setUserData] = React.useState<UserData | null>(null);
 
-	console.log(userData);
 	const fetchUserData = () => {
 		const token = getAuthHeaders();
 

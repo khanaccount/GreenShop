@@ -25,7 +25,7 @@ const Register: React.FC<RegisterProps> = ({ passwordVisible, handleTogglePasswo
 		} else {
 			try {
 				await register({ username, email, password });
-				// Очистка ошибок, если регистрация прошла успешно
+
 				setUsernameError(false);
 				setEmailError(false);
 			} catch (error) {
