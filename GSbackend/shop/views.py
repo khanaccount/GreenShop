@@ -407,6 +407,7 @@ class FavouritesGetViews(APIView):
     def productData(self, object):
         data = ProductSerializer(object).data
         dataOutput = {
+            "id": data["id"],
             "name": data["name"],
             "mainPrice": data["mainPrice"],
             "salePrice": data["salePrice"],
