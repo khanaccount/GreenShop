@@ -23,21 +23,23 @@ const Header: React.FC = () => {
 	const [userData, setUserData] = React.useState<UserData | null>(null);
 
 	console.log(userData);
+	const fetchUserData = () => {
+		const token = getAuthHeaders();
+
+		axios
+			.get(`http://127.0.0.1:8000/shop/customer/`, token)
+			.then((response) => {
+				setUserData(response.data);
+			})
+			.catch((error) => {
+				console.error("Error fetching data: ", error);
+			});
+	};
+
 	useEffect(() => {
-		const fetchUserData = () => {
-			const token = getAuthHeaders(); // Получение токена авторизации
-
-			axios
-				.get(`http://127.0.0.1:8000/shop/customer/`, token)
-				.then((response) => {
-					setUserData(response.data);
-				})
-				.catch((error) => {
-					console.error("Ошибка при получении данных: ", error);
-				});
-		};
-
-		fetchUserData();
+		if (isUserLoggedIn()) {
+			fetchUserData();
+		}
 	}, []);
 
 	const handleMethodClick = (method: string) => {
@@ -53,6 +55,7 @@ const Header: React.FC = () => {
 	};
 	const handleLoginSuccess = () => {
 		setAuthModalVisible(false);
+		fetchUserData();
 	};
 
 	return (

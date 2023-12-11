@@ -109,6 +109,7 @@ const ProductCart: React.FC = () => {
 	const [reviewText, setReviewText] = useState("");
 	const [starsSelected, setStarsSelected] = useState(0);
 	const [showReviewLimitMessage, setShowReviewLimitMessage] = useState(false);
+	const [isFavoriteActive, setIsFavoriteActive] = useState(false);
 
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
 
@@ -147,6 +148,29 @@ const ProductCart: React.FC = () => {
 			console.error("Ошибка при отправке отзыва:", error);
 			setShowReviewLimitMessage(true);
 		}
+	};
+
+	const toggleFavorite = async () => {
+		try {
+			const authHeaders = getAuthHeaders();
+			const response = await axios.post(
+				`http://127.0.0.1:8000/shop/product/favorite/`,
+				{},
+				authHeaders
+			);
+
+			if (response.status === 200) {
+				setIsFavoriteActive((prevState) => !prevState);
+				console.log("Product favorite status updated");
+			}
+		} catch (error) {
+			console.error("Error toggling favorite status:", error);
+		}
+	};
+
+	const handleFavoriteClick = () => {
+		setIsFavoriteActive((prevState) => !prevState);
+		toggleFavorite();
 	};
 
 	const decreaseQuantity = () => {
@@ -268,7 +292,7 @@ const ProductCart: React.FC = () => {
 						{product.shortDescriptionInfo ? (
 							product.shortDescriptionInfo
 						) : (
-							<span>Описание товара отсутствует.</span>
+							<span>There is no product description.</span>
 						)}
 					</p>
 
@@ -292,7 +316,9 @@ const ProductCart: React.FC = () => {
 
 						<button className={s.buyNow}>Buy NOW</button>
 						<button className={s.addToCart}>Add to cart</button>
-						<button className={s.favoriteActive}>
+						<button
+							className={`${s.favorite} ${isFavoriteActive ? s.favoriteActive : ""}`}
+							onClick={handleFavoriteClick}>
 							<Heart />
 						</button>
 					</div>
@@ -335,7 +361,7 @@ const ProductCart: React.FC = () => {
 							{product.shortDescriptionInfo ? (
 								product.shortDescriptionInfo
 							) : (
-								<span>Описание товара отсутствует.</span>
+								<span>There is no product description.</span>
 							)}
 						</p>
 					</div>
