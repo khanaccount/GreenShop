@@ -41,9 +41,10 @@ const items: Card[] = [
 type SwitchBlockProps = {
 	showDetails: () => void;
 	showAddress: () => void;
+	showWishlist: () => void;
 };
 
-const SwitchBlock: React.FC<SwitchBlockProps> = ({ showAddress, showDetails }) => {
+const SwitchBlock: React.FC<SwitchBlockProps> = ({ showAddress, showDetails, showWishlist }) => {
 	const [active, setActive] = useState<number | null>(1);
 
 	const navigate = useNavigate();
@@ -51,16 +52,19 @@ const SwitchBlock: React.FC<SwitchBlockProps> = ({ showAddress, showDetails }) =
 	const handleActive = (id: number) => {
 		setActive(id);
 		if (id === 1) {
-			showDetails(); // Show Details when Account Details is clicked
+			showDetails();
 		} else if (id === 2) {
-			showAddress(); // Show Address when Address is clicked
+			showAddress();
+		} else if (id === 4) {
+			showWishlist();
 		}
 	};
 
 	const handleLogout = () => {
-		logout(); // Выход из аккаунта
-		navigate("/"); // Перенаправление на главную страницу
+		logout();
+		navigate("/");
 	};
+
 	return (
 		<div className={s.switchBlock}>
 			<h5>My Account</h5>
