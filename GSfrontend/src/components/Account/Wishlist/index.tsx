@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import s from "./index.module.scss";
 
-interface WishlistItem {}
-
 const Wishlist: React.FC = () => {
 	const [cardData, setCardData] = useState<any>(null);
 	useEffect(() => {
