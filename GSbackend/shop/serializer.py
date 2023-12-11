@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import *
-from django.contrib.auth import authenticate
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -147,4 +146,10 @@ class TransactionSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
+        fields = "__all__"
+
+
+class FavouritesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favourite
         fields = "__all__"

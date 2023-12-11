@@ -351,3 +351,70 @@ class ReviewViews(APIView):
         product.update_reviews_info()
 
         return Response({"message": "Review deleted"}, status=status.HTTP_200_OK)
+
+
+class FavouritesViews(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def productData(self, object):
+        data = ProductSerializer(object).data
+        dataOutput = {
+            "name": data["name"],
+            "mainPrice": data["mainPrice"],
+            "salePrice": data["salePrice"],
+            "mainImg": data["mainImg"],
+        }
+        return dataOutput
+
+    def get(self, request):
+        favourites = Favourite.objects.filter(customer=request.user)
+
+        output = [
+            {"product": self.productData(output.product)} for output in favourites
+        ]
+
+        return Response(output, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        try:
+            product = Product.objects.get(id=request.data["product"])
+        except:
+            return Response(
+                {"error": "Product not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        customer = request.user
+
+        favourites = Favourite.objects.filter(customer=customer, product=product)
+        if favourites.count() == 0:
+            data = {"customer": customer.id, "product": product.id}
+
+            serializer = FavouritesSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "Favourites is exists"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def delete(self, request):
+        try:
+            product = Product.objects.get(id=request.data["product"])
+        except:
+            return Response(
+                {"error": "Product is not exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            favourites = Favourite.objects.get(product=product)
+        except:
+            return Response(
+                {"error": "Product not in favourites"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        favourites.delete()
+
+        return Response({"message": "Favourites deleted"}, status=status.HTTP_200_OK)

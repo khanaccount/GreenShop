@@ -45,6 +45,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = "Categories"
+
 
 class Size(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -174,6 +177,9 @@ class ShippingAddress(models.Model):
     def __str__(self):
         return self.streetAddress
 
+    class Meta:
+        verbose_name_plural = "Shipping Adresses"
+
 
 class Order(models.Model):
     customer = models.ForeignKey(
@@ -215,4 +221,12 @@ class Review(models.Model):
     rating = models.IntegerField(validators=[MaxValueValidator(5)])
 
     def __str__(self):
-        return self.customer.username
+        return f"{self.customer.username}: {self.product.name}"
+
+
+class Favourite(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"{self.customer.username}: {self.product.name}"
