@@ -107,12 +107,12 @@ export const startTokenRefresh = (): void => {
 
 			if (access) {
 				localStorage.setItem("accessToken", access);
+				console.log("Token refreshed successfully at:", new Date());
 			} else {
 				console.error("Access token not found in the refresh response");
 			}
 		} catch (error) {
 			console.error("Token refresh error:", error);
-			// Остановка таймера при возникновении ошибки
 			stopTokenRefresh();
 		}
 	}, 29 * 60 * 1000);
@@ -136,3 +136,30 @@ export const logout = (): void => {
 	localStorage.removeItem("accessToken");
 	localStorage.removeItem("refreshToken");
 };
+
+const autoLogin = async () => {
+	try {
+		const userData = {};
+		const response = await axios.post("http://localhost:8000/shop/login/", userData);
+		const { access, refresh } = response.data;
+
+		if (access && refresh) {
+			localStorage.setItem("accessToken", access);
+			localStorage.setItem("refreshToken", refresh);
+
+			startTokenRefresh();
+		} else {
+			console.error("Tokens are missing in the response");
+			throw new Error("Tokens are missing");
+		}
+	} catch (error) {
+		console.error("Login error:", error);
+		throw new Error("Login failed");
+	}
+};
+
+if (isUserLoggedIn()) {
+	startTokenRefresh();
+} else {
+	autoLogin();
+}

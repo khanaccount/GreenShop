@@ -108,8 +108,8 @@ const ProductCart: React.FC = () => {
 	const [quantity, setQuantity] = useState<number>(1);
 	const [reviewText, setReviewText] = useState("");
 	const [starsSelected, setStarsSelected] = useState(0);
-	const [showReviewLimitMessage, setShowReviewLimitMessage] = useState(false);
-	const [isFavoriteActive, setIsFavoriteActive] = useState(false);
+	const [showReviewLimitMessage, setShowReviewLimitMessage] = useState<boolean>(false);
+	const [isFavoriteActive, setIsFavoriteActive] = useState<boolean>(false);
 
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
 	const { id } = useParams();
@@ -127,7 +127,7 @@ const ProductCart: React.FC = () => {
 
 		try {
 			const authHeaders = getAuthHeaders();
-			const response = await axios.post(
+			await axios.post(
 				`http://127.0.0.1:8000/shop/product/reviews/${id}/`,
 				{
 					rating: starsSelected,
@@ -136,15 +136,12 @@ const ProductCart: React.FC = () => {
 				authHeaders
 			);
 
-			console.log("Ответ от сервера:", response.data);
-
 			const updatedProductResponse = await axios.get(`http://127.0.0.1:8000/shop/product/${id}/`);
 			setProduct(updatedProductResponse.data[0]);
 
 			setReviewText("");
 			setStarsSelected(0);
 		} catch (error) {
-			console.error("Ошибка при отправке отзыва:", error);
 			setShowReviewLimitMessage(true);
 		}
 	};
@@ -152,23 +149,39 @@ const ProductCart: React.FC = () => {
 	const toggleFavorite = async () => {
 		try {
 			const authHeaders = getAuthHeaders();
-			const response = await axios.post(
-				`http://127.0.0.1:8000/shop/product/favourite/${id}/`,
-				{},
-				authHeaders
-			);
 
-			if (response.status === 200) {
-				console.log("Product favorite status updated");
+			if (isFavoriteActive) {
+				await deleteFavorite();
+				setIsFavoriteActive(false);
+			} else {
+				const response = await axios.post(
+					`http://127.0.0.1:8000/shop/product/favourite/${id}/`,
+					{},
+					authHeaders
+				);
+
+				if (response.status === 200) {
+					setIsFavoriteActive(true);
+				}
 			}
 		} catch (error) {
-			console.error("Error toggling favorite status:", error);
+			console.error("Error when switching favorite factor:", error);
 		}
 	};
 
-	const handleFavoriteClick = () => {
+	const deleteFavorite = async () => {
+		try {
+			const authHeaders = getAuthHeaders();
+			await axios.delete(`http://127.0.0.1:8000/shop/product/favourite/${id}/`, authHeaders);
+			console.log("Product removed from favorites");
+		} catch (error) {
+			console.error("Error deleting favorite:", error);
+		}
+	};
+
+	const handleFavoriteClick = async () => {
 		setIsFavoriteActive((prevState) => !prevState);
-		toggleFavorite();
+		await toggleFavorite();
 	};
 
 	useEffect(() => {
@@ -179,7 +192,12 @@ const ProductCart: React.FC = () => {
 					`http://127.0.0.1:8000/shop/product/favourite/${id}/`,
 					authHeaders
 				);
-				setIsFavoriteActive(response.data.isFavorite);
+
+				if (response.data.message === "Product in favourite") {
+					setIsFavoriteActive(true);
+				} else {
+					setIsFavoriteActive(false);
+				}
 			} catch (error) {
 				console.error("Error fetching favorite status:", error);
 			}

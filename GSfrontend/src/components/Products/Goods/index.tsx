@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import s from "./index.module.scss";
 import Pagination from "../Pagination";
 import axios from "axios";
+import { getAuthHeaders } from "../../../api/auth";
+
+import Heart from "./svg/Heart";
 
 interface Goods {
 	name: string;
@@ -30,6 +33,17 @@ interface GoodsProps {
 	setCategoriesData: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
 }
 
+interface FavoriteProduct {
+	id: number;
+	product: {
+		id: number;
+		name: string;
+		mainPrice: string;
+		salePrice: string;
+		discount: boolean;
+	};
+}
+
 const sizeMap: { [key: string]: string } = {
 	Small: "s",
 	Medium: "m",
@@ -44,12 +58,13 @@ const Goods: React.FC<GoodsProps> = ({
 	selectedCategory,
 	setCategoriesData
 }) => {
-	const itemsPerPage = 9;
 	const [currentPage, setCurrentPage] = React.useState(1);
+	const [favoriteStates, setFavoriteStates] = React.useState<Map<number, boolean>>(new Map());
+	const [items, setItems] = React.useState<Goods[]>([]);
+	const itemsPerPage = 9;
 	const startIndex = (currentPage - 1) * itemsPerPage;
 	const endIndex = startIndex + itemsPerPage;
 
-	const [items, setItems] = React.useState<Goods[]>([]);
 	useEffect(() => {
 		axios
 			.get("http://127.0.0.1:8000/shop/product/")
@@ -72,12 +87,10 @@ const Goods: React.FC<GoodsProps> = ({
 			});
 	}, [setSizesData, setCategoriesData]);
 
-	// Получаем сокращенное обозначение размера
 	const getSizeCode = (sizeName: string): string => {
 		return sizeMap[sizeName] || "";
 	};
 
-	// Фильтруем товары по выбранному размеру и ценовому диапазону
 	const filteredItems = useMemo(() => {
 		let filtered = items;
 
@@ -95,7 +108,6 @@ const Goods: React.FC<GoodsProps> = ({
 			});
 		}
 
-		// Фильтрация по ценовому диапазону
 		filtered = filtered.filter((item) => {
 			const itemPrice = parseFloat(item.salePrice.slice(1));
 			return itemPrice >= priceRange[0] && itemPrice <= priceRange[1];
@@ -103,8 +115,71 @@ const Goods: React.FC<GoodsProps> = ({
 
 		return filtered;
 	}, [items, priceRange, selectedSize, selectedCategory]);
-	// Получаем товары для отображения на текущей странице
+
 	const displayedItems = filteredItems.slice(startIndex, endIndex);
+
+	useEffect(() => {
+		const fetchFavoriteStatus = async () => {
+			try {
+				const authHeaders = getAuthHeaders();
+				const response = await axios.get<FavoriteProduct[]>(
+					"http://127.0.0.1:8000/shop/product/favourite/",
+					authHeaders
+				);
+				const updatedFavoriteStates = new Map<number, boolean>();
+
+				response.data.forEach((item: FavoriteProduct) => {
+					updatedFavoriteStates.set(item.product.id, true);
+				});
+
+				setFavoriteStates(updatedFavoriteStates);
+			} catch (error) {
+				console.error("Error fetching favorite status:", error);
+			}
+		};
+
+		fetchFavoriteStatus();
+	}, []);
+
+	const toggleFavorite = async (id: number) => {
+		try {
+			const authHeaders = getAuthHeaders();
+			const updatedFavoriteStates = new Map<number, boolean>(favoriteStates);
+
+			if (updatedFavoriteStates.get(id)) {
+				await deleteFavorite(id);
+				updatedFavoriteStates.set(id, false);
+			} else {
+				const response = await axios.post(
+					`http://127.0.0.1:8000/shop/product/favourite/${id}/`,
+					{},
+					authHeaders
+				);
+
+				if (response.status === 200) {
+					updatedFavoriteStates.set(id, true);
+				}
+			}
+
+			setFavoriteStates(updatedFavoriteStates);
+		} catch (error) {
+			console.error("Error when switching favorite factor:", error);
+		}
+	};
+
+	const deleteFavorite = async (id: number) => {
+		try {
+			const authHeaders = getAuthHeaders();
+			await axios.delete(`http://127.0.0.1:8000/shop/product/favourite/${id}/`, authHeaders);
+			console.log("Product removed from favorites");
+		} catch (error) {
+			console.error("Error deleting favorite:", error);
+		}
+	};
+
+	const handleFavoriteClick = async (id: number) => {
+		await toggleFavorite(id);
+	};
 
 	return (
 		<div className={s.goods}>
@@ -117,12 +192,16 @@ const Goods: React.FC<GoodsProps> = ({
 							</Link>
 							{item.discount ? <p className={s.discount}>{item.discountPercentage}% OFF</p> : null}
 							<div className={s.hoverLinks}>
-								<a href="">
+								<button className={`${s.cart}`}>
 									<img src="img/goods/cart.svg" alt="cart" />
-								</a>
-								<a href="">
-									<img src="img/goods/favorite.svg" alt="favorite" />
-								</a>
+								</button>
+								<button
+									onClick={() => handleFavoriteClick(item.id)}
+									className={`${s.favorite} ${
+										favoriteStates.get(item.id) ? s.favoriteActive : ""
+									}`}>
+									<Heart />
+								</button>
 							</div>
 						</div>
 						<div className={s.goodsInfo}>
