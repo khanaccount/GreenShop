@@ -120,11 +120,9 @@ class Product(models.Model):
     rating = models.FloatField(default=0, editable=False)
     discount = models.BooleanField(default=False)
     discountPercentage = models.IntegerField(default=0)
-    size = models.ForeignKey(
-        Size, on_delete=models.SET_NULL, default=1, blank=True, null=True
-    )
+    size = models.ManyToManyField(Size)
     categories = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, default=1, blank=True, null=True
+        Category, on_delete=models.CASCADE, default=1, blank=True, null=True
     )
     sku = models.CharField(max_length=13, unique=True, editable=False)
     mainImg = models.CharField(max_length=200)
@@ -135,8 +133,8 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self):
-        if self.sku == "":
+    def save(self, *args, **kwargs):
+        if not self.sku:
             while True:
                 random_num = str(random.randint(10**12, 10**13 - 1))
 
@@ -150,8 +148,14 @@ class Product(models.Model):
             )
         else:
             self.salePrice = self.mainPrice
-
         super(Product, self).save()
+        print(self.size.all())
+        sizes = self.size.all()
+
+        for size in sizes:
+            SizeCount.objects.get_or_create(
+                product=self, size=size, defaults={"count": 0}
+            )
 
     def update_reviews_info(self):
         reviews = Review.objects.filter(product=self)
@@ -165,7 +169,7 @@ class Product(models.Model):
 
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(
-        Customer, on_delete=models.SET_NULL, blank=True, null=True
+        Customer, on_delete=models.CASCADE, blank=True, null=True
     )
     firstName = models.CharField(max_length=50, blank=True, null=True)
     secondName = models.CharField(max_length=50, blank=True, null=True)
@@ -183,7 +187,7 @@ class ShippingAddress(models.Model):
 
 class Order(models.Model):
     customer = models.ForeignKey(
-        Customer, on_delete=models.SET_NULL, blank=True, null=True
+        Customer, on_delete=models.CASCADE, blank=True, null=True
     )
     date = models.DateField(auto_now_add=True)
     isCompleted = models.BooleanField(default=False, blank=False)
@@ -194,9 +198,9 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     product = models.ForeignKey(
-        Product, on_delete=models.SET_NULL, blank=True, null=True
+        Product, on_delete=models.CASCADE, blank=True, null=True
     )
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField(default=0, blank=True, null=True)
 
     def __str__(self):
@@ -204,9 +208,9 @@ class OrderItem(models.Model):
 
 
 class Transaction(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     shippingAddress = models.ForeignKey(
-        ShippingAddress, on_delete=models.SET_NULL, null=True
+        ShippingAddress, on_delete=models.CASCADE, null=True
     )
     isCompleted = models.BooleanField(default=False)
 
@@ -215,8 +219,8 @@ class Transaction(models.Model):
 
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     text = models.TextField(null=True)
     rating = models.IntegerField(validators=[MaxValueValidator(5)])
 
@@ -230,3 +234,12 @@ class Favourite(models.Model):
 
     def __str__(self):
         return f"{self.customer.username}: {self.product.name}"
+
+
+class SizeCount(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    size = models.ForeignKey(Size, on_delete=models.CASCADE, null=True)
+    count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.product.name} ({self.size}) count = {self.count}"

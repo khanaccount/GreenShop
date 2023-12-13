@@ -22,10 +22,10 @@ urlpatterns = [
     path("shop/orderItem/", OrderItemView.as_view()),
     path("shop/cart/", CartView.as_view()),
     path("shop/shippingAddress/", ShippingAddressView.as_view()),
+    path("shop/transaction/", TransactionViews.as_view()),
     path("shop/edit/", CustomerRetrieveUpdateView.as_view()),
     path("shop/registration/", RegistrationView.as_view()),
     path("shop/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("shop/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("shop/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
-    path("shop/transaction/", TransactionViews.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -73,7 +73,7 @@ class ProductView(APIView):
                 "discountPercentage": output.discountPercentage,
                 "review": output.reviewCount,
                 "rating": output.rating,
-                "size": SizeSerializer(output.size).data,
+                "size": SizeSerializer(output.size, many=True).data,
                 "categories": CategorySerializer(output.categories).data,
                 "mainImg": output.mainImg,
                 "newArriwals": output.newArriwals,
@@ -111,6 +111,9 @@ class ProductCardView(APIView):
             product = Product.objects.get(id=id)
         except:
             return Http404("Product not Found")
+
+        sizeCount = SizeCount.objects.filter(product=id)
+
         data = [
             {
                 "id": product.id,
@@ -118,13 +121,14 @@ class ProductCardView(APIView):
                 "salePrice": self.twoNulls(product, "salePrice"),
                 "reviewCount": product.reviewCount,
                 "rating": product.rating,
-                "size": SizeSerializer(product.size).data,
+                "size": SizeSerializer(output.size, many=True).data,
                 "categories": CategorySerializer(product.categories).data,
                 "sku": product.sku,
                 "mainImg": product.mainImg,
                 "reviews": reviews,
                 "shortDescriptionInfo": product.shortDescriptionInfo,
                 "descriptionInfo": product.descriptionInfo,
+                "sizeCount": SizeCountSerializer(sizeCount),
             }
         ]
         return Response(data)

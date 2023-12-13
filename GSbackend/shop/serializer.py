@@ -155,3 +155,9 @@ class FavouritesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favourite
         fields = "__all__"
+
+
+class SizeCountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SizeCount
+        fields = "__all__"
