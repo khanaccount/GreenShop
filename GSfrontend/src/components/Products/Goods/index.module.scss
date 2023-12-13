@@ -71,14 +71,34 @@
 					position: absolute;
 					bottom: 10px;
 
-					a {
+					.cart,
+					.favorite {
 						display: flex;
+						justify-content: center;
+						align-items: center;
 						padding: 8px;
 						background-color: $tertiaryColor;
 						border-radius: 4px;
-
+						cursor: pointer;
 						&:not(:last-child) {
 							margin-right: 25px;
+						}
+					}
+					.favoriteActive {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						padding: 7px;
+						border-radius: 4px;
+						background: #ffc0cb;
+						border: 1px solid #ffc0cb;
+						cursor: pointer;
+						svg {
+							g {
+								path {
+									fill: white;
+								}
+							}
 						}
 					}
 				}
