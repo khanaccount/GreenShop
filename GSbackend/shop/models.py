@@ -126,7 +126,7 @@ class Product(models.Model):
     )
     sku = models.CharField(max_length=13, unique=True, editable=False)
     mainImg = models.CharField(max_length=200)
-    newArriwals = models.BooleanField(default=0)
+    newArriwals = models.BooleanField(default=1)
     shortDescriptionInfo = models.TextField(max_length=1000, null=True)
     descriptionInfo = models.TextField(null=True)
 
@@ -149,13 +149,6 @@ class Product(models.Model):
         else:
             self.salePrice = self.mainPrice
         super(Product, self).save()
-        print(self.size.all())
-        sizes = self.size.all()
-
-        for size in sizes:
-            SizeCount.objects.get_or_create(
-                product=self, size=size, defaults={"count": 0}
-            )
 
     def update_reviews_info(self):
         reviews = Review.objects.filter(product=self)
@@ -234,12 +227,3 @@ class Favourite(models.Model):
 
     def __str__(self):
         return f"{self.customer.username}: {self.product.name}"
-
-
-class SizeCount(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
-    size = models.ForeignKey(Size, on_delete=models.CASCADE, null=True)
-    count = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.product.name} ({self.size}) count = {self.count}"

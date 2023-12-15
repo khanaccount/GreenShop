@@ -112,8 +112,6 @@ class ProductCardView(APIView):
         except:
             return Http404("Product not Found")
 
-        sizeCount = SizeCount.objects.filter(product=id)
-
         data = [
             {
                 "id": product.id,
@@ -121,14 +119,13 @@ class ProductCardView(APIView):
                 "salePrice": self.twoNulls(product, "salePrice"),
                 "reviewCount": product.reviewCount,
                 "rating": product.rating,
-                "size": SizeSerializer(output.size, many=True).data,
+                "size": SizeSerializer(product.size, many=True).data,
                 "categories": CategorySerializer(product.categories).data,
                 "sku": product.sku,
                 "mainImg": product.mainImg,
                 "reviews": reviews,
                 "shortDescriptionInfo": product.shortDescriptionInfo,
                 "descriptionInfo": product.descriptionInfo,
-                "sizeCount": SizeCountSerializer(sizeCount),
             }
         ]
         return Response(data)
