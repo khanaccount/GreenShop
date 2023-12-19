@@ -172,6 +172,7 @@ class CartView(RetrieveUpdateDestroyAPIView):
                 "totalPrice": "${:.2f}".format(
                     output.quantity * output.product.salePrice
                 ),
+                "sku": ProductSerializer(output.product).data.get("sku"),
             }
             for output in orderItem
         ]
