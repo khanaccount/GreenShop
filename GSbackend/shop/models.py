@@ -183,10 +183,33 @@ class Order(models.Model):
         Customer, on_delete=models.CASCADE, blank=True, null=True
     )
     date = models.DateField(auto_now_add=True)
+    subtotalPrice = models.FloatField()
+    shippingPrice = models.FloatField()
+    totalPrice = models.FloatField()
     isCompleted = models.BooleanField(default=False, blank=False)
 
     def __str__(self):
         return str(self.id)
+
+    def update_prices(self):
+        subtotalPrice = (
+            OrderItem.objects.filter(order=self).aggregate(
+                subtotalPriceSum=models.Sum(
+                    models.F("quantity") * models.F("product__salePrice")
+                )
+            )["subtotalPriceSum"]
+            or 0
+        )
+
+        # shippingPrice = "${:.2f}".format(subtotalPriceSum * 0.05)
+        shippingPrice = 5 + subtotalPrice * 0.05
+
+        totalPrice = subtotalPrice + shippingPrice
+
+        self.subtotalPrice = subtotalPrice
+        self.shippingPrice = shippingPrice
+        self.totalPrice = totalPrice
+        self.save()
 
 
 class OrderItem(models.Model):
@@ -195,6 +218,7 @@ class OrderItem(models.Model):
     )
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField(default=0, blank=True, null=True)
+    size = models.ForeignKey(Size, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return f"{self.product}, {self.order}"

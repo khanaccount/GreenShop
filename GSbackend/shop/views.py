@@ -38,17 +38,24 @@ class CustomerView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = Customer.objects.get(id=request.user)
+        customer = request.user
+        order, created = Order.objects.get_or_create(
+            customer=customer, isCompleted=False
+        )
+
+        orderItem = order.orderitem_set.all()
+
         output = {
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
+            "id": customer.id,
+            "username": customer.username,
+            "email": customer.email,
+            "cartCount": orderItem.count(),
         }
         return Response(output)
 
-    def get(self, request):
-        customer = request.user
-        return Response(CustomerSerializer(customer).data)
+    # def get(self, request):
+    #     customer = request.user
+    #     return Response(CustomerSerializer(customer).data)
 
 
 class ProductView(APIView):
@@ -173,26 +180,33 @@ class CartView(RetrieveUpdateDestroyAPIView):
                     output.quantity * output.product.salePrice
                 ),
                 "sku": ProductSerializer(output.product).data.get("sku"),
+                "size": SizeSerializer(output.size).data["name"],
             }
             for output in orderItem
         ]
-        return Response(output)
+        pricesCart = {
+            "subtotalPrice": "${:.2f}".format(order.subtotalPrice),
+            "shippingPrice": "${:.2f}".format(order.shippingPrice),
+            "totalPrice": "${:.2f}".format(order.totalPrice),
+        }
+        return Response({"prices": pricesCart, "output": output})
 
 
 class OrderItemView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # def get(self, request):
-    #     output = [
-    #         {
-    #             "id": output.id,
-    #             "product": ProductSerializer(output.product).data,
-    #             "order": OrderSerializer(output.order).data,
-    #             "quantity": output.quantity,
-    #         }
-    #         for output in OrderItem.objects.all()
-    #     ]
-    #     return Response(output)
+    def get(self, request, id):
+        output = [
+            {
+                "id": output.id,
+                "product": ProductSerializer(output.product).data,
+                "order": OrderSerializer(output.order).data,
+                "quantity": output.quantity,
+                "size": output.size,
+            }
+            for output in OrderItem.objects.all()
+        ]
+        return Response(output)
 
     def post(self, request, id):
         customer = request.user
@@ -209,14 +223,30 @@ class OrderItemView(APIView):
         if "quantity" in request.data:
             data["quantity"] = request.data["quantity"]
 
+        if "size" in request.data:
+            size = request.data["size"]
+            if product.size.filter(id=size).exists():
+                data["size"] = size
+            else:
+                return Response(
+                    {"error": "Invalid size for the product"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            return Response(
+                {"error": "Write a size"}, status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+
         serializer = OrderItemSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(data)
+            Order.update_prices(order)
+            return Response(data, status=status.HTTP_200_OK)
 
     def put(self, request, id, *args, **kwargs):
         try:
             instance = OrderItem.objects.get(id=id)
+            order = instance.order
         except:
             return Response({"error": "Order does not exists"})
 
@@ -225,17 +255,20 @@ class OrderItemView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        Order.update_prices(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, id):
         try:
             instance = OrderItem.objects.get(id=id)
+            order = instance.order
         except:
             return Response(
                 {"error": "Order does not exists"}, status=status.HTTP_404_NOT_FOUND
             )
 
         instance.delete()
+        Order.update_prices(order)
 
         return Response({"message": "Order deleted"}, status=status.HTTP_200_OK)
 
