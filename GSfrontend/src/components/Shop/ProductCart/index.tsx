@@ -110,6 +110,8 @@ const ProductCart: React.FC = () => {
 	const [starsSelected, setStarsSelected] = useState(0);
 	const [showReviewLimitMessage, setShowReviewLimitMessage] = useState<boolean>(false);
 	const [isFavoriteActive, setIsFavoriteActive] = useState<boolean>(false);
+	const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
+	const [availableSizes, setAvailableSizes] = useState<Array<{ id: number; name: string }>>([]);
 
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
 	const { id } = useParams();
@@ -231,6 +233,10 @@ const ProductCart: React.FC = () => {
 		setActiveTab(tab);
 	};
 
+	const handleSizeClick = (id: number) => {
+		setSelectedSizeId(id);
+	};
+
 	useEffect(() => {
 		if (id) {
 			axios
@@ -238,12 +244,41 @@ const ProductCart: React.FC = () => {
 				.then((response) => {
 					setProduct(response.data[0]);
 					setSelectedImage(`/${response.data[0].mainImg}`);
+
+					const sizesFromResponse = response.data[0].size || [];
+					setAvailableSizes(sizesFromResponse);
 				})
 				.catch((error) => {
 					console.error("Error while receiving card data: ", error);
 				});
 		}
-	}, []);
+	}, [id]);
+
+	const isSizeAvailable = (sizeId: number): boolean => {
+		return availableSizes.some((size) => size.id === sizeId);
+	};
+
+	const handleAddToCart = async () => {
+		try {
+			if (selectedSizeId && quantity > 0) {
+				const authHeaders = getAuthHeaders();
+				const payload = {
+					product: product?.id,
+					sizeId: selectedSizeId,
+					quantity: quantity
+				};
+
+				await axios.post(`http://127.0.0.1:8000/shop/orderItem/`, payload, authHeaders);
+				console.log("Product successfully added to cart!");
+			} else {
+				console.error(
+					"The size has not been selected or the quantity of the product has not been specified."
+				);
+			}
+		} catch (error) {
+			console.error("Error when adding item to cart:", error);
+		}
+	};
 
 	if (!product) {
 		return <div className={s.Loading}>Loading...</div>;
@@ -332,9 +367,15 @@ const ProductCart: React.FC = () => {
 					<p className={s.sizeTitle}>Size:</p>
 					<div className={s.sizeBlock}>
 						{hollowCyrcle.map((item) => (
-							<div className={s.size} key={item.id}>
-								<p>{item.title}</p>
-								{item.icon}
+							<div key={item.id}>
+								<div
+									className={`${s.size} ${selectedSizeId === item.id ? s.sizeActive : ""} ${
+										!isSizeAvailable(item.id) ? s.sizeInactive : ""
+									}`}
+									onClick={() => handleSizeClick(item.id)}>
+									<p>{item.title}</p>
+									{item.icon}
+								</div>
 							</div>
 						))}
 					</div>
@@ -348,7 +389,9 @@ const ProductCart: React.FC = () => {
 						</button>
 
 						<button className={s.buyNow}>Buy NOW</button>
-						<button className={s.addToCart}>Add to cart</button>
+						<button onClick={handleAddToCart} className={s.addToCart}>
+							Add to cart
+						</button>
 						<button
 							className={`${s.favorite} ${isFavoriteActive ? s.favoriteActive : ""}`}
 							onClick={handleFavoriteClick}>
@@ -422,7 +465,7 @@ const ProductCart: React.FC = () => {
 							<p>No reviews available</p>
 						)}
 						<div className={s.reviewForm}>
-							<h3>Добавить отзыв</h3>
+							<h3>Add review</h3>
 							<form onSubmit={handleSubmitReview}>
 								<div className={s.stars}>
 									{[1, 2, 3, 4, 5].map((id) => (
@@ -440,7 +483,7 @@ const ProductCart: React.FC = () => {
 									value={reviewText}
 									onChange={(e) => setReviewText(e.target.value)}></textarea>
 								<button className={s.submitButton} type="submit">
-									Отправить
+									Send
 								</button>
 							</form>
 						</div>

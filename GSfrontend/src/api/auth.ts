@@ -11,6 +11,8 @@ interface LoginData {
 	password: string;
 }
 
+let refreshTimer: NodeJS.Timeout | null = null;
+
 const apiBaseUrl = "http://localhost:8000/shop/";
 
 export const register = async (userData: RegisterData): Promise<void> => {
@@ -21,7 +23,7 @@ export const register = async (userData: RegisterData): Promise<void> => {
 	}
 
 	try {
-		await axios.post("http://localhost:8000/shop/registration/", {
+		await axios.post(`${apiBaseUrl}registration/`, {
 			username,
 			email,
 			password
@@ -45,7 +47,7 @@ export const register = async (userData: RegisterData): Promise<void> => {
 
 export const login = async (userData: LoginData): Promise<void> => {
 	try {
-		const response = await axios.post("http://localhost:8000/shop/login/", userData);
+		const response = await axios.post(`${apiBaseUrl}login/`, userData);
 		const { access, refresh } = response.data;
 
 		if (access && refresh) {
@@ -79,15 +81,12 @@ export const getAuthHeaders = () => {
 
 export const someApiRequest = async () => {
 	try {
-		const headers = getAuthHeaders(); // Получение заголовков авторизации
+		const headers = getAuthHeaders();
 		const response = await axios.get(`${apiBaseUrl}some-endpoint/`, headers);
-		// Обработка ответа
 	} catch (error) {
 		console.log(`error ${error}`);
 	}
 };
-
-let refreshTimer: NodeJS.Timeout | null = null;
 
 export const startTokenRefresh = (): void => {
 	stopTokenRefresh();
@@ -99,6 +98,9 @@ export const startTokenRefresh = (): void => {
 				throw new Error("Refresh token not found");
 			}
 
+			console.log("Refreshing token...");
+			console.log("Current refresh token:", refreshToken);
+
 			const response = await axios.post(`${apiBaseUrl}token/refresh/`, {
 				refresh: refreshToken
 			});
@@ -108,6 +110,7 @@ export const startTokenRefresh = (): void => {
 			if (access) {
 				localStorage.setItem("accessToken", access);
 				console.log("Token refreshed successfully at:", new Date());
+				console.log("New access token:", access);
 			} else {
 				console.error("Access token not found in the refresh response");
 			}
@@ -140,7 +143,7 @@ export const logout = (): void => {
 const autoLogin = async () => {
 	try {
 		const userData = {};
-		const response = await axios.post("http://localhost:8000/shop/login/", userData);
+		const response = await axios.post(`${apiBaseUrl}login/`, userData);
 		const { access, refresh } = response.data;
 
 		if (access && refresh) {

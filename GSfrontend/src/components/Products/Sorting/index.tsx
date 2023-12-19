@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import s from "./index.module.scss";
 
-const Sorting: React.FC = () => {
+const Sorting: React.FC<{
+	handleSaleFilter: (id?: number) => void;
+	resetAllFilters: () => void;
+	appliedFilters: {
+		sortBy: string;
+	};
+	handleFilterChange: (newFilters: { sortBy: string }) => void;
+}> = ({ handleSaleFilter, resetAllFilters, handleFilterChange }) => {
 	const [activeCategory, setActiveCategory] = useState<number | null>(1);
 	const [isArrowActive, setIsArrowActive] = useState(false);
 	const [sortBy, setSortBy] = useState("Default sorting");
@@ -11,10 +18,14 @@ const Sorting: React.FC = () => {
 	const handleSortOptionClick = (option: string) => {
 		setSortBy(option);
 		toggleArrowStyle();
+		handleFilterChange({ sortBy: option });
 	};
 
 	const handleCategoryClick = (id: number) => {
 		setActiveCategory(id);
+		if (id === 1) {
+			resetAllFilters();
+		}
 	};
 
 	const toggleArrowStyle = () => {
@@ -24,6 +35,13 @@ const Sorting: React.FC = () => {
 	const closeMenu = (event: MouseEvent) => {
 		if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
 			setIsArrowActive(false);
+		}
+	};
+
+	const handleSaleClick = (id: number) => {
+		handleSaleFilter(id);
+		if (id === 3) {
+			handleSaleFilter();
 		}
 	};
 
@@ -48,7 +66,10 @@ const Sorting: React.FC = () => {
 					New Arrivals
 				</h5>
 				<h5
-					onClick={() => handleCategoryClick(3)}
+					onClick={() => {
+						handleCategoryClick(3);
+						handleSaleClick(3);
+					}}
 					className={activeCategory === 3 ? s.activeCategory : ""}>
 					Sale
 				</h5>
@@ -67,7 +88,7 @@ const Sorting: React.FC = () => {
 					className={isArrowActive ? `${s.sortOptions}` : `${s.sortOptionsHidden}`}>
 					<h5 onClick={() => handleSortOptionClick("Default sorting")}>Default sorting</h5>
 					<h5 onClick={() => handleSortOptionClick("Price: Low to High")}>Price: Low to High</h5>
-					<h5 onClick={() => handleSortOptionClick("Price: High to Low")}>Price: Low to Low</h5>
+					<h5 onClick={() => handleSortOptionClick("Price: High to Low")}>Price: High to Low</h5>
 					<h5 onClick={() => handleSortOptionClick("Most popular")}>Most popular</h5>
 					<h5 onClick={() => handleSortOptionClick("Rating")}>Rating</h5>
 				</div>

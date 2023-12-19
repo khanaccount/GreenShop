@@ -2,9 +2,9 @@ import React from "react";
 
 import Header from "../components/Header";
 import Path from "../components/Shop/Path";
-import ProductCart from "../components/Shop/ProductCart";
-import Footer from "../components/Footer";
 import ProductCarousel from "../components/Shop/ProductCarousel";
+import Footer from "../components/Footer";
+import ProductCart from "../components/Shop/ProductCart";
 
 export const Shop: React.FC = () => {
 	return (
