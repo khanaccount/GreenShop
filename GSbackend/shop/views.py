@@ -211,9 +211,9 @@ class OrderItemView(APIView):
 
     def put(self, request, *args, **kwargs):
         try:
-            instance = OrderItem.objects.get(id=request.data["idOrderItem"])
+            instance = OrderItem.objects.get(id=request.data["orderItem"])
         except:
-            return Response({"error": "Object does not exists"})
+            return Response({"error": "Order does not exists"})
 
         serializer = OrderItemSerializer(
             data=request.data, instance=instance, partial=True
@@ -221,6 +221,18 @@ class OrderItemView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        try:
+            instance = OrderItem.objects.get(id=request.data["orderItem"])
+        except:
+            return Response(
+                {"error": "Order does not exists"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        instance.delete()
+
+        return Response({"message": "Order deleted"}, status=status.HTTP_200_OK)
 
 
 class ShippingAddressView(APIView):
