@@ -237,6 +237,12 @@ class OrderItemView(APIView):
                 {"error": "Write a size"}, status=status.HTTP_406_NOT_ACCEPTABLE
             )
 
+        if OrderItem.objects.filter(product=product, size=size).exists():
+            return Response(
+                {"error": "Product is exists on cart"},
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+            )
+
         serializer = OrderItemSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -244,14 +250,19 @@ class OrderItemView(APIView):
             return Response(data, status=status.HTTP_200_OK)
 
     def put(self, request, id, *args, **kwargs):
+        order, created = Order.objects.get_or_create(
+            customer=request.user, isCompleted=False
+        )
+
         try:
-            instance = OrderItem.objects.get(id=id)
-            order = instance.order
+            orderItem = OrderItem.objects.get(product=id, order=order)
         except:
-            return Response({"error": "Order does not exists"})
+            return Response(
+                {"error": "Order does not exists"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         serializer = OrderItemSerializer(
-            data=request.data, instance=instance, partial=True
+            data=request.data, instance=orderItem, partial=True
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -259,15 +270,20 @@ class OrderItemView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, id):
+        order, created = Order.objects.get_or_create(
+            customer=request.user, isCompleted=False
+        )
+
         try:
-            instance = OrderItem.objects.get(id=id)
-            order = instance.order
+            orderItem = OrderItem.objects.get(
+                product=id, order=order, size=request.data["size"]
+            )
         except:
             return Response(
                 {"error": "Order does not exists"}, status=status.HTTP_404_NOT_FOUND
             )
 
-        instance.delete()
+        orderItem.delete()
         Order.update_prices(order)
 
         return Response({"message": "Order deleted"}, status=status.HTTP_200_OK)
