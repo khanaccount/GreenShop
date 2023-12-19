@@ -27,13 +27,20 @@ const Size: React.FC<SizeProps> = ({ sizesData, setSelectedSize }) => {
 		{ title: "Extra Large", id: 4, count: sizesData["XL"] || 0 }
 	];
 
+	const sizeMap: { [key: string]: string } = {
+		Small: "S",
+		Medium: "M",
+		Large: "L",
+		"Extra Large": "XL"
+	};
+
 	return (
 		<div className={s.size}>
 			<h5>Size</h5>
 			{item.map((size) => (
 				<div
 					key={size.id}
-					onClick={() => handleCategoryClick(size.id, size.title)}
+					onClick={() => handleCategoryClick(size.id, sizeMap[size.title])}
 					className={size.id === activeSizes ? s.active : ""}>
 					<p>{size.title}</p>
 					<p>({size.count})</p>

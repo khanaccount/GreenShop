@@ -69,7 +69,7 @@ const Header: React.FC = () => {
 					</Link>
 				</li>
 				<li>
-					<Link className={location.pathname === "/shop" ? s.active : ""} to="/shop">
+					<Link className={location.pathname === "/shop" ? s.active : ""} to="/Shop/Cart">
 						Shop
 					</Link>
 				</li>
@@ -87,7 +87,7 @@ const Header: React.FC = () => {
 			<div>
 				<div className={s.cart}>
 					<img width={27} height={27} src="/img/header/cart.svg" alt="cart" />
-					<span>6</span>
+					<span></span>
 				</div>
 				{isUserLoggedIn() ? (
 					<Link className={s.account} to="/account">

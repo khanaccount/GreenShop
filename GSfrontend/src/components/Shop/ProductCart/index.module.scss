@@ -196,6 +196,15 @@
 						}
 					}
 				}
+				.sizeInactive {
+					cursor: not-allowed;
+					pointer-events: none;
+					svg {
+						circle {
+							stroke: #070707;
+						}
+					}
+				}
 			}
 
 			.buying {

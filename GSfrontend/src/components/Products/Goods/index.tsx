@@ -15,14 +15,18 @@ interface Goods {
 	discountPercentage: string;
 	discount: boolean;
 	id: number;
-	size: {
-		id: number;
-		name: string;
-	};
+	rating: number;
+	review: number;
+	size: Size[];
 	categories: {
 		id: number;
 		name: string;
 	};
+}
+
+interface Size {
+	id: number;
+	name: string;
 }
 
 interface GoodsProps {
@@ -31,6 +35,8 @@ interface GoodsProps {
 	selectedSize: string | null;
 	selectedCategory: string | null;
 	setCategoriesData: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
+	isSaleClicked: boolean;
+	sortBy: string;
 }
 
 interface FavoriteProduct {
@@ -56,7 +62,9 @@ const Goods: React.FC<GoodsProps> = ({
 	setSizesData,
 	selectedSize,
 	selectedCategory,
-	setCategoriesData
+	setCategoriesData,
+	isSaleClicked,
+	sortBy
 }) => {
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const [favoriteStates, setFavoriteStates] = React.useState<Map<number, boolean>>(new Map());
@@ -69,37 +77,45 @@ const Goods: React.FC<GoodsProps> = ({
 		axios
 			.get("http://127.0.0.1:8000/shop/product/")
 			.then((response) => {
-				setItems(response.data);
+				const fetchedItems: Goods[] = response.data;
+
 				const sizes: { [key: string]: number } = {};
 				const categories: { [key: string]: number } = {};
-				response.data.forEach((item: Goods) => {
-					const sizeName = item.size.name;
-					sizes[sizeName] = (sizes[sizeName] || 0) + 1;
+
+				fetchedItems.forEach((item: Goods) => {
+					item.size.forEach((sizeItem: Size) => {
+						const sizeName = sizeItem.name;
+						sizes[sizeName] = (sizes[sizeName] || 0) + 1;
+					});
 
 					const categoryName = item.categories.name;
 					categories[categoryName] = (categories[categoryName] || 0) + 1;
 				});
+
+				setItems(fetchedItems);
 				setSizesData(sizes);
 				setCategoriesData(categories);
 			})
 			.catch((error) => {
-				console.error("Ошибка при получении данных: ", error);
+				console.error("Error while receiving data:", error);
 			});
 	}, [setSizesData, setCategoriesData]);
-
-	const getSizeCode = (sizeName: string): string => {
-		return sizeMap[sizeName] || "";
-	};
 
 	const filteredItems = useMemo(() => {
 		let filtered = items;
 
-		if (selectedSize) {
-			const selectedSizeCode = getSizeCode(selectedSize);
-			filtered = filtered.filter((item) => {
-				const itemSizeCode = item.size.name.toLowerCase();
-				return itemSizeCode === selectedSizeCode;
-			});
+		if (sortBy === "Price: Low to High") {
+			filtered = [...filtered].sort(
+				(a, b) => parseFloat(a.salePrice.slice(1)) - parseFloat(b.salePrice.slice(1))
+			);
+		} else if (sortBy === "Price: High to Low") {
+			filtered = [...filtered].sort(
+				(a, b) => parseFloat(b.salePrice.slice(1)) - parseFloat(a.salePrice.slice(1))
+			);
+		} else if (sortBy === "Most popular") {
+			filtered = [...filtered].sort((a, b) => b.review - a.review);
+		} else if (sortBy === "Rating") {
+			filtered = [...filtered].sort((a, b) => b.rating - a.rating);
 		}
 
 		if (selectedCategory) {
@@ -108,13 +124,26 @@ const Goods: React.FC<GoodsProps> = ({
 			});
 		}
 
+		if (selectedSize) {
+			filtered = filtered.filter((item) => {
+				const matches = item.size.some(
+					(sizeItem) => sizeItem.name === selectedSize || sizeMap[sizeItem.name] === selectedSize
+				);
+				return matches;
+			});
+		}
+
+		if (isSaleClicked) {
+			filtered = filtered.filter((item) => item.discount === true);
+		}
+
 		filtered = filtered.filter((item) => {
 			const itemPrice = parseFloat(item.salePrice.slice(1));
 			return itemPrice >= priceRange[0] && itemPrice <= priceRange[1];
 		});
 
 		return filtered;
-	}, [items, priceRange, selectedSize, selectedCategory]);
+	}, [items, priceRange, selectedSize, selectedCategory, isSaleClicked, sortBy]);
 
 	const displayedItems = filteredItems.slice(startIndex, endIndex);
 
@@ -187,7 +216,7 @@ const Goods: React.FC<GoodsProps> = ({
 				{displayedItems.map((item) => (
 					<div key={item.id} className={s.card}>
 						<div className={s.cardImg}>
-							<Link to={`/shop/${item.id}/`}>
+							<Link to={`/shop/${item.id}`}>
 								<img src={item.mainImg} alt={item.name} />
 							</Link>
 							{item.discount ? <p className={s.discount}>{item.discountPercentage}% OFF</p> : null}

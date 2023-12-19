@@ -4,14 +4,14 @@ import Header from "../components/Header";
 import Path from "../components/Shop/Path";
 import ProductCarousel from "../components/Shop/ProductCarousel";
 import Footer from "../components/Footer";
-import ProductCart from "../components/Shop/ProductCart";
+import OrderQuantitySelector from "../components/OrderQuantitySelector";
 
-export const Shop: React.FC = () => {
+export const Cart: React.FC = () => {
 	return (
 		<div className="container">
 			<Header />
 			<Path />
-			<ProductCart />
+			<OrderQuantitySelector />
 			<ProductCarousel />
 			<Footer />
 		</div>
