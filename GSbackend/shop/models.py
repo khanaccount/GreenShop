@@ -183,9 +183,9 @@ class Order(models.Model):
         Customer, on_delete=models.CASCADE, blank=True, null=True
     )
     date = models.DateField(auto_now_add=True)
-    subtotalPrice = models.FloatField()
-    shippingPrice = models.FloatField()
-    totalPrice = models.FloatField()
+    subtotalPrice = models.FloatField(default=0)
+    shippingPrice = models.FloatField(default=0)
+    totalPrice = models.FloatField(default=0)
     isCompleted = models.BooleanField(default=False, blank=False)
 
     def __str__(self):
