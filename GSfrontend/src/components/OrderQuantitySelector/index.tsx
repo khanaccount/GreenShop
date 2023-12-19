@@ -6,33 +6,37 @@ import { getAuthHeaders } from "../../api/auth";
 import s from "./index.module.scss";
 import Delete from "./svg/delete";
 
-export interface OrderInfo {
-	items: Item[];
-	prices: PriceInfo;
-}
-
-export interface Item {
+export interface OrderItem {
 	id: number;
 	name: string;
 	price: string;
 	quantity: number;
 	mainImg: string;
+	totalPrice: string;
 	sku: string;
+	size: string;
 }
 
-export interface PriceInfo {
-	shippingPrice: string;
+export interface OrderPrices {
 	subtotalPrice: string;
+	shippingPrice: string;
 	totalPrice: string;
 }
 
-const OrderQuantitySelector: React.FC = () => {
-	const [items, setItems] = useState<OrderInfo>({
-		items: [],
-		prices: { shippingPrice: "", subtotalPrice: "", totalPrice: "" }
-	});
+export interface OrderInfo {
+	prices: OrderPrices;
+	output: OrderItem[];
+}
 
-	console.log(items);
+const OrderQuantitySelector: React.FC = () => {
+	const [orderInfo, setOrderInfo] = useState<OrderInfo>({
+		prices: {
+			subtotalPrice: "",
+			shippingPrice: "",
+			totalPrice: ""
+		},
+		output: []
+	});
 
 	useEffect(() => {
 		fetchItems();
@@ -41,25 +45,26 @@ const OrderQuantitySelector: React.FC = () => {
 	const fetchItems = () => {
 		const authHeaders = getAuthHeaders();
 		axios
-			.get("http://127.0.0.1:8000/shop/cart/", authHeaders)
+			.get<OrderInfo>("http://127.0.0.1:8000/shop/cart/", authHeaders)
 			.then((response) => {
-				setItems(response.data);
+				setOrderInfo(response.data);
 			})
 			.catch((error) => {
 				console.error("Error response:", error);
 			});
 	};
 
-	const handleDelete = (itemId: number) => {
+	const handleDelete = (itemId: number, size: string) => {
 		const authHeaders = getAuthHeaders();
+
 		axios
 			.delete(`http://127.0.0.1:8000/shop/orderItem/${itemId}/`, authHeaders)
 			.then(() => {
 				fetchItems();
-				console.log(`Item with ID ${itemId} deleted successfully.`);
+				console.log(`Item with ID ${itemId} and size ${size} deleted successfully.`);
 			})
 			.catch((error) => {
-				console.error(`Error deleting item with ID ${itemId}:`, error);
+				console.error(`Error deleting item with ID ${itemId} and size ${size}:`, error);
 			});
 	};
 
@@ -84,11 +89,12 @@ const OrderQuantitySelector: React.FC = () => {
 			<div className={s.goods}>
 				<div className={s.categories}>
 					<h5 className={s.products}>Products</h5>
+					<h5 className={s.size}>Size</h5>
 					<h5 className={s.price}>Price</h5>
 					<h5 className={s.quantity}>Quantity</h5>
 					<h5 className={s.total}>Total</h5>
 				</div>
-				{items.map((item) => (
+				{orderInfo.output.map((item) => (
 					<div key={item.id} className={s.goodsBlock}>
 						<div className={s.info}>
 							<img width={70} height={70} src={`/${item.mainImg}`} alt="mainImg" />
@@ -99,6 +105,7 @@ const OrderQuantitySelector: React.FC = () => {
 								</p>
 							</div>
 						</div>
+						<p className={s.size}>{item.size}</p>
 						<p className={s.price}>{item.price}</p>
 						<div className={s.quantity}>
 							<button
@@ -112,7 +119,7 @@ const OrderQuantitySelector: React.FC = () => {
 							</button>
 						</div>
 						<p className={s.total}>{item.totalPrice}</p>
-						<button onClick={() => handleDelete(item.id)}>
+						<button onClick={() => handleDelete(item.id, item.size)}>
 							<Delete />
 						</button>
 					</div>
@@ -127,19 +134,19 @@ const OrderQuantitySelector: React.FC = () => {
 				</form>
 				<div className={s.pricing}>
 					<p className={s.text}>Subtotal</p>
-					<p className={s.price}>$2,683.00</p>
+					<p className={s.price}>{orderInfo.prices.subtotalPrice}</p>
 				</div>
 				<div className={s.pricing}>
 					<p className={s.text}>Coupon Discount</p>
 					<p>(-) 00.00</p>
 				</div>
 				<div className={s.pricing}>
-					<p className={s.text}>Shiping</p>
-					<p className={s.price}>$16.00</p>
+					<p className={s.text}>Shipping</p>
+					<p className={s.price}>{orderInfo.prices.shippingPrice}</p>
 				</div>
 				<div className={s.total}>
 					<p>Total</p>
-					<p className={s.price}>$2,699.00</p>
+					<p className={s.price}>{orderInfo.prices.totalPrice}</p>
 				</div>
 
 				<button className={s.checkout}>Proceed To Checkout</button>

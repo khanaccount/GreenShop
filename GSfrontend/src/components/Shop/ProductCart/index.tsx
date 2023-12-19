@@ -268,7 +268,7 @@ const ProductCart: React.FC = () => {
 					quantity: quantity
 				};
 
-				await axios.post(`http://127.0.0.1:8000/shop/orderItem/`, payload, authHeaders);
+				await axios.post(`http://127.0.0.1:8000/shop/orderItem/${id}/`, payload, authHeaders);
 				console.log("Product successfully added to cart!");
 			} else {
 				console.error(
@@ -479,7 +479,7 @@ const ProductCart: React.FC = () => {
 								</div>
 								<textarea
 									className={s.reviewText}
-									placeholder="Напишите свой отзыв здесь..."
+									placeholder="Write your review here..."
 									value={reviewText}
 									onChange={(e) => setReviewText(e.target.value)}></textarea>
 								<button className={s.submitButton} type="submit">

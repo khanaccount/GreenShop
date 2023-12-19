@@ -15,18 +15,22 @@
 				font-weight: 500;
 				line-height: 16px;
 			}
+			.size {
+				padding-left: 65px;
+			}
+
 			.price {
-				padding-left: 15px;
+				padding-left: 40px;
 			}
 			.quantity {
-				padding-left: 45px;
+				padding-left: 50px;
 			}
 			.total {
 				padding-left: 50px;
 			}
 
 			.products {
-				padding-right: 245px;
+				padding-right: 180px;
 			}
 		}
 		.goodsBlock {
@@ -34,7 +38,7 @@
 			margin-top: 11px;
 			display: grid;
 			align-items: center;
-			grid-template-columns: repeat(5, 1fr);
+			grid-template-columns: repeat(6, 1fr);
 			grid-template-rows: 1fr;
 			grid-column-gap: 40px;
 			justify-items: start;
@@ -67,6 +71,12 @@
 						}
 					}
 				}
+			}
+			.size {
+				color: #727272;
+				font-size: 14px;
+				font-weight: 500;
+				line-height: 16px;
 			}
 			.price {
 				color: $smallTextColor;

@@ -40,7 +40,7 @@ const Header: React.FC = () => {
 		if (isUserLoggedIn()) {
 			fetchUserData();
 		}
-	}, []);
+	}, [userData]);
 
 	const handleMethodClick = (method: string) => {
 		setActiveMethod(method);
@@ -88,7 +88,7 @@ const Header: React.FC = () => {
 			<div>
 				<div className={s.cart}>
 					<img width={27} height={27} src="/img/header/cart.svg" alt="cart" />
-					<span>{userData?.cartCount}</span>
+					{isUserLoggedIn() && userData?.cartCount !== 0 && <span>{userData?.cartCount}</span>}
 				</div>
 				{isUserLoggedIn() ? (
 					<Link className={s.account} to="/account">
