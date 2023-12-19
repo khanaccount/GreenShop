@@ -52,23 +52,23 @@ class CustomerView(APIView):
 
 
 class ProductView(APIView):
-    def twoNulls(NULL, object, string):
-        objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
+    # def twoNulls(NULL, object, string):
+    #     objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
 
-        objectPrice = "$" + str(objectPrice)
+    #     objectPrice = "$" + str(objectPrice)
 
-        if len(objectPrice.split(".")[1]) == 1:
-            objectPrice += "0"
+    #     if len(objectPrice.split(".")[1]) == 1:
+    #         objectPrice += "0"
 
-        return objectPrice
+    #     return objectPrice
 
     def get(self, request):
         output = [
             {
                 "id": output.id,
                 "name": output.name,
-                "mainPrice": self.twoNulls(output, "mainPrice"),
-                "salePrice": self.twoNulls(output, "salePrice"),
+                "mainPrice": "${:.2f}".format(output.mainPrice),
+                "salePrice": "${:.2f}".format(output.salePrice),
                 "discount": output.discount,
                 "discountPercentage": output.discountPercentage,
                 "review": output.reviewCount,
@@ -90,15 +90,15 @@ class ProductView(APIView):
 
 
 class ProductCardView(APIView):
-    def twoNulls(NULL, object, string):
-        objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
+    # def twoNulls(NULL, object, string):
+    #     objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
 
-        objectPrice = "$" + str(objectPrice)
+    #     objectPrice = "$" + str(objectPrice)
 
-        if len(objectPrice.split(".")[1]) == 1:
-            objectPrice += "0"
+    #     if len(objectPrice.split(".")[1]) == 1:
+    #         objectPrice += "0"
 
-        return objectPrice
+    #     return objectPrice
 
     def get(self, request, id):
         try:
@@ -116,7 +116,7 @@ class ProductCardView(APIView):
             {
                 "id": product.id,
                 "name": product.name,
-                "salePrice": self.twoNulls(product, "salePrice"),
+                "salePrice": "${:.2f}".format(product.salePrice),
                 "reviewCount": product.reviewCount,
                 "rating": product.rating,
                 "size": SizeSerializer(product.size, many=True).data,
@@ -168,6 +168,10 @@ class CartView(RetrieveUpdateDestroyAPIView):
                 "name": ProductSerializer(output.product).data.get("name"),
                 "price": ProductSerializer(output.product).data.get("salePrice"),
                 "quantity": output.quantity,
+                "mainImg": ProductSerializer(output.product).data.get("mainImg"),
+                "totalPrice": "${:.2f}".format(
+                    output.quantity * output.product.salePrice
+                ),
             }
             for output in orderItem
         ]
@@ -177,21 +181,21 @@ class CartView(RetrieveUpdateDestroyAPIView):
 class OrderItemView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        output = [
-            {
-                "id": output.id,
-                "product": ProductSerializer(output.product).data,
-                "order": OrderSerializer(output.order).data,
-                "quantity": output.quantity,
-            }
-            for output in OrderItem.objects.all()
-        ]
-        return Response(output)
+    # def get(self, request):
+    #     output = [
+    #         {
+    #             "id": output.id,
+    #             "product": ProductSerializer(output.product).data,
+    #             "order": OrderSerializer(output.order).data,
+    #             "quantity": output.quantity,
+    #         }
+    #         for output in OrderItem.objects.all()
+    #     ]
+    #     return Response(output)
 
-    def post(self, request):
+    def post(self, request, id):
         customer = request.user
-        product = Product.objects.get(id=request.data["product"])
+        product = Product.objects.get(id=id)
         order, created = Order.objects.get_or_create(
             customer=customer, isCompleted=False
         )
@@ -209,9 +213,9 @@ class OrderItemView(APIView):
             serializer.save()
             return Response(data)
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request, id, *args, **kwargs):
         try:
-            instance = OrderItem.objects.get(id=request.data["orderItem"])
+            instance = OrderItem.objects.get(id=id)
         except:
             return Response({"error": "Order does not exists"})
 
@@ -222,9 +226,9 @@ class OrderItemView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request):
+    def delete(self, request, id):
         try:
-            instance = OrderItem.objects.get(id=request.data["orderItem"])
+            instance = OrderItem.objects.get(id=id)
         except:
             return Response(
                 {"error": "Order does not exists"}, status=status.HTTP_404_NOT_FOUND
