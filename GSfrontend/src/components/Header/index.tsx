@@ -12,6 +12,7 @@ interface UserData {
 	id: number;
 	username: string;
 	email: string;
+	cartCount: number;
 }
 
 const Header: React.FC = () => {
@@ -69,7 +70,7 @@ const Header: React.FC = () => {
 					</Link>
 				</li>
 				<li>
-					<Link className={location.pathname === "/shop" ? s.active : ""} to="/Shop/Cart">
+					<Link className={location.pathname === "/Shop/Cart" ? s.active : ""} to="/Shop/Cart">
 						Shop
 					</Link>
 				</li>
@@ -87,7 +88,7 @@ const Header: React.FC = () => {
 			<div>
 				<div className={s.cart}>
 					<img width={27} height={27} src="/img/header/cart.svg" alt="cart" />
-					<span></span>
+					<span>{userData?.cartCount}</span>
 				</div>
 				{isUserLoggedIn() ? (
 					<Link className={s.account} to="/account">
