@@ -60,12 +60,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = [
-            "id",
-            "product",
-            "order",
-            "quantity",
-        ]
+        fields = "__all__"
 
     def update(self, instance, validated_data):
         instance.quantity = validated_data.get("quantity")
