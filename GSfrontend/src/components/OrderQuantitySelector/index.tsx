@@ -6,18 +6,31 @@ import { getAuthHeaders } from "../../api/auth";
 import s from "./index.module.scss";
 import Delete from "./svg/delete";
 
-interface OrderItem {
+export interface OrderInfo {
+	items: Item[];
+	prices: PriceInfo;
+}
+
+export interface Item {
 	id: number;
-	mainImg: string;
 	name: string;
 	price: string;
 	quantity: number;
-	totalPrice: string;
+	mainImg: string;
 	sku: string;
 }
 
+export interface PriceInfo {
+	shippingPrice: string;
+	subtotalPrice: string;
+	totalPrice: string;
+}
+
 const OrderQuantitySelector: React.FC = () => {
-	const [items, setItems] = useState<OrderItem[]>([]);
+	const [items, setItems] = useState<OrderInfo>({
+		items: [],
+		prices: { shippingPrice: "", subtotalPrice: "", totalPrice: "" }
+	});
 
 	console.log(items);
 

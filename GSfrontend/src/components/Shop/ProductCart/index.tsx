@@ -264,7 +264,7 @@ const ProductCart: React.FC = () => {
 				const authHeaders = getAuthHeaders();
 				const payload = {
 					product: product?.id,
-					sizeId: selectedSizeId,
+					size: selectedSizeId,
 					quantity: quantity
 				};
 
