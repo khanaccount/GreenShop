@@ -19,7 +19,7 @@ urlpatterns = [
     path("shop/product/favourite/", FavouritesGetViews.as_view()),
     path("shop/product/favourite/<int:id>/", FavouritesViews.as_view()),
     path("shop/order/", OrderView.as_view()),
-    path("shop/orderItem/", OrderItemView.as_view()),
+    path("shop/orderItem/<int:id>/", OrderItemView.as_view()),
     path("shop/cart/", CartView.as_view()),
     path("shop/shippingAddress/", ShippingAddressView.as_view()),
     path("shop/transaction/", TransactionViews.as_view()),
