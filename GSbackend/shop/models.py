@@ -8,7 +8,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 import random
-from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from datetime import datetime, timedelta
 
@@ -183,9 +183,9 @@ class Order(models.Model):
         Customer, on_delete=models.CASCADE, blank=True, null=True
     )
     date = models.DateField(auto_now_add=True)
-    subtotalPrice = models.FloatField()
-    shippingPrice = models.FloatField()
-    totalPrice = models.FloatField()
+    subtotalPrice = models.FloatField(default=0)
+    shippingPrice = models.FloatField(default=0)
+    totalPrice = models.FloatField(default=0)
     isCompleted = models.BooleanField(default=False, blank=False)
 
     def __str__(self):
@@ -217,7 +217,9 @@ class OrderItem(models.Model):
         Product, on_delete=models.CASCADE, blank=True, null=True
     )
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True)
-    quantity = models.IntegerField(default=0, blank=True, null=True)
+    quantity = models.IntegerField(
+        default=1, validators=[MinValueValidator(1), MaxValueValidator(99)]
+    )
     size = models.ForeignKey(Size, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
