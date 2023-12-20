@@ -12,6 +12,7 @@ from django.http import Http404
 
 class CategoryView(APIView):
     def get(self, request):
+        # Получение списка размеров и их преобразование в json
         output = [
             {
                 "id": output.id,
@@ -24,6 +25,7 @@ class CategoryView(APIView):
 
 class SizeView(APIView):
     def get(self, request):
+        # Получение списка размеров и их преобразование в json
         output = [
             {
                 "id": output.id,
@@ -38,6 +40,7 @@ class CustomerView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Получение данных о текущем пользователе
         customer = request.user
         order, created = Order.objects.get_or_create(
             customer=customer, isCompleted=False
@@ -45,6 +48,7 @@ class CustomerView(APIView):
 
         orderItem = order.orderitem_set.all()
 
+        # Преобразование в json
         output = {
             "id": customer.id,
             "username": customer.username,
@@ -53,6 +57,7 @@ class CustomerView(APIView):
         }
         return Response(output)
 
+    # Дополнительный вариант метода get, если используется сериализатор:
     # def get(self, request):
     #     customer = request.user
     #     return Response(CustomerSerializer(customer).data)
@@ -70,6 +75,7 @@ class ProductView(APIView):
     #     return objectPrice
 
     def get(self, request):
+        # Получение списка продуктов и их преобразование в json
         output = [
             {
                 "id": output.id,
@@ -90,6 +96,7 @@ class ProductView(APIView):
         return Response(output)
 
     def post(self, request):
+        # Создание нового продукта
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -108,6 +115,7 @@ class ProductCardView(APIView):
     #     return objectPrice
 
     def get(self, request, id):
+        # Получение данных о конкретном продукте и его отзывах
         try:
             reviews = ReviewSerializer(
                 Review.objects.filter(product=id), many=True
@@ -119,6 +127,7 @@ class ProductCardView(APIView):
         except:
             return Http404("Product not Found")
 
+        # Преобразование в json
         data = [
             {
                 "id": product.id,
@@ -142,6 +151,7 @@ class OrderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Получение списка заказов и их преобразование в json
         output = [
             {
                 "id": output.id,
@@ -154,6 +164,7 @@ class OrderView(APIView):
         return Response(output)
 
     def post(self, request):
+        # Создание нового заказа
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -164,14 +175,18 @@ class CartView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Получение данных о корзине нынешнего пользователя
         customer = request.user
         order, created = Order.objects.get_or_create(
             customer=customer, isCompleted=False
         )
         orderItem = order.orderitem_set.all()
+
+        # Преобразование в json
         output = [
             {
                 "id": output.id,
+                "idProduct": ProductSerializer(output.product).data.get("id"),
                 "name": ProductSerializer(output.product).data.get("name"),
                 "price": ProductSerializer(output.product).data.get("salePrice"),
                 "quantity": output.quantity,
@@ -196,6 +211,7 @@ class OrderItemView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, id):
+        # Получение списка позиций заказа и их преобразование в json
         output = [
             {
                 "id": output.id,
@@ -209,6 +225,7 @@ class OrderItemView(APIView):
         return Response(output)
 
     def post(self, request, id):
+        # Добавление новой позиции в заказ
         customer = request.user
         product = Product.objects.get(id=id)
         order, created = Order.objects.get_or_create(
@@ -250,6 +267,7 @@ class OrderItemView(APIView):
             return Response(data, status=status.HTTP_200_OK)
 
     def put(self, request, id, *args, **kwargs):
+        # Обновление данных о позиции заказа, в частности, о количестве единиц продукта
         order, created = Order.objects.get_or_create(
             customer=request.user, isCompleted=False
         )
@@ -270,6 +288,7 @@ class OrderItemView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, id):
+        # Удаление позиции из заказа
         order, created = Order.objects.get_or_create(
             customer=request.user, isCompleted=False
         )
@@ -290,7 +309,10 @@ class OrderItemView(APIView):
 
 
 class ShippingAddressView(APIView):
+    authentication_classes = [IsAuthenticated]
+
     def get(self, request):
+        # Получение списка адресов доставки пользователя
         output = [
             {
                 "id": output.id,
@@ -299,14 +321,15 @@ class ShippingAddressView(APIView):
                 "region": output.region,
                 "city": output.city,
             }
-            for output in ShippingAddress.objects.all()
+            for output in ShippingAddress.objects.filter(customer=request.user)
         ]
         return Response(output)
 
     def post(self, request):
+        # Добавление нового адреса доставки
         serializer = ShippingAdressSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            serializer.save(customer=request.user)
             return Response(serializer.data)
 
 
@@ -314,6 +337,7 @@ class RegistrationView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
+        # Регистрация нового пользователя
         serializer = RegistrationSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
@@ -340,6 +364,7 @@ class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
+        # Обновление данных о текущем пользователе
         serializer = CustomerEditSerializer(
             request.user, data=request.data, partial=True
         )
@@ -353,6 +378,7 @@ class TransactionViews(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Получение данных о транзакциях пользователя и их преобразование в json
         output = [
             {
                 "order": OrderSerializer(output.order).data,
@@ -365,6 +391,7 @@ class TransactionViews(APIView):
         return Response(output)
 
     def post(self, request):
+        # Создание новой транзакции
         serializer = TransactionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -383,6 +410,7 @@ class ReviewViews(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, id):
+        # Добавление нового отзыва к продукту
         serializer = ReviewSerializer(data=request.data)
         product = Product.objects.get(id=id)
         review = Review.objects.filter(customer=request.user, product=id)
@@ -400,6 +428,7 @@ class ReviewViews(APIView):
             )
 
     def delete(self, request, id):
+        # Удаление отзыва пользователя о продукте
         try:
             review = Review.objects.get(customer=request.user, product=id)
         except:
@@ -424,6 +453,8 @@ class FavouritesViews(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, id):
+        # Добавление товара в избранное
+
         try:
             favourite = Favourite.objects.get(customer=request.user, product=id)
             return Response(
@@ -458,6 +489,8 @@ class FavouritesViews(APIView):
             )
 
     def delete(self, request, id):
+        # Удаление товара из избранного
+
         try:
             product = Product.objects.get(id=id)
         except:
@@ -483,6 +516,7 @@ class FavouritesGetViews(APIView):
     permission_classes = [IsAuthenticated]
 
     def productData(self, object):
+        # Преобразование данных в json
         data = ProductSerializer(object).data
         dataOutput = {
             "id": data["id"],
@@ -496,6 +530,7 @@ class FavouritesGetViews(APIView):
         return dataOutput
 
     def get(self, request):
+        # Получение всех избранных товаров
         favourites = Favourite.objects.filter(customer=request.user)
 
         output = [
