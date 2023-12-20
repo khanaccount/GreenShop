@@ -195,7 +195,7 @@ class CartView(RetrieveUpdateDestroyAPIView):
                     output.quantity * output.product.salePrice
                 ),
                 "sku": ProductSerializer(output.product).data.get("sku"),
-                "size": SizeSerializer(output.size).data["name"],
+                "size": SizeSerializer(output.size).data,
             }
             for output in orderItem
         ]
