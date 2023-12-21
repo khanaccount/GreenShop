@@ -14,7 +14,11 @@ export interface OrderItem {
 	mainImg: string;
 	totalPrice: string;
 	sku: string;
-	size: string;
+	size: {
+		id: number;
+		name: string;
+	};
+	idProduct: number;
 }
 
 export interface OrderPrices {
@@ -38,6 +42,8 @@ const OrderQuantitySelector: React.FC = () => {
 		output: []
 	});
 
+	console.log(orderInfo);
+
 	useEffect(() => {
 		fetchItems();
 	}, []);
@@ -54,25 +60,30 @@ const OrderQuantitySelector: React.FC = () => {
 			});
 	};
 
-	const handleDelete = (itemId: number, size: string) => {
+	const handleDelete = (idProduct: number, sizeId: number) => {
 		const authHeaders = getAuthHeaders();
 
 		axios
-			.delete(`http://127.0.0.1:8000/shop/orderItem/${itemId}/`, authHeaders)
+			.delete(`http://127.0.0.1:8000/shop/orderItem/${idProduct}/`, {
+				headers: {
+					Authorization: authHeaders?.headers?.Authorization
+				},
+				data: { size: sizeId }
+			})
 			.then(() => {
 				fetchItems();
-				console.log(`Item with ID ${itemId} and size ${size} deleted successfully.`);
+				console.log(`Item with ID ${idProduct} and size ${sizeId} deleted successfully.`);
 			})
 			.catch((error) => {
-				console.error(`Error deleting item with ID ${itemId} and size ${size}:`, error);
+				console.error(`Error deleting item with ID ${idProduct} and size ${sizeId}:`, error);
 			});
 	};
 
-	const updateQuantity = (itemId: number, newQuantity: number) => {
+	const updateQuantity = (idProduct: number, newQuantity: number) => {
 		const authHeaders = getAuthHeaders();
 		axios
 			.put(
-				`http://127.0.0.1:8000/shop/orderItem/${itemId}/`,
+				`http://127.0.0.1:8000/shop/orderItem/${idProduct}/`,
 				{ quantity: newQuantity },
 				authHeaders
 			)
@@ -80,7 +91,7 @@ const OrderQuantitySelector: React.FC = () => {
 				fetchItems();
 			})
 			.catch((error) => {
-				console.error(`Error updating quantity for item with ID ${itemId}:`, error);
+				console.error(`Error updating quantity for item with ID ${idProduct}:`, error);
 			});
 	};
 
@@ -105,21 +116,23 @@ const OrderQuantitySelector: React.FC = () => {
 								</p>
 							</div>
 						</div>
-						<p className={s.size}>{item.size}</p>
+						<p className={s.size}>{item.size.name}</p>
 						<p className={s.price}>{item.price}</p>
 						<div className={s.quantity}>
 							<button
-								onClick={() => updateQuantity(item.id, item.quantity - 1)}
+								onClick={() => updateQuantity(item.idProduct, item.quantity - 1)}
 								className={s.minus}>
 								-
 							</button>
 							<span>{item.quantity}</span>
-							<button onClick={() => updateQuantity(item.id, item.quantity + 1)} className={s.plus}>
+							<button
+								onClick={() => updateQuantity(item.idProduct, item.quantity + 1)}
+								className={s.plus}>
 								+
 							</button>
 						</div>
 						<p className={s.total}>{item.totalPrice}</p>
-						<button onClick={() => handleDelete(item.id, item.size)}>
+						<button onClick={() => handleDelete(item.idProduct, item.size.id)}>
 							<Delete />
 						</button>
 					</div>

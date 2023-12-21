@@ -6,6 +6,7 @@ import axios from "axios";
 import { getAuthHeaders } from "../../../api/auth";
 
 import Heart from "./svg/Heart";
+import Cart from "./svg/Cart";
 
 interface Goods {
 	name: string;
@@ -221,9 +222,6 @@ const Goods: React.FC<GoodsProps> = ({
 							</Link>
 							{item.discount ? <p className={s.discount}>{item.discountPercentage}% OFF</p> : null}
 							<div className={s.hoverLinks}>
-								<button className={`${s.cart}`}>
-									<img src="img/goods/cart.svg" alt="cart" />
-								</button>
 								<button
 									onClick={() => handleFavoriteClick(item.id)}
 									className={`${s.favorite} ${
