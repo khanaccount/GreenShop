@@ -71,7 +71,6 @@
 					position: absolute;
 					bottom: 10px;
 
-					.cart,
 					.favorite {
 						display: flex;
 						justify-content: center;
@@ -80,6 +79,13 @@
 						background-color: $tertiaryColor;
 						border-radius: 4px;
 						cursor: pointer;
+						svg {
+							g {
+								path {
+									fill: $mainColor;
+								}
+							}
+						}
 						&:not(:last-child) {
 							margin-right: 25px;
 						}
@@ -92,6 +98,23 @@
 						border-radius: 4px;
 						background: #ffc0cb;
 						border: 1px solid #ffc0cb;
+						cursor: pointer;
+						svg {
+							g {
+								path {
+									fill: white;
+								}
+							}
+						}
+					}
+					.cartAcitve {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						padding: 7px;
+						border-radius: 4px;
+						background: $secondaryColor;
+						border: 1px solid $secondaryColor;
 						cursor: pointer;
 						svg {
 							g {

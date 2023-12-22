@@ -40,7 +40,7 @@ const Header: React.FC = () => {
 		if (isUserLoggedIn()) {
 			fetchUserData();
 		}
-	}, [userData]);
+	}, []);
 
 	const handleMethodClick = (method: string) => {
 		setActiveMethod(method);

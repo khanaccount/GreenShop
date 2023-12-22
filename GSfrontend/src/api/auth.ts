@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 interface RegisterData {
 	username: string;
@@ -11,9 +12,9 @@ interface LoginData {
 	password: string;
 }
 
-let refreshTimer: NodeJS.Timeout | null = null;
-
 const apiBaseUrl = "http://localhost:8000/shop/";
+
+let tokenRefreshInterval: NodeJS.Timeout;
 
 export const register = async (userData: RegisterData): Promise<void> => {
 	const { username, email, password } = userData;
@@ -52,9 +53,9 @@ export const login = async (userData: LoginData): Promise<void> => {
 
 		if (access && refresh) {
 			localStorage.setItem("accessToken", access);
-			localStorage.setItem("refreshToken", refresh);
+			Cookies.set("refreshToken", refresh, { expires: 30 });
 
-			startTokenRefresh();
+			startTokenRefreshInterval();
 		} else {
 			console.error("Tokens are missing in the response");
 			throw new Error("Tokens are missing");
@@ -79,90 +80,82 @@ export const getAuthHeaders = () => {
 	return {};
 };
 
-export const someApiRequest = async () => {
-	try {
-		const headers = getAuthHeaders();
-		const response = await axios.get(`${apiBaseUrl}some-endpoint/`, headers);
-	} catch (error) {
-		console.log(`error ${error}`);
-	}
-};
+export const startTokenRefreshInterval = () => {
+	clearInterval(tokenRefreshInterval);
 
-export const startTokenRefresh = (): void => {
-	stopTokenRefresh();
-
-	refreshTimer = setInterval(async () => {
+	tokenRefreshInterval = setInterval(async () => {
 		try {
-			const refreshToken = localStorage.getItem("refreshToken");
-			if (!refreshToken) {
-				throw new Error("Refresh token not found");
-			}
-
-			console.log("Refreshing token...");
-			console.log("Current refresh token:", refreshToken);
-
-			const response = await axios.post(`${apiBaseUrl}token/refresh/`, {
-				refresh: refreshToken
-			});
-
-			const { access } = response.data;
-
-			if (access) {
-				localStorage.setItem("accessToken", access);
-				console.log("Token refreshed successfully at:", new Date());
-				console.log("New access token:", access);
-			} else {
-				console.error("Access token not found in the refresh response");
-			}
-		} catch (error) {
-			console.error("Token refresh error:", error);
-			stopTokenRefresh();
+			await refreshAccessToken();
+		} catch (refreshError) {
+			console.error("Refresh error:", refreshError);
+			clearInterval(tokenRefreshInterval);
 		}
 	}, 29 * 60 * 1000);
 };
 
-export const stopTokenRefresh = (): void => {
-	if (refreshTimer) {
-		clearInterval(refreshTimer);
-		refreshTimer = null;
+export const someApiRequest = async () => {
+	try {
+		const headers = getAuthHeaders();
+		const response = await axios.get(`${apiBaseUrl}some-endpoint/`, headers);
+	} catch (error: any) {
+		if (error.response && error.response.status === 401) {
+			try {
+				await refreshAccessToken();
+				const headers = getAuthHeaders();
+				const response = await axios.get(`${apiBaseUrl}some-endpoint/`, headers);
+				// Обработка успешного ответа после обновления access токена
+			} catch (refreshError) {
+				console.error("Refresh error:", refreshError);
+			}
+		} else {
+			console.error(`Error: ${error}`);
+		}
+	}
+};
+
+const refreshAccessToken = async () => {
+	try {
+		const refresh = Cookies.get("refreshToken");
+		if (!refresh) {
+			throw new Error("Refresh token is missing");
+		}
+
+		console.log("Refreshing access token...");
+
+		const response = await axios.post(`${apiBaseUrl}token/refresh/`, { refresh });
+		const newAccessToken = response.data.access;
+
+		if (newAccessToken) {
+			localStorage.setItem("accessToken", newAccessToken);
+			console.log("Access token refreshed successfully:", newAccessToken);
+		} else {
+			throw new Error("New access token is missing in the response");
+		}
+	} catch (error) {
+		console.error("Failed to refresh access token:", error);
+		throw new Error("Failed to refresh access token");
 	}
 };
 
 export const isUserLoggedIn = (): boolean => {
 	const accessToken = localStorage.getItem("accessToken");
-	const refreshToken = localStorage.getItem("refreshToken");
+	const refreshToken = Cookies.get("refreshToken");
+	console.log("Access Token:", accessToken);
+	console.log("Refresh Token:", refreshToken);
 	return !!accessToken && !!refreshToken;
 };
 
 export const logout = (): void => {
-	stopTokenRefresh();
+	clearInterval(tokenRefreshInterval);
 	localStorage.removeItem("accessToken");
-	localStorage.removeItem("refreshToken");
+	Cookies.remove("refreshToken");
 };
 
-const autoLogin = async () => {
-	try {
-		const userData = {};
-		const response = await axios.post(`${apiBaseUrl}login/`, userData);
-		const { access, refresh } = response.data;
-
-		if (access && refresh) {
-			localStorage.setItem("accessToken", access);
-			localStorage.setItem("refreshToken", refresh);
-
-			startTokenRefresh();
-		} else {
-			console.error("Tokens are missing in the response");
-			throw new Error("Tokens are missing");
-		}
-	} catch (error) {
-		console.error("Login error:", error);
-		throw new Error("Login failed");
+export const initApp = () => {
+	const refreshToken = Cookies.get("refreshToken");
+	if (refreshToken) {
+		startTokenRefreshInterval();
 	}
 };
 
-if (isUserLoggedIn()) {
-	startTokenRefresh();
-} else {
-	autoLogin();
-}
+initApp();

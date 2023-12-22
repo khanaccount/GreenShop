@@ -3,15 +3,13 @@ import PhoneInput from "react-phone-number-input/input";
 
 import s from "./index.module.scss";
 
-const Address: React.FC = () => {
+const Payment: React.FC = () => {
 	const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
 	const [showRegionDropdown, setShowRegionDropdown] = useState(false);
 	const [showStateDropdown, setShowStateDropdown] = useState(false);
 	const [filteredRegions, setFilteredRegions] = useState<string[]>([]);
 	const [selectedCountry, setSelectedCountry] = useState<string | undefined>(undefined);
 	const [filteredStates, setFilteredStates] = useState<string[]>([]);
-	const [showRegionDropdownImg, setShowRegionDropdownImg] = useState(false);
-	const [showStateDropdownImg, setShowStateDropdownImg] = useState(false);
 
 	const handlePhoneChange = (value: string | undefined) => {
 		setPhoneNumber(value);
@@ -20,21 +18,11 @@ const Address: React.FC = () => {
 	const toggleRegionDropdown = () => {
 		setShowRegionDropdown(!showRegionDropdown);
 		setShowStateDropdown(false);
-		setShowRegionDropdownImg(!showRegionDropdownImg);
-		setShowStateDropdownImg(false);
-		if (!showRegionDropdown) {
-			handleRegionInputChange({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
-		}
 	};
 
 	const toggleStateDropdown = () => {
 		setShowStateDropdown(!showStateDropdown && !!selectedCountry);
 		setShowRegionDropdown(false);
-		setShowStateDropdownImg(!showStateDropdownImg);
-		setShowRegionDropdownImg(false);
-		if (!showStateDropdown) {
-			handleStateInputChange({ target: { value: "" } } as React.ChangeEvent<HTMLInputElement>);
-		}
 	};
 
 	const handleRegionSelect = (selectedRegion: string) => {
@@ -76,7 +64,6 @@ const Address: React.FC = () => {
 		setSelectedCountry(undefined);
 		setFilteredStates([]);
 		setShowStateDropdown(false);
-
 		if (!inputValue) {
 			handleRegionInputClear();
 		}
@@ -232,6 +219,7 @@ const Address: React.FC = () => {
 							disabled={!selectedCountry}
 						/>
 						<img
+							onClick={toggleStateDropdown}
 							className={showStateDropdown ? s.arrdownActive : s.arrdown}
 							src="img/address/arrdown.svg"
 							alt="arrdown"
@@ -287,4 +275,4 @@ const Address: React.FC = () => {
 	);
 };
 
-export default Address;
+export default Payment;

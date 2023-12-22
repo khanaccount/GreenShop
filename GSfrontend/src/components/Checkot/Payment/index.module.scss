@@ -1,0 +1,103 @@
+@import "../../../variables.scss";
+
+.addressBlock {
+	.addAddress {
+		display: flex;
+		align-items: center;
+	}
+	h5 {
+		color: $mainColor;
+		padding-bottom: 9px;
+		font-size: 17px;
+		font-weight: 500;
+		line-height: 16px;
+	}
+	p {
+		margin-bottom: 30px;
+	}
+
+	.formText {
+		margin-bottom: 10px;
+		color: $mainColor;
+		font-size: 15px;
+		font-weight: 400;
+		line-height: 15px;
+	}
+
+	.addBtn {
+		cursor: pointer;
+		padding-left: 308px;
+		color: $secondaryColor;
+		font-size: 16px;
+		font-weight: 500;
+		line-height: 16px;
+	}
+
+	input {
+		width: 417px;
+		height: 40px;
+		border-radius: 3px;
+		border: 1px solid #eaeaea;
+		padding: 0 10px;
+		outline: none;
+	}
+	span {
+		color: $spanColor;
+		font-size: 22px;
+		font-weight: 400;
+		line-height: 15px;
+	}
+
+	.inputBlock {
+		display: flex;
+
+		&:not(:last-child) {
+			padding-bottom: 30px;
+		}
+		.firstForm {
+			margin-right: 30px;
+			position: relative;
+			.arrdown,
+			.arrdownActive {
+				cursor: pointer;
+				position: absolute;
+				top: 35px;
+				right: 10px;
+				width: 24px;
+				height: 24px;
+			}
+			.arrdownActive {
+				transform: rotate(180deg);
+			}
+		}
+	}
+	.inputBlock {
+		display: flex;
+	}
+
+	.dropdownContent {
+		position: absolute;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		max-height: 200px;
+		overflow-y: auto;
+		z-index: 1;
+		width: 100%;
+	}
+
+	.regionList,
+	.stateList {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+
+		li {
+			padding: 8px 16px;
+			cursor: pointer;
+
+			&:hover {
+				background-color: #f0f0f0;
+			}
+		}
+	}
+}

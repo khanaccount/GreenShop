@@ -221,9 +221,6 @@ const Goods: React.FC<GoodsProps> = ({
 							</Link>
 							{item.discount ? <p className={s.discount}>{item.discountPercentage}% OFF</p> : null}
 							<div className={s.hoverLinks}>
-								<button className={`${s.cart}`}>
-									<img src="img/goods/cart.svg" alt="cart" />
-								</button>
 								<button
 									onClick={() => handleFavoriteClick(item.id)}
 									className={`${s.favorite} ${
