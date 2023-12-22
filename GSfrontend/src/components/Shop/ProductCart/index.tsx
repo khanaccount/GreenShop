@@ -279,10 +279,11 @@ const ProductCart: React.FC = () => {
 			console.error("Error when adding item to cart:", error);
 		}
 	};
-
+	console.log(product)
 	if (!product) {
 		return <div className={s.Loading}>Loading...</div>;
 	}
+	
 	return (
 		<div className={s.product}>
 			<div className={s.item}>

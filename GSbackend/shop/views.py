@@ -100,6 +100,7 @@ class ProductView(APIView):
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
+            Product.create_product_quantity(serializer.instance)
             return Response(serializer.data)
 
 
@@ -127,23 +128,49 @@ class ProductCardView(APIView):
         except:
             return Http404("Product not Found")
 
-        # Преобразование в json
-        data = [
+        productQuantity = ProductQuantity.objects.filter(product=product)
+        size = [
             {
-                "id": product.id,
-                "name": product.name,
-                "salePrice": "${:.2f}".format(product.salePrice),
-                "reviewCount": product.reviewCount,
-                "rating": product.rating,
-                "size": SizeSerializer(product.size, many=True).data,
-                "categories": CategorySerializer(product.categories).data,
-                "sku": product.sku,
-                "mainImg": product.mainImg,
-                "reviews": reviews,
-                "shortDescriptionInfo": product.shortDescriptionInfo,
-                "descriptionInfo": product.descriptionInfo,
+                "id": sizeQuantity.size.id,
+                "name": sizeQuantity.size.name,
+                "quantity": sizeQuantity.quantity,
             }
+            for sizeQuantity in productQuantity
         ]
+
+        # Преобразование в json
+        data = {
+            "id": product.id,
+            "name": product.name,
+            "salePrice": "${:.2f}".format(product.salePrice),
+            "reviewCount": product.reviewCount,
+            "rating": product.rating,
+            "size": size,
+            "categories": CategorySerializer(product.categories).data,
+            "sku": product.sku,
+            "mainImg": product.mainImg,
+            "reviews": reviews,
+            "shortDescriptionInfo": product.shortDescriptionInfo,
+            "descriptionInfo": product.descriptionInfo,
+        }
+
+        if request.user.is_authenticated:
+            order, created = Order.objects.get_or_create(
+                customer=request.user, isCompleted=False
+            )
+
+            orderItem = OrderItem.objects.filter(order=order, product=product.id)
+            print(orderItem.count())
+
+            sizeInCart = [
+                {
+                    "id": SizeSerializer(output.size).data["id"],
+                    "name": SizeSerializer(output.size).data["name"],
+                }
+                for output in orderItem
+            ]
+            data["inCart"] = sizeInCart
+
         return Response(data)
 
 
@@ -218,7 +245,7 @@ class OrderItemView(APIView):
                 "product": ProductSerializer(output.product).data,
                 "order": OrderSerializer(output.order).data,
                 "quantity": output.quantity,
-                "size": output.size,
+                "size": SizeSerializer(output.size).data,
             }
             for output in OrderItem.objects.all()
         ]

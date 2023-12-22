@@ -159,6 +159,15 @@ class Product(models.Model):
         self.rating = round(averageRating, 2) if averageRating is not None else 0
         self.save()
 
+    def create_product_quantity(self):
+        sizes = self.size.all()
+
+        print(sizes)
+
+        for size in sizes:
+            productQuantity = ProductQuantity(product=self, size=size)
+            productQuantity.save()
+
 
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(
@@ -253,3 +262,15 @@ class Favourite(models.Model):
 
     def __str__(self):
         return f"{self.customer.username}: {self.product.name}"
+
+
+class ProductQuantity(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    size = models.ForeignKey(Size, on_delete=models.CASCADE, null=True)
+    quantity = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+    )
+
+    def __str__(self):
+        return f"{self.product.name}: {self.quantity} ({self.size.name})"
