@@ -238,7 +238,14 @@ class OrderItemView(APIView):
         }
 
         if "quantity" in request.data:
-            data["quantity"] = request.data["quantity"]
+            quantity = request.data["quantity"]
+            if quantity <= 0 or quantity >= 100:
+                return Response(
+                    {"error": "Invalid quntity value"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                data["quantity"] = quantity
 
         if "size" in request.data:
             size = request.data["size"]
@@ -278,6 +285,11 @@ class OrderItemView(APIView):
             return Response(
                 {"error": "Order does not exists"}, status=status.HTTP_404_NOT_FOUND
             )
+
+        if "quantity" in request.data:
+            quantity = request.data["quantity"]
+            if quantity <= 0 or quantity >= 100:
+                return Response({"error": "Invalid quntity value"})
 
         serializer = OrderItemSerializer(
             data=request.data, instance=orderItem, partial=True
