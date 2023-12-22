@@ -162,7 +162,9 @@ const OrderQuantitySelector: React.FC = () => {
 					<p className={s.price}>{orderInfo.prices.totalPrice}</p>
 				</div>
 
-				<button className={s.checkout}>Proceed To Checkout</button>
+				<NavLink to={"Checkout"} className={s.checkout}>
+					Proceed To Checkout
+				</NavLink>
 				<NavLink to={"/"} className={s.continue}>
 					Continue Shopping
 				</NavLink>

@@ -6,7 +6,6 @@ import axios from "axios";
 import { getAuthHeaders } from "../../../api/auth";
 
 import Heart from "./svg/Heart";
-import Cart from "./svg/Cart";
 
 interface Goods {
 	name: string;

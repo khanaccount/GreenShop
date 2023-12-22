@@ -6,6 +6,7 @@ import { Home } from "./pages/Home";
 import { Account } from "./pages/Account";
 import { Shop } from "./pages/Shop";
 import { Cart } from "./pages/Cart";
+import { Checkout } from "./pages/Checkout";
 
 const App: React.FC = () => {
 	return (
@@ -20,6 +21,10 @@ const App: React.FC = () => {
 				<Route
 					path="/shop/cart"
 					element={isUserLoggedIn() ? <Cart /> : <Navigate to="/" replace={true} />}
+				/>
+				<Route
+					path="/shop/cart/checkout"
+					element={isUserLoggedIn() ? <Checkout /> : <Navigate to="/" replace={true} />}
 				/>
 			</Routes>
 		</>
