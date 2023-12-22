@@ -127,7 +127,6 @@ const refreshAccessToken = async () => {
 
 		if (newAccessToken) {
 			localStorage.setItem("accessToken", newAccessToken);
-			console.log("Access token refreshed successfully:", newAccessToken);
 		} else {
 			throw new Error("New access token is missing in the response");
 		}
@@ -140,8 +139,6 @@ const refreshAccessToken = async () => {
 export const isUserLoggedIn = (): boolean => {
 	const accessToken = localStorage.getItem("accessToken");
 	const refreshToken = Cookies.get("refreshToken");
-	console.log("Access Token:", accessToken);
-	console.log("Refresh Token:", refreshToken);
 	return !!accessToken && !!refreshToken;
 };
 
