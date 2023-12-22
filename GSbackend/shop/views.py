@@ -240,7 +240,10 @@ class OrderItemView(APIView):
         if "quantity" in request.data:
             quantity = request.data["quantity"]
             if quantity <= 0 or quantity >= 100:
-                Response({"error": "Invalid quntity value"})
+                return Response(
+                    {"error": "Invalid quntity value"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             else:
                 data["quantity"] = quantity
 
@@ -286,7 +289,7 @@ class OrderItemView(APIView):
         if "quantity" in request.data:
             quantity = request.data["quantity"]
             if quantity <= 0 or quantity >= 100:
-                Response({"error": "Invalid quntity value"})
+                return Response({"error": "Invalid quntity value"})
 
         serializer = OrderItemSerializer(
             data=request.data, instance=orderItem, partial=True
