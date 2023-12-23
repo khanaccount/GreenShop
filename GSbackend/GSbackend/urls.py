@@ -21,6 +21,7 @@ urlpatterns = [
     path("shop/order/", OrderView.as_view()),
     path("shop/orderItem/<int:id>/", OrderItemView.as_view()),
     path("shop/cart/", CartView.as_view()),
+    path("shop/cart/coupon/", CouponViews.as_view()),
     path("shop/shippingAddress/", ShippingAddressView.as_view()),
     path("shop/transaction/", TransactionViews.as_view()),
     path("shop/edit/", CustomerRetrieveUpdateView.as_view()),

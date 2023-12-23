@@ -577,3 +577,61 @@ class FavouritesGetViews(APIView):
         ]
 
         return Response(output, status=status.HTTP_200_OK)
+
+
+class CouponViews(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            coupon = Coupon.objects.get(couponCode=request.data["couponCode"])
+        except:
+            return Response(
+                {"error": "Incorrect coupon"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            order, created = Order.objects.get_or_create(
+                customer=request.user, isCompleted=False
+            )
+        except:
+            return Response({"error": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        if order.isUsedCoupon == True:
+            return Response(
+                {"error": "The coupon is already in use"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if coupon.isActive == True:
+            order.isUsedCoupon = True
+            if coupon.isFreeDelivery:
+                order.isFreeDelivery = True
+            if coupon.isDiscount:
+                order.isDiscountCoupon = True
+                order.couponDiscount = coupon.discount
+            order.save()
+            order.update_prices()
+            return Response(CouponSerializer(coupon).data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "Invalid coupon"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+    def delete(self, request):
+        try:
+            order, create = Order.objects.get_or_create(
+                customer=request.user, isCompleted=False
+            )
+        except:
+            return Response({"error": "error"}, status=status.HTTP_404_NOT_FOUND)
+
+        order.isUsedCoupon = False
+        order.isFreeDelivery = False
+        order.isDiscountCoupon = False
+        order.couponDiscount = 0
+
+        order.save()
+        order.update_prices()
+
+        return Response({"message": "Coupon is deleted from order"})

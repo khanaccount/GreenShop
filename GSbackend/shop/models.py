@@ -10,7 +10,8 @@ from django.contrib.auth.models import (
 import random
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from datetime import datetime, timedelta
+import string
+import secrets
 
 
 class CustomerManager(BaseUserManager):
@@ -195,6 +196,13 @@ class Order(models.Model):
     subtotalPrice = models.FloatField(default=0)
     shippingPrice = models.FloatField(default=0)
     totalPrice = models.FloatField(default=0)
+    isUsedCoupon = models.BooleanField(default=False)
+    isFreeDelivery = models.BooleanField(default=False)
+    isDiscountCoupon = models.BooleanField(default=False)
+    coupon = models.CharField(
+        default=None, max_length=16, editable=False, blank=True, null=True
+    )
+    couponDiscount = models.IntegerField(default=1)
     isCompleted = models.BooleanField(default=False, blank=False)
 
     def __str__(self):
@@ -213,7 +221,13 @@ class Order(models.Model):
         # shippingPrice = "${:.2f}".format(subtotalPriceSum * 0.05)
         shippingPrice = 5 + subtotalPrice * 0.05
 
+        if self.isFreeDelivery:
+            shippingPrice = 0
+
         totalPrice = subtotalPrice + shippingPrice
+
+        if self.isUsedCoupon:
+            totalPrice = round(totalPrice * (1 - (self.couponDiscount / 100)), 2)
 
         self.subtotalPrice = subtotalPrice
         self.shippingPrice = shippingPrice
@@ -274,3 +288,25 @@ class ProductQuantity(models.Model):
 
     def __str__(self):
         return f"{self.product.name}: {self.quantity} ({self.size.name})"
+
+
+class Coupon(models.Model):
+    couponCode = models.CharField(editable=False, max_length=16)
+    isFreeDelivery = models.BooleanField()
+    isDiscount = models.BooleanField()
+    discount = models.IntegerField(default=0)
+    isActive = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.couponCode}: Discount - {self.discount}; Free delivery - {self.isFreeDelivery}"
+
+    def save(self):
+        alphabet = string.ascii_letters + string.digits
+        if not self.couponCode:
+            while True:
+                randomCode = "".join(random.choice(alphabet) for _ in range(16))
+
+                if not Coupon.objects.filter(couponCode=randomCode).exists():
+                    self.couponCode = randomCode
+                    break
+            super(Coupon, self).save()
