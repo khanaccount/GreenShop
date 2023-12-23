@@ -236,6 +236,7 @@ const ProductCart: React.FC = () => {
 	const handleSizeClick = (id: number) => {
 		setSelectedSizeId(id);
 	};
+	console.log(product);
 
 	useEffect(() => {
 		if (id) {
@@ -279,7 +280,6 @@ const ProductCart: React.FC = () => {
 			console.error("Error when adding item to cart:", error);
 		}
 	};
-
 	if (!product) {
 		return <div className={s.Loading}>Loading...</div>;
 	}
