@@ -230,6 +230,10 @@ class CartView(RetrieveUpdateDestroyAPIView):
             "subtotalPrice": "${:.2f}".format(order.subtotalPrice),
             "shippingPrice": "${:.2f}".format(order.shippingPrice),
             "totalPrice": "${:.2f}".format(order.totalPrice),
+            "isUsedCoupon": order.isUsedCoupon,
+            "isFreeDelivery": order.isFreeDelivery,
+            "isDiscountCoupon": order.isDiscountCoupon,
+            "couponDiscount": "{}%".format(order.couponDiscount),
         }
         return Response({"prices": pricesCart, "output": output})
 
