@@ -150,3 +150,9 @@ class FavouritesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favourite
         fields = "__all__"
+
+
+class CouponSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = "__all__"

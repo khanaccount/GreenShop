@@ -100,6 +100,7 @@ class ProductView(APIView):
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
+            Product.create_product_quantity(serializer.instance)
             return Response(serializer.data)
 
 
@@ -127,23 +128,49 @@ class ProductCardView(APIView):
         except:
             return Http404("Product not Found")
 
-        # Преобразование в json
-        data = [
+        productQuantity = ProductQuantity.objects.filter(product=product)
+        size = [
             {
-                "id": product.id,
-                "name": product.name,
-                "salePrice": "${:.2f}".format(product.salePrice),
-                "reviewCount": product.reviewCount,
-                "rating": product.rating,
-                "size": SizeSerializer(product.size, many=True).data,
-                "categories": CategorySerializer(product.categories).data,
-                "sku": product.sku,
-                "mainImg": product.mainImg,
-                "reviews": reviews,
-                "shortDescriptionInfo": product.shortDescriptionInfo,
-                "descriptionInfo": product.descriptionInfo,
+                "id": sizeQuantity.size.id,
+                "name": sizeQuantity.size.name,
+                "quantity": sizeQuantity.quantity,
             }
+            for sizeQuantity in productQuantity
         ]
+
+        # Преобразование в json
+        data = {
+            "id": product.id,
+            "name": product.name,
+            "salePrice": "${:.2f}".format(product.salePrice),
+            "reviewCount": product.reviewCount,
+            "rating": product.rating,
+            "size": size,
+            "categories": CategorySerializer(product.categories).data,
+            "sku": product.sku,
+            "mainImg": product.mainImg,
+            "reviews": reviews,
+            "shortDescriptionInfo": product.shortDescriptionInfo,
+            "descriptionInfo": product.descriptionInfo,
+        }
+
+        if request.user.is_authenticated:
+            order, created = Order.objects.get_or_create(
+                customer=request.user, isCompleted=False
+            )
+
+            orderItem = OrderItem.objects.filter(order=order, product=product.id)
+            print(orderItem.count())
+
+            sizeInCart = [
+                {
+                    "id": SizeSerializer(output.size).data["id"],
+                    "name": SizeSerializer(output.size).data["name"],
+                }
+                for output in orderItem
+            ]
+            data["inCart"] = sizeInCart
+
         return Response(data)
 
 
@@ -203,6 +230,10 @@ class CartView(RetrieveUpdateDestroyAPIView):
             "subtotalPrice": "${:.2f}".format(order.subtotalPrice),
             "shippingPrice": "${:.2f}".format(order.shippingPrice),
             "totalPrice": "${:.2f}".format(order.totalPrice),
+            "isUsedCoupon": order.isUsedCoupon,
+            "isFreeDelivery": order.isFreeDelivery,
+            "isDiscountCoupon": order.isDiscountCoupon,
+            "couponDiscount": "{}%".format(order.couponDiscount),
         }
         return Response({"prices": pricesCart, "output": output})
 
@@ -218,7 +249,7 @@ class OrderItemView(APIView):
                 "product": ProductSerializer(output.product).data,
                 "order": OrderSerializer(output.order).data,
                 "quantity": output.quantity,
-                "size": output.size,
+                "size": SizeSerializer(output.size).data,
             }
             for output in OrderItem.objects.all()
         ]
@@ -550,3 +581,61 @@ class FavouritesGetViews(APIView):
         ]
 
         return Response(output, status=status.HTTP_200_OK)
+
+
+class CouponViews(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            coupon = Coupon.objects.get(couponCode=request.data["couponCode"])
+        except:
+            return Response(
+                {"error": "Incorrect coupon"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            order, created = Order.objects.get_or_create(
+                customer=request.user, isCompleted=False
+            )
+        except:
+            return Response({"error": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        if order.isUsedCoupon == True:
+            return Response(
+                {"error": "The coupon is already in use"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if coupon.isActive == True:
+            order.isUsedCoupon = True
+            if coupon.isFreeDelivery:
+                order.isFreeDelivery = True
+            if coupon.isDiscount:
+                order.isDiscountCoupon = True
+                order.couponDiscount = coupon.discount
+            order.save()
+            order.update_prices()
+            return Response(CouponSerializer(coupon).data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "Invalid coupon"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+    def delete(self, request):
+        try:
+            order, create = Order.objects.get_or_create(
+                customer=request.user, isCompleted=False
+            )
+        except:
+            return Response({"error": "error"}, status=status.HTTP_404_NOT_FOUND)
+
+        order.isUsedCoupon = False
+        order.isFreeDelivery = False
+        order.isDiscountCoupon = False
+        order.couponDiscount = 0
+
+        order.save()
+        order.update_prices()
+
+        return Response({"message": "Coupon is deleted from order"})

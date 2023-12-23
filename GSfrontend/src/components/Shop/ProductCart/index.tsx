@@ -283,6 +283,7 @@ const ProductCart: React.FC = () => {
 	if (!product) {
 		return <div className={s.Loading}>Loading...</div>;
 	}
+
 	return (
 		<div className={s.product}>
 			<div className={s.item}>
