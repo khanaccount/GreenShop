@@ -269,6 +269,12 @@
 					}
 				}
 
+				.alreadyAdded {
+					pointer-events: none;
+					color: gray;
+					border: 1px solid gray;
+				}
+
 				.favorite {
 					display: flex;
 					align-items: center;

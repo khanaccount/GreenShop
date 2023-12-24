@@ -42,8 +42,6 @@ const OrderQuantitySelector: React.FC = () => {
 		output: []
 	});
 
-	console.log(orderInfo);
-
 	useEffect(() => {
 		fetchItems();
 	}, []);
@@ -79,12 +77,13 @@ const OrderQuantitySelector: React.FC = () => {
 			});
 	};
 
-	const updateQuantity = (idProduct: number, newQuantity: number) => {
+	const updateQuantity = (idProduct: number, sizeId: number, newQuantity: number) => {
 		const authHeaders = getAuthHeaders();
+
 		axios
 			.put(
 				`http://127.0.0.1:8000/shop/orderItem/${idProduct}/`,
-				{ quantity: newQuantity },
+				{ quantity: newQuantity, size: sizeId },
 				authHeaders
 			)
 			.then(() => {
@@ -92,6 +91,28 @@ const OrderQuantitySelector: React.FC = () => {
 			})
 			.catch((error) => {
 				console.error(`Error updating quantity for item with ID ${idProduct}:`, error);
+			});
+	};
+
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const couponCode = e.currentTarget.elements.namedItem("couponCode") as HTMLInputElement;
+
+		if (couponCode) {
+			applyCoupon(couponCode.value);
+		}
+	};
+
+	const applyCoupon = (couponCode: string) => {
+		const authHeaders = getAuthHeaders();
+
+		axios
+			.post("http://127.0.0.1:8000/shop/cart/coupon/", { couponCode }, authHeaders)
+			.then((response) => {
+				console.log("Coupon applied successfully", response.data);
+			})
+			.catch((error) => {
+				console.error("Error applying coupon:", error);
 			});
 	};
 
@@ -120,13 +141,13 @@ const OrderQuantitySelector: React.FC = () => {
 						<p className={s.price}>{item.price}</p>
 						<div className={s.quantity}>
 							<button
-								onClick={() => updateQuantity(item.idProduct, item.quantity - 1)}
+								onClick={() => updateQuantity(item.idProduct, item.size.id, item.quantity - 1)}
 								className={s.minus}>
 								-
 							</button>
 							<span>{item.quantity}</span>
 							<button
-								onClick={() => updateQuantity(item.idProduct, item.quantity + 1)}
+								onClick={() => updateQuantity(item.idProduct, item.size.id, item.quantity + 1)}
 								className={s.plus}>
 								+
 							</button>
@@ -141,8 +162,8 @@ const OrderQuantitySelector: React.FC = () => {
 			<div className={s.totalPrice}>
 				<h1>CartTotal</h1>
 				<h3>Coupon Apply</h3>
-				<form className={s.couponForm}>
-					<input type="text" placeholder="Enter coupon code" />
+				<form className={s.couponForm} onSubmit={handleSubmit}>
+					<input type="text" placeholder="Enter coupon code" name="couponCode" />
 					<button type="submit">Apply</button>
 				</form>
 				<div className={s.pricing}>

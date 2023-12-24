@@ -119,6 +119,7 @@ const ProductCart: React.FC = () => {
 	const [isFavoriteActive, setIsFavoriteActive] = useState<boolean>(false);
 	const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
 	const [availableSizes, setAvailableSizes] = useState<Array<{ id: number; name: string }>>([]);
+	const [isAlreadyAdded, setIsAlreadyAdded] = useState(false);
 
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
 	const { id } = useParams();
@@ -242,13 +243,16 @@ const ProductCart: React.FC = () => {
 
 	const handleSizeClick = (id: number) => {
 		setSelectedSizeId(id);
+		const isSizeInCart = product?.inCart.some((item) => item.id === id);
+		setIsAlreadyAdded(!!isSizeInCart);
 	};
 	console.log(product);
 
 	useEffect(() => {
 		if (id) {
+			const authHeaders = getAuthHeaders();
 			axios
-				.get(`http://127.0.0.1:8000/shop/product/${id}/`)
+				.get(`http://127.0.0.1:8000/shop/product/${id}/`, authHeaders)
 				.then((response) => {
 					setProduct(response.data[0]);
 					setSelectedImage(`/${response.data[0].mainImg}`);
@@ -276,7 +280,15 @@ const ProductCart: React.FC = () => {
 					quantity: quantity
 				};
 
+				const isSizeInCart = product?.inCart.some((item) => item.id === selectedSizeId);
+
+				if (isSizeInCart) {
+					setIsAlreadyAdded(true);
+					return;
+				}
+
 				await axios.post(`http://127.0.0.1:8000/shop/orderItem/${id}/`, payload, authHeaders);
+				setIsAlreadyAdded(true);
 				console.log("Product successfully added to cart!");
 			} else {
 				console.error(
@@ -287,6 +299,7 @@ const ProductCart: React.FC = () => {
 			console.error("Error when adding item to cart:", error);
 		}
 	};
+
 	if (!product) {
 		return <div className={s.Loading}>Loading...</div>;
 	}
@@ -397,8 +410,10 @@ const ProductCart: React.FC = () => {
 						</button>
 
 						<button className={s.buyNow}>Buy NOW</button>
-						<button onClick={handleAddToCart} className={s.addToCart}>
-							Add to cart
+						<button
+							onClick={handleAddToCart}
+							className={`${s.addToCart} ${isAlreadyAdded ? s.alreadyAdded : ""}`}>
+							{isAlreadyAdded ? "Product added" : "Add to cart"}
 						</button>
 						<button
 							className={`${s.favorite} ${isFavoriteActive ? s.favoriteActive : ""}`}
