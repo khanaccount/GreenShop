@@ -311,7 +311,9 @@ class OrderItemView(APIView):
         )
 
         try:
-            orderItem = OrderItem.objects.get(product=id, order=order)
+            orderItem = OrderItem.objects.get(
+                product=id, order=order, size=request.size
+            )
         except:
             return Response(
                 {"error": "Order does not exists"}, status=status.HTTP_404_NOT_FOUND
