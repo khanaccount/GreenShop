@@ -139,20 +139,22 @@ class ProductCardView(APIView):
         ]
 
         # Преобразование в json
-        data = [{
-            "id": product.id,
-            "name": product.name,
-            "salePrice": "${:.2f}".format(product.salePrice),
-            "reviewCount": product.reviewCount,
-            "rating": product.rating,
-            "size": size,
-            "categories": CategorySerializer(product.categories).data,
-            "sku": product.sku,
-            "mainImg": product.mainImg,
-            "reviews": reviews,
-            "shortDescriptionInfo": product.shortDescriptionInfo,
-            "descriptionInfo": product.descriptionInfo,
-        }]
+        data = [
+            {
+                "id": product.id,
+                "name": product.name,
+                "salePrice": "${:.2f}".format(product.salePrice),
+                "reviewCount": product.reviewCount,
+                "rating": product.rating,
+                "size": size,
+                "categories": CategorySerializer(product.categories).data,
+                "sku": product.sku,
+                "mainImg": product.mainImg,
+                "reviews": reviews,
+                "shortDescriptionInfo": product.shortDescriptionInfo,
+                "descriptionInfo": product.descriptionInfo,
+            }
+        ]
 
         if request.user.is_authenticated:
             order, created = Order.objects.get_or_create(
@@ -231,10 +233,12 @@ class CartView(RetrieveUpdateDestroyAPIView):
             "shippingPrice": "${:.2f}".format(order.shippingPrice),
             "totalPrice": "${:.2f}".format(order.totalPrice),
             "isUsedCoupon": order.isUsedCoupon,
-            "isFreeDelivery": order.isFreeDelivery,
-            "isDiscountCoupon": order.isDiscountCoupon,
-            "couponDiscount": "{}%".format(order.couponDiscount),
         }
+
+        if order.coupon:
+            pricesCart["isFreeDelivery"] = order.coupon.isFreeDelivery
+            pricesCart["isDiscountCoupon"] = order.coupon.isDiscountCoupon
+            pricesCart["couponDiscount"] = "{}%".format(order.coupon.discount)
         return Response({"prices": pricesCart, "output": output})
 
 
@@ -292,7 +296,7 @@ class OrderItemView(APIView):
                 {"error": "Write a size"}, status=status.HTTP_406_NOT_ACCEPTABLE
             )
 
-        if OrderItem.objects.filter(product=product, size=size).exists():
+        if OrderItem.objects.filter(product=product, size=size, order=order).exists():
             return Response(
                 {"error": "Product is exists on cart"},
                 status=status.HTTP_406_NOT_ACCEPTABLE,
@@ -348,7 +352,13 @@ class OrderItemView(APIView):
             )
 
         orderItem.delete()
-        Order.update_prices(order)
+
+        if orderItem.objects.filter(order=order).count() == 0:
+            order.isUsedCoupon = False
+            order.coupon = None
+            order.save()
+
+        order.update_prices()
 
         return Response({"message": "Order deleted"}, status=status.HTTP_200_OK)
 
@@ -611,11 +621,7 @@ class CouponViews(APIView):
 
         if coupon.isActive == True:
             order.isUsedCoupon = True
-            if coupon.isFreeDelivery:
-                order.isFreeDelivery = True
-            if coupon.isDiscount:
-                order.isDiscountCoupon = True
-                order.couponDiscount = coupon.discount
+            order.coupon = coupon
             order.save()
             order.update_prices()
             return Response(CouponSerializer(coupon).data, status=status.HTTP_200_OK)
@@ -633,9 +639,7 @@ class CouponViews(APIView):
             return Response({"error": "error"}, status=status.HTTP_404_NOT_FOUND)
 
         order.isUsedCoupon = False
-        order.isFreeDelivery = False
-        order.isDiscountCoupon = False
-        order.couponDiscount = 0
+        order.coupon = None
 
         order.save()
         order.update_prices()
