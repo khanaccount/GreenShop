@@ -139,7 +139,7 @@ class ProductCardView(APIView):
         ]
 
         # Преобразование в json
-        data = [{
+        data = {
             "id": product.id,
             "name": product.name,
             "salePrice": "${:.2f}".format(product.salePrice),
@@ -152,7 +152,7 @@ class ProductCardView(APIView):
             "reviews": reviews,
             "shortDescriptionInfo": product.shortDescriptionInfo,
             "descriptionInfo": product.descriptionInfo,
-        }]
+        }
 
         if request.user.is_authenticated:
             order, created = Order.objects.get_or_create(
