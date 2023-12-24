@@ -151,6 +151,7 @@
 		.couponForm {
 			display: flex;
 			align-items: center;
+
 			input {
 				padding: 13px 9px;
 				width: 100%;
@@ -167,7 +168,8 @@
 					line-height: 15px;
 				}
 			}
-			button {
+			.applyCoupon,
+			.deleteCoupon {
 				cursor: pointer;
 				margin-left: -4px;
 				padding: 12px 25px 12px 35px;
@@ -179,6 +181,10 @@
 				height: 40px;
 				border-radius: 0px 3px 3px 0px;
 				background: $secondaryColor;
+			}
+			.deleteCoupon {
+				font-size: 15px;
+				padding: 0 25px 0 25px;
 			}
 		}
 

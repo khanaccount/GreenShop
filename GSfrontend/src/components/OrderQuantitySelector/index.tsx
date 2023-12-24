@@ -25,6 +25,10 @@ export interface OrderPrices {
 	subtotalPrice: string;
 	shippingPrice: string;
 	totalPrice: string;
+	isUsedCoupon: boolean;
+	couponDiscount: string;
+	isDiscountCoupon: boolean;
+	isFreeDelivery: boolean;
 }
 
 export interface OrderInfo {
@@ -33,16 +37,27 @@ export interface OrderInfo {
 }
 
 const OrderQuantitySelector: React.FC = () => {
+	const [coupon, setCoupon] = useState<string>("");
+	const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 	const [orderInfo, setOrderInfo] = useState<OrderInfo>({
 		prices: {
 			subtotalPrice: "",
 			shippingPrice: "",
-			totalPrice: ""
+			totalPrice: "",
+			isUsedCoupon: false,
+			couponDiscount: "",
+			isDiscountCoupon: false,
+			isFreeDelivery: false
 		},
 		output: []
 	});
 
 	useEffect(() => {
+		const savedCoupon = localStorage.getItem("appliedCoupon");
+		if (savedCoupon) {
+			setAppliedCoupon(savedCoupon);
+			setCoupon(savedCoupon);
+		}
 		fetchItems();
 	}, []);
 
@@ -77,6 +92,8 @@ const OrderQuantitySelector: React.FC = () => {
 			});
 	};
 
+	console.log(orderInfo);
+
 	const updateQuantity = (idProduct: number, sizeId: number, newQuantity: number) => {
 		const authHeaders = getAuthHeaders();
 
@@ -99,6 +116,7 @@ const OrderQuantitySelector: React.FC = () => {
 		const couponCode = e.currentTarget.elements.namedItem("couponCode") as HTMLInputElement;
 
 		if (couponCode) {
+			setCoupon(couponCode.value);
 			applyCoupon(couponCode.value);
 		}
 	};
@@ -107,12 +125,33 @@ const OrderQuantitySelector: React.FC = () => {
 		const authHeaders = getAuthHeaders();
 
 		axios
-			.post("http://127.0.0.1:8000/shop/cart/coupon/", { couponCode }, authHeaders)
+			.post(`http://127.0.0.1:8000/shop/cart/coupon/`, { couponCode }, authHeaders)
 			.then((response) => {
 				console.log("Coupon applied successfully", response.data);
+				setAppliedCoupon(couponCode);
+				setCoupon(couponCode);
+				localStorage.setItem("appliedCoupon", couponCode);
+				fetchItems();
 			})
 			.catch((error) => {
 				console.error("Error applying coupon:", error);
+			});
+	};
+
+	const handleDeleteCoupon = () => {
+		const authHeaders = getAuthHeaders();
+
+		axios
+			.delete(`http://127.0.0.1:8000/shop/cart/coupon/`, authHeaders)
+			.then(() => {
+				console.log(`Coupon ${appliedCoupon} deleted successfully`);
+				setAppliedCoupon(null);
+				setCoupon("");
+				localStorage.removeItem("appliedCoupon");
+				fetchItems();
+			})
+			.catch((error) => {
+				console.error(`Error deleting coupon ${appliedCoupon}:`, error);
 			});
 	};
 
@@ -163,8 +202,23 @@ const OrderQuantitySelector: React.FC = () => {
 				<h1>CartTotal</h1>
 				<h3>Coupon Apply</h3>
 				<form className={s.couponForm} onSubmit={handleSubmit}>
-					<input type="text" placeholder="Enter coupon code" name="couponCode" />
-					<button type="submit">Apply</button>
+					<input
+						type="text"
+						placeholder="Enter coupon code"
+						name="couponCode"
+						value={coupon}
+						onChange={(e) => setCoupon(e.target.value)}
+						readOnly={!!appliedCoupon}
+					/>
+					{orderInfo.prices.isUsedCoupon ? (
+						<button className={s.deleteCoupon} onClick={handleDeleteCoupon}>
+							Delete Coupon
+						</button>
+					) : (
+						<button className={s.applyCoupon} type="submit">
+							Apply
+						</button>
+					)}
 				</form>
 				<div className={s.pricing}>
 					<p className={s.text}>Subtotal</p>
