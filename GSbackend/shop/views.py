@@ -139,20 +139,22 @@ class ProductCardView(APIView):
         ]
 
         # Преобразование в json
-        data = {
-            "id": product.id,
-            "name": product.name,
-            "salePrice": "${:.2f}".format(product.salePrice),
-            "reviewCount": product.reviewCount,
-            "rating": product.rating,
-            "size": size,
-            "categories": CategorySerializer(product.categories).data,
-            "sku": product.sku,
-            "mainImg": product.mainImg,
-            "reviews": reviews,
-            "shortDescriptionInfo": product.shortDescriptionInfo,
-            "descriptionInfo": product.descriptionInfo,
-        }
+        data = [
+            {
+                "id": product.id,
+                "name": product.name,
+                "salePrice": "${:.2f}".format(product.salePrice),
+                "reviewCount": product.reviewCount,
+                "rating": product.rating,
+                "size": size,
+                "categories": CategorySerializer(product.categories).data,
+                "sku": product.sku,
+                "mainImg": product.mainImg,
+                "reviews": reviews,
+                "shortDescriptionInfo": product.shortDescriptionInfo,
+                "descriptionInfo": product.descriptionInfo,
+            }
+        ]
 
         if request.user.is_authenticated:
             order, created = Order.objects.get_or_create(
@@ -169,7 +171,7 @@ class ProductCardView(APIView):
                 }
                 for output in orderItem
             ]
-            data["inCart"] = sizeInCart
+            data[0]["inCart"] = sizeInCart
 
         return Response(data)
 
