@@ -72,22 +72,29 @@ interface Review {
 }
 
 interface Product {
+	id: number;
 	name: string;
 	salePrice: string;
-	mainImg: string;
+	reviewCount: number;
 	rating: number;
-	id: number;
-	shortDescriptionInfo: string;
 	size: {
 		id: number;
 		name: string;
+		quantity: number;
 	};
 	categories: {
 		id: number;
 		name: string;
 	};
 	sku: string;
+	mainImg: string;
 	reviews: Review[];
+	shortDescriptionInfo: string;
+	descriptionInfo: string;
+	inCart: {
+		id: number;
+		name: string;
+	}[];
 }
 
 const calculateAverageRating = (reviews: Review[]) => {
