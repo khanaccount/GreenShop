@@ -312,7 +312,7 @@ class OrderItemView(APIView):
 
         try:
             orderItem = OrderItem.objects.get(
-                product=id, order=order, size=request.size
+                product=id, order=order, size=request.data["size"]
             )
         except:
             return Response(
