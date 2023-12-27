@@ -3,7 +3,7 @@ import jwt
 from django.core.validators import RegexValidator
 from django.conf import settings
 from django.contrib.auth.models import (
-    AbstractBaseUser,
+    AbstractUser,
     BaseUserManager,
     PermissionsMixin,
 )
@@ -34,7 +34,7 @@ class CustomerManager(BaseUserManager):
     def create_superuser(self, username, email, password):
         user = self.create_user(username, email, password)
         user.is_superuser = True
-        user.isStaff = True
+        user.is_staff = True
         user.save()
 
         return user
@@ -57,32 +57,32 @@ class Size(models.Model):
         return self.name
 
 
-class Customer(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(
-        max_length=100,
-        unique=True,
-        validators=[
-            RegexValidator(
-                regex=r"^[a-zA-Z0-9][a-zA-Z0-9_]*$",
-                message=("Invalid username"),
-                code="invalid_username",
-            ),
-        ],
-    )
-    password = models.CharField(
-        max_length=25,
-        validators=[
-            RegexValidator(
-                regex=r"^[A-Za-z\d!@#$%^&*()_+]+$",
-                message=("Invalid password"),
-                code="invalid_password",
-            ),
-        ],
-    )
+class Customer(AbstractUser):
+    # username = models.CharField(
+    #     max_length=100,
+    #     unique=True,
+    #     validators=[
+    #         RegexValidator(
+    #             regex=r"^[a-zA-Z0-9][a-zA-Z0-9_]*$",
+    #             message=("Invalid username"),
+    #             code="invalid_username",
+    #         ),
+    #     ],
+    # )
+    # password = models.CharField(
+    #     max_length=25,
+    #     validators=[
+    #         RegexValidator(
+    #             regex=r"^[A-Za-z\d!@#$%^&*()_+]+$",
+    #             message=("Invalid password"),
+    #             code="invalid_password",
+    #         ),
+    #     ],
+    # )
     email = models.EmailField(max_length=50, unique=True)
 
-    isStaff = models.BooleanField(default=False)
-    isActive = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
@@ -91,27 +91,6 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-
-    # @property
-    # def token(self):
-    #     return self._generate_jwt_token()
-
-    # def get_full_name(self):
-    #     return self.username
-
-    # def get_short_name(self):
-    #     return self.username
-
-    # def _generate_jwt_token(self):
-    #     dt = datetime.now() + timedelta(days=1)
-
-    #     token = jwt.encode(
-    #         {"id": self.pk, "exp": int((dt - datetime(1970, 1, 1)).total_seconds())},
-    #         settings.SECRET_KEY,
-    #         algorithm="HS256",
-    #     )
-
-    #     return token
 
 
 class Product(models.Model):

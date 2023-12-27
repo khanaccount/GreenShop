@@ -57,23 +57,8 @@ class CustomerView(APIView):
         }
         return Response(output)
 
-    # Дополнительный вариант метода get, если используется сериализатор:
-    # def get(self, request):
-    #     customer = request.user
-    #     return Response(CustomerSerializer(customer).data)
-
 
 class ProductView(APIView):
-    # def twoNulls(NULL, object, string):
-    #     objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
-
-    #     objectPrice = "$" + str(objectPrice)
-
-    #     if len(objectPrice.split(".")[1]) == 1:
-    #         objectPrice += "0"
-
-    #     return objectPrice
-
     def get(self, request):
         # Получение списка продуктов и их преобразование в json
         output = [
@@ -105,16 +90,6 @@ class ProductView(APIView):
 
 
 class ProductCardView(APIView):
-    # def twoNulls(NULL, object, string):
-    #     objectPrice = object.mainPrice if string == "mainPrice" else object.salePrice
-
-    #     objectPrice = "$" + str(objectPrice)
-
-    #     if len(objectPrice.split(".")[1]) == 1:
-    #         objectPrice += "0"
-
-    #     return objectPrice
-
     def get(self, request, id):
         # Получение данных о конкретном продукте и его отзывах
         try:
@@ -403,6 +378,8 @@ class RegistrationView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        customer = serializer.data
 
 
 # class LoginView(APIView):
