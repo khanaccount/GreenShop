@@ -257,14 +257,15 @@ class Order(models.Model):
             else 0
         )
 
+        totalPrice = subtotalPrice
+
         if self.isUsedCoupon:
+            if self.coupon.isDiscountCoupon:
+                totalPrice = round(totalPrice * (1 - (self.coupon.discount / 100)), 2)
             if self.coupon.isFreeDelivery:
                 shippingPrice = 0
 
-        totalPrice = subtotalPrice + shippingPrice
-
-        if self.isUsedCoupon:
-            totalPrice = round(totalPrice * (1 - (self.coupon.discount / 100)), 2)
+        totalPrice += shippingPrice
 
         self.subtotalPrice = subtotalPrice
         self.shippingPrice = shippingPrice
