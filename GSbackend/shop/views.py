@@ -667,9 +667,9 @@ class ProductCarousel(APIView):
             {
                 "id": output.id,
                 "name": output.name,
-                "mainPrice": output.mainPrice,
-                "salePrice": output.salePrice,
-                "discount": output.discount,
+                "mainPrice": "${:.2f}".format(output.mainPrice),
+                "salePrice": "${:.2f}".format(output.salePrice),
+                "discount": output.discount + "%",
                 "discountPercentage": output.discountPercentage,
                 "mainImg": output.mainImg,
             }
