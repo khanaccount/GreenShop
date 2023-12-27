@@ -34,7 +34,7 @@ class CustomerManager(BaseUserManager):
     def create_superuser(self, username, email, password):
         user = self.create_user(username, email, password)
         user.is_superuser = True
-        user.is_staff = True
+        user.isStaff = True
         user.save()
 
         return user
@@ -81,7 +81,8 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     )
     email = models.EmailField(max_length=50, unique=True)
 
-    is_staff = models.BooleanField(default=False)
+    isStaff = models.BooleanField(default=False)
+    isActive = models.BooleanField(default=False)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
