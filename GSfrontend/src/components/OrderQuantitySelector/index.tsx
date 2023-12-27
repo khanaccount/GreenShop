@@ -226,7 +226,7 @@ const OrderQuantitySelector: React.FC = () => {
 				</div>
 				<div className={s.pricing}>
 					<p className={s.text}>Coupon Discount</p>
-					<p>(-) 00.00</p>
+					<p>(-) {orderInfo.prices.couponDiscount}</p>
 				</div>
 				<div className={s.pricing}>
 					<p className={s.text}>Shipping</p>
@@ -237,7 +237,7 @@ const OrderQuantitySelector: React.FC = () => {
 					<p className={s.price}>{orderInfo.prices.totalPrice}</p>
 				</div>
 
-				<NavLink to={"Checkout"} className={s.checkout}>
+				<NavLink to={"/shop/checkout"} className={s.checkout}>
 					Proceed To Checkout
 				</NavLink>
 				<NavLink to={"/"} className={s.continue}>

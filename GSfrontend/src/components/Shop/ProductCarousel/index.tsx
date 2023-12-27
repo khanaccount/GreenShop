@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
+import axios from "axios";
 
 import s from "./index.module.scss";
 
@@ -45,6 +46,14 @@ const carts: Items[] = [
 ];
 
 const ProductCarousel: React.FC = () => {
+	const [carouselItems, setCarouselItems] = useState<Items>();
+
+	console.log(carouselItems);
+
+	axios
+		.get("http://127.0.0.1:8000/shop/product/carousel/")
+		.then((response) => setCarouselItems(response.data));
+
 	return (
 		<div className={s.productCarousel}>
 			<h5 className={s.title}>Releted Products</h5>

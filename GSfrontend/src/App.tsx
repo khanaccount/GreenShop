@@ -23,7 +23,7 @@ const App: React.FC = () => {
 					element={isUserLoggedIn() ? <Cart /> : <Navigate to="/" replace={true} />}
 				/>
 				<Route
-					path="/shop/cart/checkout"
+					path="/Shop/Checkout"
 					element={isUserLoggedIn() ? <Checkout /> : <Navigate to="/" replace={true} />}
 				/>
 			</Routes>
