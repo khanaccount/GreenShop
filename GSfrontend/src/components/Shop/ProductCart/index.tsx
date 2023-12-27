@@ -72,22 +72,29 @@ interface Review {
 }
 
 interface Product {
+	id: number;
 	name: string;
 	salePrice: string;
-	mainImg: string;
+	reviewCount: number;
 	rating: number;
-	id: number;
-	shortDescriptionInfo: string;
 	size: {
 		id: number;
 		name: string;
+		quantity: number;
 	};
 	categories: {
 		id: number;
 		name: string;
 	};
 	sku: string;
+	mainImg: string;
 	reviews: Review[];
+	shortDescriptionInfo: string;
+	descriptionInfo: string;
+	inCart: {
+		id: number;
+		name: string;
+	}[];
 }
 
 const calculateAverageRating = (reviews: Review[]) => {
@@ -112,6 +119,7 @@ const ProductCart: React.FC = () => {
 	const [isFavoriteActive, setIsFavoriteActive] = useState<boolean>(false);
 	const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
 	const [availableSizes, setAvailableSizes] = useState<Array<{ id: number; name: string }>>([]);
+	const [isAlreadyAdded, setIsAlreadyAdded] = useState(false);
 
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
 	const { id } = useParams();
@@ -235,12 +243,15 @@ const ProductCart: React.FC = () => {
 
 	const handleSizeClick = (id: number) => {
 		setSelectedSizeId(id);
+		const isSizeInCart = product?.inCart.some((item) => item.id === id);
+		setIsAlreadyAdded(!!isSizeInCart);
 	};
 
 	useEffect(() => {
 		if (id) {
+			const authHeaders = getAuthHeaders();
 			axios
-				.get(`http://127.0.0.1:8000/shop/product/${id}/`)
+				.get(`http://127.0.0.1:8000/shop/product/${id}/`, authHeaders)
 				.then((response) => {
 					setProduct(response.data[0]);
 					setSelectedImage(`/${response.data[0].mainImg}`);
@@ -268,8 +279,19 @@ const ProductCart: React.FC = () => {
 					quantity: quantity
 				};
 
+				const isSizeInCart = product?.inCart.some((item) => item.id === selectedSizeId);
+
+				if (isSizeInCart) {
+					setIsAlreadyAdded(true);
+					return;
+				}
+
 				await axios.post(`http://127.0.0.1:8000/shop/orderItem/${id}/`, payload, authHeaders);
 				console.log("Product successfully added to cart!");
+				setIsAlreadyAdded(true);
+
+				const updatedProductResponse = await axios.get(`http://127.0.0.1:8000/shop/product/${id}/`);
+				setProduct(updatedProductResponse.data[0]);
 			} else {
 				console.error(
 					"The size has not been selected or the quantity of the product has not been specified."
@@ -279,11 +301,10 @@ const ProductCart: React.FC = () => {
 			console.error("Error when adding item to cart:", error);
 		}
 	};
-	console.log(product)
 	if (!product) {
 		return <div className={s.Loading}>Loading...</div>;
 	}
-	
+
 	return (
 		<div className={s.product}>
 			<div className={s.item}>
@@ -390,8 +411,10 @@ const ProductCart: React.FC = () => {
 						</button>
 
 						<button className={s.buyNow}>Buy NOW</button>
-						<button onClick={handleAddToCart} className={s.addToCart}>
-							Add to cart
+						<button
+							onClick={handleAddToCart}
+							className={`${s.addToCart} ${isAlreadyAdded ? s.alreadyAdded : ""}`}>
+							{isAlreadyAdded ? "Product added" : "Add to cart"}
 						</button>
 						<button
 							className={`${s.favorite} ${isFavoriteActive ? s.favoriteActive : ""}`}

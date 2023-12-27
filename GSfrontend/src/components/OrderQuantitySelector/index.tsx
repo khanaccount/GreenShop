@@ -25,6 +25,10 @@ export interface OrderPrices {
 	subtotalPrice: string;
 	shippingPrice: string;
 	totalPrice: string;
+	isUsedCoupon: boolean;
+	couponDiscount: string;
+	isDiscountCoupon: boolean;
+	isFreeDelivery: boolean;
 }
 
 export interface OrderInfo {
@@ -33,18 +37,27 @@ export interface OrderInfo {
 }
 
 const OrderQuantitySelector: React.FC = () => {
+	const [coupon, setCoupon] = useState<string>("");
+	const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 	const [orderInfo, setOrderInfo] = useState<OrderInfo>({
 		prices: {
 			subtotalPrice: "",
 			shippingPrice: "",
-			totalPrice: ""
+			totalPrice: "",
+			isUsedCoupon: false,
+			couponDiscount: "",
+			isDiscountCoupon: false,
+			isFreeDelivery: false
 		},
 		output: []
 	});
 
-	console.log(orderInfo);
-
 	useEffect(() => {
+		const savedCoupon = localStorage.getItem("appliedCoupon");
+		if (savedCoupon) {
+			setAppliedCoupon(savedCoupon);
+			setCoupon(savedCoupon);
+		}
 		fetchItems();
 	}, []);
 
@@ -79,12 +92,15 @@ const OrderQuantitySelector: React.FC = () => {
 			});
 	};
 
-	const updateQuantity = (idProduct: number, newQuantity: number) => {
+	console.log(orderInfo);
+
+	const updateQuantity = (idProduct: number, sizeId: number, newQuantity: number) => {
 		const authHeaders = getAuthHeaders();
+
 		axios
 			.put(
 				`http://127.0.0.1:8000/shop/orderItem/${idProduct}/`,
-				{ quantity: newQuantity },
+				{ quantity: newQuantity, size: sizeId },
 				authHeaders
 			)
 			.then(() => {
@@ -92,6 +108,50 @@ const OrderQuantitySelector: React.FC = () => {
 			})
 			.catch((error) => {
 				console.error(`Error updating quantity for item with ID ${idProduct}:`, error);
+			});
+	};
+
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const couponCode = e.currentTarget.elements.namedItem("couponCode") as HTMLInputElement;
+
+		if (couponCode) {
+			setCoupon(couponCode.value);
+			applyCoupon(couponCode.value);
+		}
+	};
+
+	const applyCoupon = (couponCode: string) => {
+		const authHeaders = getAuthHeaders();
+
+		axios
+			.post(`http://127.0.0.1:8000/shop/cart/coupon/`, { couponCode }, authHeaders)
+			.then((response) => {
+				console.log("Coupon applied successfully", response.data);
+				setAppliedCoupon(couponCode);
+				setCoupon(couponCode);
+				localStorage.setItem("appliedCoupon", couponCode);
+				fetchItems();
+			})
+			.catch((error) => {
+				console.error("Error applying coupon:", error);
+			});
+	};
+
+	const handleDeleteCoupon = () => {
+		const authHeaders = getAuthHeaders();
+
+		axios
+			.delete(`http://127.0.0.1:8000/shop/cart/coupon/`, authHeaders)
+			.then(() => {
+				console.log(`Coupon ${appliedCoupon} deleted successfully`);
+				setAppliedCoupon(null);
+				setCoupon("");
+				localStorage.removeItem("appliedCoupon");
+				fetchItems();
+			})
+			.catch((error) => {
+				console.error(`Error deleting coupon ${appliedCoupon}:`, error);
 			});
 	};
 
@@ -120,13 +180,13 @@ const OrderQuantitySelector: React.FC = () => {
 						<p className={s.price}>{item.price}</p>
 						<div className={s.quantity}>
 							<button
-								onClick={() => updateQuantity(item.idProduct, item.quantity - 1)}
+								onClick={() => updateQuantity(item.idProduct, item.size.id, item.quantity - 1)}
 								className={s.minus}>
 								-
 							</button>
 							<span>{item.quantity}</span>
 							<button
-								onClick={() => updateQuantity(item.idProduct, item.quantity + 1)}
+								onClick={() => updateQuantity(item.idProduct, item.size.id, item.quantity + 1)}
 								className={s.plus}>
 								+
 							</button>
@@ -141,9 +201,24 @@ const OrderQuantitySelector: React.FC = () => {
 			<div className={s.totalPrice}>
 				<h1>CartTotal</h1>
 				<h3>Coupon Apply</h3>
-				<form className={s.couponForm}>
-					<input type="text" placeholder="Enter coupon code" />
-					<button type="submit">Apply</button>
+				<form className={s.couponForm} onSubmit={handleSubmit}>
+					<input
+						type="text"
+						placeholder="Enter coupon code"
+						name="couponCode"
+						value={coupon}
+						onChange={(e) => setCoupon(e.target.value)}
+						readOnly={!!appliedCoupon}
+					/>
+					{orderInfo.prices.isUsedCoupon ? (
+						<button className={s.deleteCoupon} onClick={handleDeleteCoupon}>
+							Delete Coupon
+						</button>
+					) : (
+						<button className={s.applyCoupon} type="submit">
+							Apply
+						</button>
+					)}
 				</form>
 				<div className={s.pricing}>
 					<p className={s.text}>Subtotal</p>
