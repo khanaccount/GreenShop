@@ -246,7 +246,6 @@ const ProductCart: React.FC = () => {
 		const isSizeInCart = product?.inCart.some((item) => item.id === id);
 		setIsAlreadyAdded(!!isSizeInCart);
 	};
-	console.log(product);
 
 	useEffect(() => {
 		if (id) {
@@ -288,8 +287,11 @@ const ProductCart: React.FC = () => {
 				}
 
 				await axios.post(`http://127.0.0.1:8000/shop/orderItem/${id}/`, payload, authHeaders);
-				setIsAlreadyAdded(true);
 				console.log("Product successfully added to cart!");
+				setIsAlreadyAdded(true);
+
+				const updatedProductResponse = await axios.get(`http://127.0.0.1:8000/shop/product/${id}/`);
+				setProduct(updatedProductResponse.data[0]);
 			} else {
 				console.error(
 					"The size has not been selected or the quantity of the product has not been specified."
@@ -299,7 +301,6 @@ const ProductCart: React.FC = () => {
 			console.error("Error when adding item to cart:", error);
 		}
 	};
-
 	if (!product) {
 		return <div className={s.Loading}>Loading...</div>;
 	}
