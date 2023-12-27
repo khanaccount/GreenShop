@@ -238,11 +238,13 @@ class CartView(RetrieveUpdateDestroyAPIView):
         if order.coupon:
             pricesCart["isFreeDelivery"] = order.coupon.isFreeDelivery
             pricesCart["isDiscountCoupon"] = order.coupon.isDiscountCoupon
-            pricesCart["couponDiscount"] = "{}%".format(order.coupon.discount)
+            pricesCart["couponDiscount"] = "${:.2f}".format(
+                order.subtotalPrice - order.totalPrice + order.shippingPrice
+            )
         else:
             pricesCart["isFreeDelivery"] = False
             pricesCart["isDiscountCoupon"] = False
-            pricesCart["couponDiscount"] = "0%"
+            pricesCart["couponDiscount"] = "0.00$"
         return Response({"prices": pricesCart, "output": output})
 
 
@@ -641,10 +643,17 @@ class CouponViews(APIView):
         except:
             return Response({"error": "error"}, status=status.HTTP_404_NOT_FOUND)
 
+        if not order.isUsedCoupon:
+            return Response(
+                {"message": "The coupon is not used"}, status=status.HTTP_404_NOT_FOUND
+            )
+
         order.isUsedCoupon = False
         order.coupon = None
 
         order.save()
         order.update_prices()
 
-        return Response({"message": "Coupon is deleted from order"})
+        return Response(
+            {"message": "Coupon is deleted from order"}, status=status.HTTP_200_OK
+        )
