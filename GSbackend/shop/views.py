@@ -239,6 +239,10 @@ class CartView(RetrieveUpdateDestroyAPIView):
             pricesCart["isFreeDelivery"] = order.coupon.isFreeDelivery
             pricesCart["isDiscountCoupon"] = order.coupon.isDiscountCoupon
             pricesCart["couponDiscount"] = "{}%".format(order.coupon.discount)
+        else:
+            pricesCart["isFreeDelivery"] = False
+            pricesCart["isDiscountCoupon"] = False
+            pricesCart["couponDiscount"] = "0%"
         return Response({"prices": pricesCart, "output": output})
 
 
@@ -305,7 +309,7 @@ class OrderItemView(APIView):
         serializer = OrderItemSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            Order.update_prices(order)
+            order.update_prices()
             return Response(data, status=status.HTTP_200_OK)
 
     def put(self, request, id, *args, **kwargs):
@@ -353,11 +357,10 @@ class OrderItemView(APIView):
 
         orderItem.delete()
 
-        if orderItem.objects.filter(order=order).count() == 0:
+        if OrderItem.objects.filter(order=order).count() == 0:
             order.isUsedCoupon = False
             order.coupon = None
             order.save()
-
         order.update_prices()
 
         return Response({"message": "Order deleted"}, status=status.HTTP_200_OK)

@@ -248,11 +248,18 @@ class Order(models.Model):
             or 0
         )
 
-        # shippingPrice = "${:.2f}".format(subtotalPriceSum * 0.05)
-        shippingPrice = 5 + subtotalPrice * 0.05
+        print(subtotalPrice)
 
-        if self.coupon.isFreeDelivery:
-            shippingPrice = 0
+        # shippingPrice = "${:.2f}".format(subtotalPriceSum * 0.05)
+        shippingPrice = (
+            5 + subtotalPrice * 0.05
+            if OrderItem.objects.filter(order=self).count() != 0
+            else 0
+        )
+
+        if self.isUsedCoupon:
+            if self.coupon.isFreeDelivery:
+                shippingPrice = 0
 
         totalPrice = subtotalPrice + shippingPrice
 
