@@ -18,6 +18,7 @@ urlpatterns = [
     path("shop/product/reviews/<int:id>/", ReviewViews.as_view()),
     path("shop/product/favourite/", FavouritesGetViews.as_view()),
     path("shop/product/favourite/<int:id>/", FavouritesViews.as_view()),
+    path("shop/product/carousel/", ProductCarousel.as_view()),
     path("shop/order/", OrderView.as_view()),
     path("shop/orderItem/<int:id>/", OrderItemView.as_view()),
     path("shop/cart/", CartView.as_view()),
