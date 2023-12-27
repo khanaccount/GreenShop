@@ -639,3 +639,23 @@ class CouponViews(APIView):
         order.update_prices()
 
         return Response({"message": "Coupon is deleted from order"})
+
+
+class ProductCarousel(APIView):
+    def get(self, request):
+        products = Product.objects.order_by("?")[:15]
+
+        output = [
+            {
+                "id": output.id,
+                "name": output.name,
+                "mainPrice": output.mainPrice,
+                "salePrice": output.salePrice,
+                "discount": output.discount,
+                "discountPercentage": output.discountPercentage,
+                "mainImg": output.mainImg,
+            }
+            for output in products
+        ]
+
+        return Response(output, status=status.HTTP_200_OK)
