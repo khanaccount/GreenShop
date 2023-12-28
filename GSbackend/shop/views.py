@@ -6,8 +6,16 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveUpdateDestroy
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 from django.http import Http404
+
+from .utils import Util
+
+from django.conf import settings
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 
 class CategoryView(APIView):
@@ -344,7 +352,7 @@ class OrderItemView(APIView):
 
 
 class ShippingAddressView(APIView):
-    authentication_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         # Получение списка адресов доставки пользователя
@@ -362,10 +370,33 @@ class ShippingAddressView(APIView):
 
     def post(self, request):
         # Добавление нового адреса доставки
-        serializer = ShippingAdressSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+        shippingAddresses = ShippingAddress.objects.filter(customer=request.user)
+
+        if shippingAddresses.count() < 3:
+            serializer = ShippingAdressSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
             serializer.save(customer=request.user)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "More then three addresses"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def delete(self, request):
+        try:
+            shippingAddress = ShippingAddress.objects.get(
+                id=request.data["shippingAddress"]
+            )
+        except:
+            return Response(
+                {"error": "Shipping address not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        shippingAddress.delete()
+
+        return Response({"message": "Sucess deleted"}, status=status.HTTP_200_OK)
 
 
 class RegistrationView(APIView):
@@ -375,11 +406,61 @@ class RegistrationView(APIView):
         # Регистрация нового пользователя
         serializer = RegistrationSerializer(data=request.data)
 
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         customer = serializer.data
+
+        tokens = RefreshToken.for_user(customer).access_token
+
+        current_site = get_current_site(request).domain
+        relative_link = reverse("email-verify")
+
+        absurl = "http://" + current_site + relative_link + "?token=" + str(tokens)
+        email_body = (
+            "Hi "
+            + customer["username"]
+            + " Use the link below to verify your email \n"
+            + absurl
+        )
+
+        data = {
+            "email_body": email_body,
+            "to_email": customer["email"],
+            "email_subject": "Verify your email",
+        }
+
+        Util.send_email(data=data)
+
+        return Response(
+            {"user_data": customer, "access_token": str(tokens)},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class VerifyEmail(APIView):
+    serializer_class = EmailVerificationSerializer
+
+    def get(self, request):
+        token = request.GET.get("token")
+
+        try:
+            payload = jwt.decode(token, options={"verify_signature": False})
+            customer = Customer.objects.get(id=payload("user_id"))
+            if not customer.is_active:
+                customer.is_active = True
+                customer.save()
+            return Response(
+                {"email": "Successfully activated"}, status=status.HTTP_200_OK
+            )
+        except jwt.ExpiredSignatureError as identifier:
+            return Response(
+                {"error": "Activation Expired"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except jwt.exceptions.DecodeError as identifier:
+            return Response(
+                {"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 # class LoginView(APIView):

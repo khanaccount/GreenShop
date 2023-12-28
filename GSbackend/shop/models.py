@@ -3,7 +3,7 @@ import jwt
 from django.core.validators import RegexValidator
 from django.conf import settings
 from django.contrib.auth.models import (
-    AbstractUser,
+    AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
@@ -57,32 +57,32 @@ class Size(models.Model):
         return self.name
 
 
-class Customer(AbstractUser):
-    # username = models.CharField(
-    #     max_length=100,
-    #     unique=True,
-    #     validators=[
-    #         RegexValidator(
-    #             regex=r"^[a-zA-Z0-9][a-zA-Z0-9_]*$",
-    #             message=("Invalid username"),
-    #             code="invalid_username",
-    #         ),
-    #     ],
-    # )
-    # password = models.CharField(
-    #     max_length=25,
-    #     validators=[
-    #         RegexValidator(
-    #             regex=r"^[A-Za-z\d!@#$%^&*()_+]+$",
-    #             message=("Invalid password"),
-    #             code="invalid_password",
-    #         ),
-    #     ],
-    # )
+class Customer(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(
+        max_length=100,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r"^[a-zA-Z0-9][a-zA-Z0-9_]*$",
+                message=("Invalid username"),
+                code="invalid_username",
+            ),
+        ],
+    )
+    password = models.CharField(
+        max_length=25,
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Za-z\d!@#$%^&*()_+]+$",
+                message=("Invalid password"),
+                code="invalid_password",
+            ),
+        ],
+    )
     email = models.EmailField(max_length=50, unique=True)
 
     is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
@@ -154,12 +154,12 @@ class ShippingAddress(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE, blank=True, null=True
     )
-    firstName = models.CharField(max_length=50, blank=True, null=True)
-    secondName = models.CharField(max_length=50, blank=True, null=True)
+    firstName = models.CharField(max_length=50)
+    secondName = models.CharField(max_length=50)
     streetAddress = models.CharField(max_length=200, null=False)
     region = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
-    phone = models.CharField(max_length=50, default="", blank=True, null=True)
+    phone = models.CharField(max_length=50)
 
     def __str__(self):
         return self.streetAddress
