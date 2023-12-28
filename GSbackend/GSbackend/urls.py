@@ -27,6 +27,7 @@ urlpatterns = [
     path("shop/transaction/", TransactionViews.as_view()),
     path("shop/edit/", CustomerRetrieveUpdateView.as_view()),
     path("shop/registration/", RegistrationView.as_view()),
+    path("shop/email-verify/", VerifyEmail.as_view(), name="email-verify"),
     path("shop/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("shop/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("shop/token/verify/", TokenVerifyView.as_view(), name="token_verify"),

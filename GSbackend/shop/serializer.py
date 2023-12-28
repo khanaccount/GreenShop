@@ -70,7 +70,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class ShippingAdressSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Order
+        model = ShippingAddress
         fields = "__all__"
 
 
@@ -79,8 +79,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-
-        fields = ["username", "email", "password"]
+        fields = "__all__"
 
     def create(self, validated_data):
         return Customer.objects.create_user(**validated_data)
@@ -109,6 +108,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
 #             )
 
 #         return {"username": user.username, "token": user.token}
+
+
+class EmailVerificationSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(max_length=256)
+
+    class Meta:
+        model = Customer
+        fields = ["token"]
 
 
 class CustomerEditSerializer(serializers.ModelSerializer):

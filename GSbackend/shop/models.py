@@ -82,6 +82,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=50, unique=True)
 
     is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
@@ -90,27 +91,6 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-
-    # @property
-    # def token(self):
-    #     return self._generate_jwt_token()
-
-    # def get_full_name(self):
-    #     return self.username
-
-    # def get_short_name(self):
-    #     return self.username
-
-    # def _generate_jwt_token(self):
-    #     dt = datetime.now() + timedelta(days=1)
-
-    #     token = jwt.encode(
-    #         {"id": self.pk, "exp": int((dt - datetime(1970, 1, 1)).total_seconds())},
-    #         settings.SECRET_KEY,
-    #         algorithm="HS256",
-    #     )
-
-    #     return token
 
 
 class Product(models.Model):
@@ -174,12 +154,12 @@ class ShippingAddress(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE, blank=True, null=True
     )
-    firstName = models.CharField(max_length=50, blank=True, null=True)
-    secondName = models.CharField(max_length=50, blank=True, null=True)
+    firstName = models.CharField(max_length=50)
+    secondName = models.CharField(max_length=50)
     streetAddress = models.CharField(max_length=200, null=False)
     region = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
-    phone = models.CharField(max_length=50, default="", blank=True, null=True)
+    phone = models.CharField(max_length=50)
 
     def __str__(self):
         return self.streetAddress
