@@ -394,7 +394,7 @@ class ShippingAddressView(APIView):
 
         shippingAddress.delete()
 
-        return Response({"message": "Sucess deleted"}, status=status.HTTP_200_OK)
+        return Response({"message": "Success deleted"}, status=status.HTTP_200_OK)
 
 
 class RegistrationView(APIView):
@@ -407,8 +407,7 @@ class RegistrationView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        customer = serializer.data
-
+        customer = Customer.objects.get(username=serializer.data["username"])
         tokens = RefreshToken.for_user(customer).access_token
 
         current_site = get_current_site(request).domain
@@ -417,21 +416,24 @@ class RegistrationView(APIView):
         absurl = "http://" + current_site + relative_link + "?token=" + str(tokens)
         email_body = (
             "Hi "
-            + customer["username"]
+            + customer.username
             + " Use the link below to verify your email \n"
             + absurl
         )
 
         data = {
             "email_body": email_body,
-            "to_email": customer["email"],
+            "to_email": customer.email,
             "email_subject": "Verify your email",
         }
 
         Util.send_email(data=data)
 
         return Response(
-            {"user_data": customer, "access_token": str(tokens)},
+            {
+                "user_data": CustomerSerializer(customer).data,
+                "access_token": str(tokens),
+            },
             status=status.HTTP_201_CREATED,
         )
 
