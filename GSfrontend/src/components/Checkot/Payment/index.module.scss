@@ -1,103 +1,331 @@
 @import "../../../variables.scss";
 
-.addressBlock {
-	.addAddress {
-		display: flex;
-		align-items: center;
-	}
-	h5 {
-		color: $mainColor;
-		padding-bottom: 9px;
-		font-size: 17px;
-		font-weight: 500;
-		line-height: 16px;
-	}
-	p {
-		margin-bottom: 30px;
-	}
-
-	.formText {
-		margin-bottom: 10px;
-		color: $mainColor;
-		font-size: 15px;
-		font-weight: 400;
-		line-height: 15px;
-	}
-
-	.addBtn {
-		cursor: pointer;
-		padding-left: 308px;
-		color: $secondaryColor;
-		font-size: 16px;
-		font-weight: 500;
-		line-height: 16px;
-	}
-
-	input {
-		width: 417px;
-		height: 40px;
-		border-radius: 3px;
-		border: 1px solid #eaeaea;
-		padding: 0 10px;
-		outline: none;
-	}
-	span {
-		color: $spanColor;
-		font-size: 22px;
-		font-weight: 400;
-		line-height: 15px;
-	}
-
-	.inputBlock {
-		display: flex;
-
-		&:not(:last-child) {
-			padding-bottom: 30px;
+.payment {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 36px;
+	.addressBlock {
+		.addAddress {
+			display: flex;
+			align-items: center;
 		}
-		.firstForm {
-			margin-right: 30px;
-			position: relative;
-			.arrdown,
-			.arrdownActive {
+		.billingAddress,
+		.differentAddress {
+			color: $mainColor;
+			font-size: 17px;
+			font-weight: 500;
+			line-height: 16px;
+		}
+		.billingAddress {
+			padding-bottom: 21px;
+		}
+		.differentAddress {
+			padding-left: 20px;
+			padding-bottom: 54px;
+		}
+
+		.formText {
+			margin-bottom: 10px;
+			color: $mainColor;
+			font-size: 15px;
+			font-weight: 400;
+			line-height: 15px;
+		}
+
+		input {
+			width: 350px;
+			height: 40px;
+			border-radius: 3px;
+			border: 1px solid #eaeaea;
+			padding: 0 10px;
+			outline: none;
+		}
+		span {
+			color: $spanColor;
+			font-size: 22px;
+			font-weight: 400;
+			line-height: 15px;
+		}
+
+		.inputBlock {
+			display: flex;
+
+			&:not(:last-child) {
+				padding-bottom: 30px;
+			}
+			.firstForm {
+				margin-right: 30px;
+				position: relative;
+				.arrdown,
+				.arrdownActive {
+					cursor: pointer;
+					position: absolute;
+					top: 35px;
+					right: 10px;
+					width: 24px;
+					height: 24px;
+				}
+				.arrdownActive {
+					transform: rotate(180deg);
+				}
+			}
+		}
+		.inputBlock {
+			display: flex;
+		}
+
+		.dropdownContent {
+			position: absolute;
+			background-color: #fff;
+			border: 1px solid #ccc;
+			max-height: 200px;
+			overflow-y: auto;
+			z-index: 1;
+			width: 100%;
+		}
+
+		.regionList,
+		.stateList {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+
+			li {
+				padding: 8px 16px;
 				cursor: pointer;
-				position: absolute;
-				top: 35px;
-				right: 10px;
-				width: 24px;
-				height: 24px;
-			}
-			.arrdownActive {
-				transform: rotate(180deg);
+
+				&:hover {
+					background-color: #f0f0f0;
+				}
 			}
 		}
-	}
-	.inputBlock {
-		display: flex;
+		.optional {
+			color: $mainColor;
+			margin-bottom: 10px;
+			font-size: 15px;
+			font-weight: 400;
+			line-height: 15px;
+		}
+
+		.notes {
+			margin-bottom: 400px;
+			width: 350px;
+			height: 152px;
+			border-radius: 3px;
+			border: 1px solid #eaeaea;
+			padding: 8px;
+			resize: none;
+		}
 	}
 
-	.dropdownContent {
-		position: absolute;
-		background-color: #fff;
-		border: 1px solid #ccc;
-		max-height: 200px;
-		overflow-y: auto;
-		z-index: 1;
-		width: 100%;
-	}
+	.order {
+		h1 {
+			color: $mainColor;
+			font-size: 20px;
+			font-weight: 700;
+			line-height: 16px;
+		}
 
-	.regionList,
-	.stateList {
-		list-style: none;
-		padding: 0;
-		margin: 0;
+		.info {
+			padding-top: 20px;
+			display: flex;
+			justify-content: space-between;
+			border-bottom: 1px solid rgba($secondaryColor, 0.3);
+			padding-bottom: 11px;
+			h3 {
+				color: $mainColor;
+				font-size: 16px;
+				font-weight: 500;
+				line-height: 16px;
 
-		li {
-			padding: 8px 16px;
+				&:last-child {
+					margin-right: 17px;
+				}
+			}
+		}
+
+		.card {
+			margin-top: 10px;
+			background: #fbfbfb;
+			width: 405px;
+			height: 70px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			img {
+				width: 70px;
+				height: 70px;
+				mix-blend-mode: multiply;
+			}
+
+			&Info {
+				padding-left: 10px;
+				width: 200px;
+				&Name {
+					color: $mainColor;
+					font-size: 16px;
+					font-weight: 500;
+					line-height: 16px;
+				}
+				&Sku {
+					padding-top: 6px;
+					display: flex;
+					.sku {
+						color: $saleColor;
+						font-size: 14px;
+						font-weight: 400;
+						line-height: 16px;
+					}
+					.number {
+						color: $smallTextColor;
+						font-size: 14px;
+						font-weight: 400;
+						line-height: 16px;
+					}
+				}
+			}
+			.size {
+				width: 50px;
+			}
+			.quantity {
+				color: $smallTextColor;
+				font-size: 14px;
+				font-weight: 400;
+				line-height: 16px;
+				width: 50px;
+			}
+			.price {
+				color: $secondaryColor;
+				padding-right: 16px;
+				font-size: 18px;
+				font-weight: 700;
+				line-height: 16px;
+			}
+		}
+
+		.pricingCards {
+			.pricing {
+				display: flex;
+				justify-content: space-between;
+				&:first-of-type {
+					margin-top: 30px;
+				}
+				&:not(:last-child) {
+					padding-bottom: 21px;
+				}
+				.text {
+					color: $mainColor;
+					font-size: 16px;
+					font-weight: 400;
+					line-height: 16px;
+				}
+				.price {
+					color: $mainColor;
+
+					font-size: 18px;
+
+					font-weight: 500;
+					line-height: 16px;
+				}
+			}
+			.total {
+				display: flex;
+				justify-content: space-between;
+				margin: 20px 0 30px 0;
+				border-top: 1px solid rgba($secondaryColor, 0.3);
+				padding-top: 15px;
+				p {
+					color: $mainColor;
+					font-size: 16px;
+					font-weight: 700;
+					line-height: 16px;
+				}
+
+				.price {
+					color: $secondaryColor;
+					font-size: 18px;
+					font-weight: 700;
+					line-height: 16px;
+				}
+			}
+		}
+		.checkout {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100%;
+			height: 40px;
+			background: $secondaryColor;
+			border-radius: 3px;
 			cursor: pointer;
 
-			&:hover {
-				background-color: #f0f0f0;
+			color: $tertiaryColor;
+			font-size: 15px;
+			font-weight: 700;
+			line-height: 16px;
+		}
+		.continue {
+			margin-top: 15px;
+			color: $secondaryColor;
+			font-size: 15px;
+			font-weight: 400;
+			line-height: 16px;
+			display: flex;
+			justify-content: center;
+		}
+
+		.methods {
+			h4 {
+				margin-bottom: 19px;
 			}
+			.method {
+				cursor: pointer;
+				border-radius: 3px;
+				border: 1px solid #46a358;
+				height: 45px;
+				display: flex;
+				align-items: center;
+				position: relative;
+				&:not(:last-child) {
+					margin-bottom: 15px;
+				}
+				.cyrcle0 {
+					padding-left: 11px;
+				}
+
+				.cyrcle1 {
+					position: absolute;
+					left: 14px;
+				}
+				.acceptedMethods {
+					padding-left: 10px;
+				}
+				h3 {
+					padding-left: 10px;
+					color: $mainColor;
+					font-size: 15px;
+					font-weight: 400;
+					line-height: 16px;
+				}
+			}
+		}
+
+		.placeOrder {
+			margin-top: 50px;
+
+			color: #fff;
+			font-size: 15px;
+			font-weight: 700;
+			line-height: 16px;
+
+			cursor: pointer;
+			background: $secondaryColor;
+			width: 100%;
+			border-radius: 3px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 40px;
 		}
 	}
 }

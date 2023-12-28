@@ -1,103 +1,68 @@
-import React, { useState } from "react";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+import React, { useEffect, useState } from "react";
 import { Carousel } from "react-responsive-carousel";
+import { Link } from "react-router-dom";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import axios from "axios";
 
 import s from "./index.module.scss";
 
 type Items = {
-	name: string;
-	price: string;
-	img: string;
+	discount: boolean;
+	discountPercentage: number;
 	id: string;
+	mainImg: string;
+	mainPrice: number;
+	name: string;
+	salePrice: number;
 };
 
-const carts: Items[] = [
-	{
-		name: "Beach Spider Lily",
-		price: "$129.00",
-		img: "/img/goods/01.png",
-		id: "1"
-	},
-	{
-		name: "Beach Spider Lily",
-		price: "$129.00",
-		img: "/img/goods/01.png",
-		id: "2"
-	},
-	{
-		name: "Beach Spider Lily",
-		price: "$129.00",
-		img: "/img/goods/01.png",
-		id: "3"
-	},
-	{
-		name: "Beach Spider Lily",
-		price: "$129.00",
-		img: "/img/goods/01.png",
-		id: "4"
-	},
-	{
-		name: "Beach Spider Lily",
-		price: "$129.00",
-		img: "/img/goods/01.png",
-		id: "5"
-	}
-];
-
 const ProductCarousel: React.FC = () => {
-	const [carouselItems, setCarouselItems] = useState<Items>();
+	const [carouselItems, setCarouselItems] = useState<Items[][]>([[], [], []]);
 
-	console.log(carouselItems);
+	useEffect(() => {
+		axios
+			.get("http://127.0.0.1:8000/shop/product/carousel/")
+			.then((response) => {
+				const items: Items[] = response.data;
 
-	axios
-		.get("http://127.0.0.1:8000/shop/product/carousel/")
-		.then((response) => setCarouselItems(response.data));
+				const carouselData: Items[][] = [
+					items.slice(0, 5),
+					items.slice(5, 10),
+					items.slice(10, 15)
+				];
+
+				setCarouselItems(carouselData);
+			})
+			.catch((error) => {
+				console.error("Error response:", error);
+			});
+	}, []);
 
 	return (
 		<div className={s.productCarousel}>
-			<h5 className={s.title}>Releted Products</h5>
+			<h5 className={s.title}>Related Products</h5>
 			<Carousel
 				className={s.carousel}
 				showArrows={false}
 				showStatus={false}
 				showThumbs={false}
-				infiniteLoop={true}
-				autoPlay={true}
+				infiniteLoop={false}
+				autoPlay={false}
 				interval={5000}>
-				<div className={s.carouselItems}>
-					{carts.map((item) => (
-						<div key={item.id} className={s.item}>
-							<div className={s.imgBlock}>
-								<img src={item.img} alt="plant" />
-							</div>
-							<h5 className={s.itemName}>{item.name}</h5>
-							<p className={s.itemPrice}>{item.price}</p>
-						</div>
-					))}
-				</div>
-				<div className={s.carouselItems}>
-					{carts.map((item) => (
-						<div key={item.id} className={s.item}>
-							<div className={s.imgBlock}>
-								<img src={item.img} alt="plant" />
-							</div>
-							<h5 className={s.itemName}>{item.name}</h5>
-							<p className={s.itemPrice}>{item.price}</p>
-						</div>
-					))}
-				</div>
-				<div className={s.carouselItems}>
-					{carts.map((item) => (
-						<div key={item.id} className={s.item}>
-							<div className={s.imgBlock}>
-								<img src={item.img} alt="plant" />
-							</div>
-							<h5 className={s.itemName}>{item.name}</h5>
-							<p className={s.itemPrice}>{item.price}</p>
-						</div>
-					))}
-				</div>
+				{carouselItems.map((carousel, index) => (
+					<div key={index} className={s.carouselItems}>
+						{carousel.map((item) => (
+							<Link to={`/shop/${item.id}`} key={item.id} className={s.item}>
+								<img className={s.imgBlock} src={`/${item.mainImg}`} alt={item.name} />
+								{item.discount ? (
+									<p className={s.itemDiscount}>{item.discountPercentage}% OFF</p>
+								) : null}
+								<h5 className={s.itemName}>{item.name}</h5>
+								<p className={s.itemPrice}>{item.discount ? item.salePrice : item.mainPrice}</p>
+							</Link>
+						))}
+					</div>
+				))}
 			</Carousel>
 		</div>
 	);

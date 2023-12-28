@@ -23,10 +23,10 @@
 				padding-left: 40px;
 			}
 			.quantity {
-				padding-left: 50px;
+				padding-left: 60px;
 			}
 			.total {
-				padding-left: 50px;
+				padding-left: 65px;
 			}
 
 			.products {
@@ -88,6 +88,8 @@
 			.quantity {
 				display: flex;
 				align-items: center;
+				justify-content: center;
+				width: 100px;
 
 				span {
 					padding: 0 10px;
@@ -109,6 +111,7 @@
 			}
 
 			.total {
+				width: 100px;
 				color: $secondaryColor;
 				font-size: 16px;
 				font-weight: 700;

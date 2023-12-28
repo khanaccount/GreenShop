@@ -87,7 +87,9 @@ const Header: React.FC = () => {
 			</ul>
 			<div>
 				<div className={s.cart}>
-					<img width={27} height={27} src="/img/header/cart.svg" alt="cart" />
+					<Link to="/Shop/Cart">
+						<img width={27} height={27} src="/img/header/cart.svg" alt="cart" />
+					</Link>
 					{isUserLoggedIn() && userData?.cartCount !== 0 && <span>{userData?.cartCount}</span>}
 				</div>
 				{isUserLoggedIn() ? (

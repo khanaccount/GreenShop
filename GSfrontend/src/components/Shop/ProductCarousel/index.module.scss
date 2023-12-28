@@ -58,6 +58,22 @@
 					font-weight: 700;
 					line-height: 16px;
 				}
+
+				&Discount {
+					background: $secondaryColor;
+					position: absolute;
+					display: flex;
+					color: $tertiaryColor;
+					font-size: 18px;
+					font-weight: 500;
+					line-height: 16px;
+					padding-left: 9px;
+					align-items: center;
+					top: 20px;
+					left: 0;
+					width: 95px;
+					height: 35px;
+				}
 			}
 		}
 	}
