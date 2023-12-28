@@ -189,35 +189,6 @@ const Address: React.FC = () => {
 
 			<div className={s.inputBlock}>
 				<form className={s.firstForm}>
-					<label htmlFor="Region">
-						<p className={s.formText}>
-							Street Address <span>*</span>
-						</p>
-						<input
-							placeholder="House number and street name"
-							type="text"
-							id="Region"
-							name="Region"
-						/>
-					</label>
-				</form>
-				<form className={s.secondForm}>
-					<label htmlFor="appartment">
-						<p className={s.formText}>
-							Appartment <span>*</span>
-						</p>
-						<input
-							placeholder="Appartment, suite, unit, etc. (optional)"
-							type="text"
-							id="appartment"
-							name="appartment"
-						/>
-					</label>
-				</form>
-			</div>
-
-			<div className={s.inputBlock}>
-				<form className={s.firstForm}>
 					<label htmlFor="State">
 						<p className={s.formText}>
 							State <span>*</span>
@@ -249,12 +220,17 @@ const Address: React.FC = () => {
 						</div>
 					)}
 				</form>
-				<form className={s.secondForm}>
-					<label htmlFor="City">
+				<form className={s.firstForm}>
+					<label htmlFor="Region">
 						<p className={s.formText}>
-							Town / City <span>*</span>
+							Street Address <span>*</span>
 						</p>
-						<input type="text" id="City" name="City" />
+						<input
+							placeholder="House number and street name"
+							type="text"
+							id="Region"
+							name="Region"
+						/>
 					</label>
 				</form>
 			</div>
@@ -268,6 +244,17 @@ const Address: React.FC = () => {
 						<input type="text" id="EmailAddress" name="EmailAddress" />
 					</label>
 				</form>
+				<form className={s.secondForm}>
+					<label htmlFor="City">
+						<p className={s.formText}>
+							Town / City <span>*</span>
+						</p>
+						<input type="text" id="City" name="City" />
+					</label>
+				</form>
+			</div>
+
+			<div className={s.inputBlock}>
 				<form className={s.secondForm}>
 					<label htmlFor="PhoneNumber">
 						<p className={s.formText}>
