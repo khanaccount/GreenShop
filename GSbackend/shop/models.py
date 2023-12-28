@@ -11,7 +11,6 @@ import random
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 import string
-import secrets
 
 
 class CustomerManager(BaseUserManager):

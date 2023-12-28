@@ -14,8 +14,6 @@ from django.http import Http404
 from .utils import Util
 
 from django.conf import settings
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 
 
 class CategoryView(APIView):
