@@ -357,7 +357,11 @@ class ShippingAddressView(APIView):
         output = [
             {
                 "id": output.id,
+                "firstName": output.firstName,
+                "lastName": output.lastName,
                 "customer": CustomerSerializer(output.customer).data,
+                "phone": output.phone,
+                "state": output.state,
                 "streetAddress": output.streetAddress,
                 "region": output.region,
                 "city": output.city,
@@ -446,7 +450,7 @@ class VerifyEmail(APIView):
 
         try:
             payload = jwt.decode(token, options={"verify_signature": False})
-            customer = Customer.objects.get(id=payload("user_id"))
+            customer = Customer.objects.get(id=payload["user_id"])
             if not customer.is_active:
                 customer.is_active = True
                 customer.save()

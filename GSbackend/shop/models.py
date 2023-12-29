@@ -154,10 +154,11 @@ class ShippingAddress(models.Model):
         Customer, on_delete=models.CASCADE, blank=True, null=True
     )
     firstName = models.CharField(max_length=50)
-    secondName = models.CharField(max_length=50)
+    lastName = models.CharField(max_length=50)
     streetAddress = models.CharField(max_length=200, null=False)
     region = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
+    state = models.CharField(max_length=200, null=True, blank=True)
     phone = models.CharField(max_length=50)
 
     def __str__(self):
