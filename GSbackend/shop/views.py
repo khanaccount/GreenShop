@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import *
 from .serializer import *
@@ -13,7 +12,7 @@ from django.http import Http404
 
 from .utils import Util
 
-from django.conf import settings
+from django.core.exceptions import ValidationError
 
 
 class CategoryView(APIView):
@@ -371,17 +370,39 @@ class ShippingAddressView(APIView):
         return Response(output)
 
     def post(self, request):
-        # Добавление нового адреса доставки
-        shippingAddresses = ShippingAddress.objects.filter(customer=request.user)
+        # Получение списка адресов доставки пользователя
+        shipping_addresses = ShippingAddress.objects.filter(customer=request.user)
 
-        if shippingAddresses.count() < 3:
+        if shipping_addresses.count() < 3:
             serializer = ShippingAdressSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(customer=request.user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+            try:
+                # Проверка уникальности адреса
+                serializer.is_valid(raise_exception=True)
+
+                # Проверка правильности введённого номера
+                phone_number = serializer.validated_data.get("phone")
+                if not self.is_valid_phone_number(phone_number):
+                    return Response(
+                        {"error": "Invalid phone number"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                if self.is_duplicate_address(
+                    serializer.validated_data, shipping_addresses
+                ):
+                    return Response(
+                        {"error": "Duplicate address"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                serializer.save(customer=request.user)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except ValidationError as e:
+                return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(
-                {"error": "More then three addresses"},
+                {"error": "More than three addresses"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -399,6 +420,21 @@ class ShippingAddressView(APIView):
         shippingAddress.delete()
 
         return Response({"message": "Success deleted"}, status=status.HTTP_200_OK)
+
+    def is_valid_phone_number(self, phone_number):
+        # Проверка номера на валидность
+        return phone_number[1:].isdigit()
+
+    def is_duplicate_address(self, data, existing_addresses):
+        # Проверка наличия адреса с теми же значениями
+        for address in existing_addresses:
+            if (
+                address.streetAddress == data.get("streetAddress")
+                and address.region == data.get("region")
+                and address.city == data.get("city")
+            ):
+                return True
+        return False
 
 
 class RegistrationView(APIView):
