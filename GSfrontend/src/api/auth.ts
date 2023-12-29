@@ -29,15 +29,20 @@ export const register = async (userData: RegisterData): Promise<void> => {
 			email,
 			password
 		});
-	} catch (error: any) {
-		if (error.response && error.response.data && error.response.data.errors) {
+	} catch (error) {
+		if (
+			axios.isAxiosError(error) &&
+			error.response &&
+			error.response.data &&
+			error.response.data.errors
+		) {
 			const { errors } = error.response.data;
 			if (errors.username && errors.username.length > 0) {
-				const usernameError = errors.username[0];
+				const usernameError: string = errors.username[0];
 				alert(`Error - Username: ${usernameError}`);
 			}
 			if (errors.email && errors.email.length > 0) {
-				const emailError = errors.email[0];
+				const emailError: string = errors.email[0];
 				alert(`Error - Email: ${emailError}`);
 			}
 		} else {
@@ -91,26 +96,6 @@ export const startTokenRefreshInterval = () => {
 			clearInterval(tokenRefreshInterval);
 		}
 	}, 29 * 60 * 1000);
-};
-
-export const someApiRequest = async () => {
-	try {
-		const headers = getAuthHeaders();
-		const response = await axios.get(`${apiBaseUrl}some-endpoint/`, headers);
-	} catch (error: any) {
-		if (error.response && error.response.status === 401) {
-			try {
-				await refreshAccessToken();
-				const headers = getAuthHeaders();
-				const response = await axios.get(`${apiBaseUrl}some-endpoint/`, headers);
-				// Обработка успешного ответа после обновления access токена
-			} catch (refreshError) {
-				console.error("Refresh error:", refreshError);
-			}
-		} else {
-			console.error(`Error: ${error}`);
-		}
-	}
 };
 
 const refreshAccessToken = async () => {
