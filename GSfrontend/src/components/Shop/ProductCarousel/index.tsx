@@ -19,6 +19,8 @@ type Items = {
 const ProductCarousel: React.FC = () => {
 	const [carouselItems, setCarouselItems] = useState<Items[][]>([[], [], []]);
 
+	console.log(carouselItems);
+
 	useEffect(() => {
 		axios
 			.get("http://127.0.0.1:8000/shop/product/carousel/")

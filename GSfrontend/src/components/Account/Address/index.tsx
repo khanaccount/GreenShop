@@ -1,7 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-number-input/input";
+import axios from "axios";
+import { getAuthHeaders } from "../../../api/auth";
 
 import s from "./index.module.scss";
+
+interface UserData {
+	id: number;
+	username: string;
+	email: string;
+	cartCount: number;
+}
 
 const Address: React.FC = () => {
 	const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
@@ -12,6 +21,7 @@ const Address: React.FC = () => {
 	const [filteredStates, setFilteredStates] = useState<string[]>([]);
 	const [showRegionDropdownImg, setShowRegionDropdownImg] = useState(false);
 	const [showStateDropdownImg, setShowStateDropdownImg] = useState(false);
+	const [userData, setUserData] = React.useState<UserData | null>(null);
 
 	const handlePhoneChange = (value: string | undefined) => {
 		setPhoneNumber(value);
@@ -116,6 +126,45 @@ const Address: React.FC = () => {
 		}
 	};
 
+	useEffect(() => {
+		const token = getAuthHeaders();
+		axios
+			.get(`http://127.0.0.1:8000/shop/customer/`, token)
+			.then((response) => {
+				setUserData(response.data);
+			})
+			.catch((error) => {
+				console.error("Error fetching data: ", error);
+			});
+	}, []);
+
+	const handleAddButtonClick = () => {
+		const firstName = (document.getElementById("firstName") as HTMLInputElement)?.value;
+		const lastName = (document.getElementById("lastName") as HTMLInputElement)?.value;
+		const streetAddress = (document.getElementById("streetAddress") as HTMLInputElement)?.value;
+		const region = (document.getElementById("Region") as HTMLInputElement)?.value;
+		const city = (document.getElementById("City") as HTMLInputElement)?.value;
+		const phoneNumber = (document.getElementById("PhoneNumber") as HTMLInputElement)?.value;
+
+		const data = {
+			firstName,
+			secondName: lastName,
+			streetAddress,
+			region,
+			city,
+			phone: phoneNumber
+		};
+
+		axios
+			.post("shop/shippingAddress/", data)
+			.then((response) => {
+				console.log("Shipping address added:", response.data);
+			})
+			.catch((error) => {
+				console.error("Error adding shipping address:", error);
+			});
+	};
+
 	return (
 		<div className={s.addressBlock}>
 			<div className={s.addAddress}>
@@ -123,8 +172,11 @@ const Address: React.FC = () => {
 					<h5>Billing Address</h5>
 					<p>The following addresses will be used on the checkout page by default.</p>
 				</div>
-				<p className={s.addBtn}>Add</p>
+				<p className={s.addBtn} onClick={handleAddButtonClick}>
+					Add
+				</p>
 			</div>
+
 			<div className={s.inputBlock}>
 				<form className={s.firstForm}>
 					<label htmlFor="firstName">
@@ -238,10 +290,14 @@ const Address: React.FC = () => {
 			<div className={s.inputBlock}>
 				<form className={s.firstForm}>
 					<label htmlFor="EmailAddress">
-						<p className={s.formText}>
-							Email address<span>*</span>
-						</p>
-						<input type="text" id="EmailAddress" name="EmailAddress" />
+						<p className={s.formText}>Email address</p>
+						<input
+							value={userData?.email || ""}
+							readOnly
+							type="text"
+							id="EmailAddress"
+							name="EmailAddress"
+						/>
 					</label>
 				</form>
 				<form className={s.secondForm}>

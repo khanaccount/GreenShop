@@ -120,6 +120,7 @@ const ProductCart: React.FC = () => {
 	const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
 	const [availableSizes, setAvailableSizes] = useState<Array<{ id: number; name: string }>>([]);
 	const [isAlreadyAdded, setIsAlreadyAdded] = useState(false);
+	const [isSizeSelected, setIsSizeSelected] = useState(false);
 
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
 	const { id } = useParams();
@@ -245,6 +246,7 @@ const ProductCart: React.FC = () => {
 		setSelectedSizeId(id);
 		const isSizeInCart = product?.inCart.some((item) => item.id === id);
 		setIsAlreadyAdded(!!isSizeInCart);
+		setIsSizeSelected(true);
 	};
 
 	useEffect(() => {
@@ -289,9 +291,6 @@ const ProductCart: React.FC = () => {
 				await axios.post(`http://127.0.0.1:8000/shop/orderItem/${id}/`, payload, authHeaders);
 				console.log("Product successfully added to cart!");
 				setIsAlreadyAdded(true);
-
-				const updatedProductResponse = await axios.get(`http://127.0.0.1:8000/shop/product/${id}/`);
-				setProduct(updatedProductResponse.data[0]);
 			} else {
 				console.error(
 					"The size has not been selected or the quantity of the product has not been specified."
@@ -413,8 +412,10 @@ const ProductCart: React.FC = () => {
 						<button className={s.buyNow}>Buy NOW</button>
 						<button
 							onClick={handleAddToCart}
-							className={`${s.addToCart} ${isAlreadyAdded ? s.alreadyAdded : ""}`}>
-							{isAlreadyAdded ? "Product added" : "Add to cart"}
+							className={`${isSizeSelected ? s.addToCart : s.selectSize} ${
+								isAlreadyAdded ? s.alreadyAdded : ""
+							}`}>
+							{isSizeSelected ? (isAlreadyAdded ? "Product added" : "Add to cart") : "Select size"}
 						</button>
 						<button
 							className={`${s.favorite} ${isFavoriteActive ? s.favoriteActive : ""}`}

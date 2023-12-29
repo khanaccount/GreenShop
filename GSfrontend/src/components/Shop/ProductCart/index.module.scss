@@ -241,7 +241,8 @@
 				}
 
 				.buyNow,
-				.addToCart {
+				.addToCart,
+				.selectSize {
 					font-size: 14px;
 					font-weight: 700;
 					line-height: 20px;
@@ -269,7 +270,8 @@
 					}
 				}
 
-				.alreadyAdded {
+				.alreadyAdded,
+				.selectSize {
 					pointer-events: none;
 					color: gray;
 					border: 1px solid gray;
