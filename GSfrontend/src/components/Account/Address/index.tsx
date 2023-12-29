@@ -12,8 +12,19 @@ interface UserData {
 	cartCount: number;
 }
 
+interface ShippingAddress {
+	id: number;
+	state: string;
+	phoneNumber: string;
+	city: string;
+	region: string;
+	streetAddress: string;
+	lastName: string;
+	firstName: string;
+}
+
 const Address: React.FC = () => {
-	const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
+	const [phone, setPhone] = useState<string | undefined>(undefined);
 	const [showRegionDropdown, setShowRegionDropdown] = useState(false);
 	const [showStateDropdown, setShowStateDropdown] = useState(false);
 	const [filteredRegions, setFilteredRegions] = useState<string[]>([]);
@@ -22,9 +33,10 @@ const Address: React.FC = () => {
 	const [showRegionDropdownImg, setShowRegionDropdownImg] = useState(false);
 	const [showStateDropdownImg, setShowStateDropdownImg] = useState(false);
 	const [userData, setUserData] = React.useState<UserData | null>(null);
+	const [shippingAddress, setShippingAddress] = useState<ShippingAddress[]>([]);
 
 	const handlePhoneChange = (value: string | undefined) => {
-		setPhoneNumber(value);
+		setPhone(value);
 	};
 
 	const toggleRegionDropdown = () => {
@@ -138,25 +150,39 @@ const Address: React.FC = () => {
 			});
 	}, []);
 
+	useEffect(() => {
+		const token = getAuthHeaders();
+		axios
+			.get("http://127.0.0.1:8000/shop/shippingAddress/", token)
+			.then((response) => {
+				setShippingAddress(response.data);
+			})
+			.catch((error) => {
+				console.error("Error fetching shipping address data: ", error);
+			});
+	}, []);
+
 	const handleAddButtonClick = () => {
 		const firstName = (document.getElementById("firstName") as HTMLInputElement)?.value;
 		const lastName = (document.getElementById("lastName") as HTMLInputElement)?.value;
 		const streetAddress = (document.getElementById("streetAddress") as HTMLInputElement)?.value;
 		const region = (document.getElementById("Region") as HTMLInputElement)?.value;
 		const city = (document.getElementById("City") as HTMLInputElement)?.value;
-		const phoneNumber = (document.getElementById("PhoneNumber") as HTMLInputElement)?.value;
+		const phone = (document.getElementById("PhoneNumber") as HTMLInputElement)?.value;
+		const state = (document.getElementById("State") as HTMLInputElement)?.value;
 
 		const data = {
 			firstName,
-			secondName: lastName,
+			lastName,
 			streetAddress,
 			region,
 			city,
-			phone: phoneNumber
+			phone,
+			state
 		};
-
+		const authHeaders = getAuthHeaders();
 		axios
-			.post("shop/shippingAddress/", data)
+			.post("http://127.0.0.1:8000/shop/shippingAddress/", data, authHeaders)
 			.then((response) => {
 				console.log("Shipping address added:", response.data);
 			})
@@ -171,6 +197,15 @@ const Address: React.FC = () => {
 				<div className={s.billingAddres}>
 					<h5>Billing Address</h5>
 					<p>The following addresses will be used on the checkout page by default.</p>
+				</div>
+				<div className={s.addedAddresses}>
+					{shippingAddress.map((address, index) => (
+						<div className={s.adders} key={index}>
+							<h3>Shipping Address</h3>
+							<p>First Name: {address.firstName}</p>
+							<p>Last Name: {address.lastName}</p>
+						</div>
+					))}
 				</div>
 				<p className={s.addBtn} onClick={handleAddButtonClick}>
 					Add
@@ -273,15 +308,15 @@ const Address: React.FC = () => {
 					)}
 				</form>
 				<form className={s.firstForm}>
-					<label htmlFor="Region">
+					<label htmlFor="streetAddress">
 						<p className={s.formText}>
 							Street Address <span>*</span>
 						</p>
 						<input
 							placeholder="House number and street name"
+							id="streetAddress"
 							type="text"
-							id="Region"
-							name="Region"
+							name="streetAddress"
 						/>
 					</label>
 				</form>
@@ -301,26 +336,15 @@ const Address: React.FC = () => {
 					</label>
 				</form>
 				<form className={s.secondForm}>
-					<label htmlFor="City">
-						<p className={s.formText}>
-							Town / City <span>*</span>
-						</p>
-						<input type="text" id="City" name="City" />
-					</label>
-				</form>
-			</div>
-
-			<div className={s.inputBlock}>
-				<form className={s.secondForm}>
-					<label htmlFor="PhoneNumber">
+					<label htmlFor="Phone">
 						<p className={s.formText}>
 							Phone Number <span>*</span>
 						</p>
 						<PhoneInput
-							id="PhoneNumber"
-							name="PhoneNumber"
+							id="Phone"
+							name="Phone"
 							placeholder="Enter phone number"
-							value={phoneNumber}
+							value={phone}
 							onChange={handlePhoneChange}
 						/>
 					</label>

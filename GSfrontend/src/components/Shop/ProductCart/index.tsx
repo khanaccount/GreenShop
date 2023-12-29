@@ -125,6 +125,8 @@ const ProductCart: React.FC = () => {
 	const averageRating = product?.reviews ? calculateAverageRating(product.reviews) : 0;
 	const { id } = useParams();
 
+	console.log(product);
+
 	const handleStarClick = (id: number) => {
 		setStarsSelected(id);
 	};
@@ -244,11 +246,11 @@ const ProductCart: React.FC = () => {
 
 	const handleSizeClick = (id: number) => {
 		setSelectedSizeId(id);
-		const isSizeInCart = product?.inCart.some((item) => item.id === id);
+		setIsAlreadyAdded(false);
+		const isSizeInCart = product?.inCart && product?.inCart.some((item) => item.id === id);
 		setIsAlreadyAdded(!!isSizeInCart);
 		setIsSizeSelected(true);
 	};
-
 	useEffect(() => {
 		if (id) {
 			const authHeaders = getAuthHeaders();
@@ -281,7 +283,8 @@ const ProductCart: React.FC = () => {
 					quantity: quantity
 				};
 
-				const isSizeInCart = product?.inCart.some((item) => item.id === selectedSizeId);
+				const isSizeInCart =
+					product && product.inCart && product.inCart.some((item) => item.id === selectedSizeId);
 
 				if (isSizeInCart) {
 					setIsAlreadyAdded(true);
@@ -289,7 +292,6 @@ const ProductCart: React.FC = () => {
 				}
 
 				await axios.post(`http://127.0.0.1:8000/shop/orderItem/${id}/`, payload, authHeaders);
-				console.log("Product successfully added to cart!");
 				setIsAlreadyAdded(true);
 			} else {
 				console.error(

@@ -19,8 +19,6 @@ type Items = {
 const ProductCarousel: React.FC = () => {
 	const [carouselItems, setCarouselItems] = useState<Items[][]>([[], [], []]);
 
-	console.log(carouselItems);
-
 	useEffect(() => {
 		axios
 			.get("http://127.0.0.1:8000/shop/product/carousel/")
@@ -57,7 +55,7 @@ const ProductCarousel: React.FC = () => {
 							<Link to={`/shop/${item.id}`} key={item.id} className={s.item}>
 								<img className={s.imgBlock} src={`/${item.mainImg}`} alt={item.name} />
 								{item.discount ? (
-									<p className={s.itemDiscount}>{item.discountPercentage}% OFF</p>
+									<p className={s.itemDiscount}>{item.discountPercentage} OFF</p>
 								) : null}
 								<h5 className={s.itemName}>{item.name}</h5>
 								<p className={s.itemPrice}>{item.discount ? item.salePrice : item.mainPrice}</p>
