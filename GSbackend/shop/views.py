@@ -357,7 +357,11 @@ class ShippingAddressView(APIView):
         output = [
             {
                 "id": output.id,
+                "firstName": output.firstName,
+                "lastName": output.lastName,
                 "customer": CustomerSerializer(output.customer).data,
+                "phone": output.phone,
+                "state": output.state,
                 "streetAddress": output.streetAddress,
                 "region": output.region,
                 "city": output.city,
