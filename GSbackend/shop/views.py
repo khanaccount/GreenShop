@@ -550,18 +550,31 @@ class TransactionViews(APIView):
 
     def post(self, request):
         # Создание новой транзакции
-        serializer = TransactionSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            shippingAddress = ShippingAddress.objects.get(
+                customer=request.user, id=request.data["shippingAddress"]
+            )
+        except:
+            return Response(
+                {"error": "This user does not have such a shipping address"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         try:
             order = Order.objects.get(isCompleted=False, customer=request.user)
             order.isCompleted = True
             order.save()
 
-            serializer.save(order=order)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Order.DoesNotExist:
-            return Response({"order": "Order not found"})
+        except:
+            return Response(
+                {"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = TransactionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(shippingAddress=shippingAddress, order=order)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ReviewViews(APIView):
