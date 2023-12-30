@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import PhoneInput from "react-phone-number-input/input";
+import Delete from "../../OrderQuantitySelector/svg/delete";
 import axios from "axios";
 import { getAuthHeaders } from "../../../api/auth";
 
@@ -15,16 +15,20 @@ interface UserData {
 interface ShippingAddress {
 	id: number;
 	state: string;
-	phoneNumber: string;
+	phone: string;
 	city: string;
 	region: string;
 	streetAddress: string;
 	lastName: string;
 	firstName: string;
+	customer: {
+		email: string;
+		username: string;
+		id: number;
+	};
 }
 
 const Address: React.FC = () => {
-	const [phone, setPhone] = useState<string | undefined>(undefined);
 	const [showRegionDropdown, setShowRegionDropdown] = useState(false);
 	const [showStateDropdown, setShowStateDropdown] = useState(false);
 	const [filteredRegions, setFilteredRegions] = useState<string[]>([]);
@@ -34,10 +38,6 @@ const Address: React.FC = () => {
 	const [showStateDropdownImg, setShowStateDropdownImg] = useState(false);
 	const [userData, setUserData] = React.useState<UserData | null>(null);
 	const [shippingAddress, setShippingAddress] = useState<ShippingAddress[]>([]);
-
-	const handlePhoneChange = (value: string | undefined) => {
-		setPhone(value);
-	};
 
 	const toggleRegionDropdown = () => {
 		setShowRegionDropdown(!showRegionDropdown);
@@ -168,7 +168,7 @@ const Address: React.FC = () => {
 		const streetAddress = (document.getElementById("streetAddress") as HTMLInputElement)?.value;
 		const region = (document.getElementById("Region") as HTMLInputElement)?.value;
 		const city = (document.getElementById("City") as HTMLInputElement)?.value;
-		const phone = (document.getElementById("PhoneNumber") as HTMLInputElement)?.value;
+		const phone = (document.getElementById("Phone") as HTMLInputElement)?.value;
 		const state = (document.getElementById("State") as HTMLInputElement)?.value;
 
 		const data = {
@@ -181,14 +181,69 @@ const Address: React.FC = () => {
 			state
 		};
 		const authHeaders = getAuthHeaders();
+
 		axios
 			.post("http://127.0.0.1:8000/shop/shippingAddress/", data, authHeaders)
 			.then((response) => {
 				console.log("Shipping address added:", response.data);
+				axios
+					.get("http://127.0.0.1:8000/shop/shippingAddress/", getAuthHeaders())
+					.then((response) => {
+						setShippingAddress(response.data);
+					})
+					.catch((error) => {
+						console.error("Error fetching updated shipping address data: ", error);
+					});
 			})
 			.catch((error) => {
 				console.error("Error adding shipping address:", error);
 			});
+	};
+
+	const handleDeleteAddress = (addressIdToDelete: number) => {
+		const authHeaders = getAuthHeaders();
+		const requestData = {
+			shippingAddress: addressIdToDelete
+		};
+
+		axios
+			.delete("http://127.0.0.1:8000/shop/shippingAddress/", {
+				headers: {
+					Authorization: authHeaders?.headers?.Authorization
+				},
+				data: requestData
+			})
+			.then(() => {
+				console.log(`Shipping address with ID ${addressIdToDelete} deleted successfully`);
+				axios
+					.get("http://127.0.0.1:8000/shop/shippingAddress/", authHeaders)
+					.then((response) => {
+						setShippingAddress(response.data);
+					})
+					.catch((error) => {
+						console.error("Error fetching updated shipping addresses after deletion: ", error);
+					});
+			})
+			.catch((error) => {
+				console.error(`Error deleting shipping address with ID ${addressIdToDelete}:`, error);
+			});
+	};
+
+	const handlePhoneKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		const regex = /[0-9]/;
+		const isValidInput = regex.test(event.key);
+
+		if (!isValidInput && event.key !== "Backspace") {
+			event.preventDefault();
+		}
+	};
+
+	const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		let phoneNumber = event.target.value;
+		if (!phoneNumber.startsWith("+") && phoneNumber !== "") {
+			phoneNumber = "+" + phoneNumber;
+			(event.target as HTMLInputElement).value = phoneNumber;
+		}
 	};
 
 	return (
@@ -197,19 +252,33 @@ const Address: React.FC = () => {
 				<div className={s.billingAddres}>
 					<h5>Billing Address</h5>
 					<p>The following addresses will be used on the checkout page by default.</p>
-				</div>
-				<div className={s.addedAddresses}>
-					{shippingAddress.map((address, index) => (
-						<div className={s.adders} key={index}>
-							<h3>Shipping Address</h3>
-							<p>First Name: {address.firstName}</p>
-							<p>Last Name: {address.lastName}</p>
-						</div>
-					))}
+					<h4>(max 3 addresses)</h4>
 				</div>
 				<p className={s.addBtn} onClick={handleAddButtonClick}>
 					Add
 				</p>
+			</div>
+			<div className={s.addedAddresses}>
+				{shippingAddress.map((address, index) => (
+					<div className={s.adderss} key={index}>
+						<h3>Shipping Address {index + 1}</h3>
+						<div>
+							<p className={s.addressField}>First Name: {address.firstName}</p>
+							<p className={s.addressField}>Last Name: {address.lastName}</p>
+						</div>
+						<div>
+							<p className={s.addressField}>Country / Region: {address.region}</p>
+							<p className={s.addressField}>Town / City: {address.city}</p>
+						</div>
+						<div>
+							<p className={s.addressField}>State : {address.state}</p>
+							<p className={s.addressField}>Phone: {address.phone}</p>
+						</div>
+						<button onClick={() => handleDeleteAddress(address.id)}>
+							<Delete />
+						</button>
+					</div>
+				))}
 			</div>
 
 			<div className={s.inputBlock}>
@@ -340,12 +409,12 @@ const Address: React.FC = () => {
 						<p className={s.formText}>
 							Phone Number <span>*</span>
 						</p>
-						<PhoneInput
+						<input
+							onKeyDown={handlePhoneKeyDown}
+							onChange={handlePhoneChange}
 							id="Phone"
 							name="Phone"
 							placeholder="Enter phone number"
-							value={phone}
-							onChange={handlePhoneChange}
 						/>
 					</label>
 				</form>

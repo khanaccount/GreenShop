@@ -15,6 +15,38 @@ interface LoginData {
 const apiBaseUrl = "http://localhost:8000/shop/";
 
 let tokenRefreshInterval: NodeJS.Timeout;
+let lastInteractionTime = Date.now();
+
+const updateLastInteractionTime = () => {
+	lastInteractionTime = Date.now();
+};
+
+document.addEventListener("click", updateLastInteractionTime);
+document.addEventListener("keydown", updateLastInteractionTime);
+
+const checkActivityAndRefreshToken = async () => {
+	const inactivityPeriod = Date.now() - lastInteractionTime;
+	const refreshInterval = 29 * 60 * 1000; // Интервал обновления токена (в миллисекундах)
+
+	if (inactivityPeriod > refreshInterval) {
+		try {
+			await refreshAccessToken();
+			// Обновить время последнего взаимодействия после успешного обновления токена
+			lastInteractionTime = Date.now();
+		} catch (refreshError) {
+			console.error("Refresh error:", refreshError);
+			clearInterval(tokenRefreshInterval);
+		}
+	}
+};
+
+export const startTokenRefreshInterval = () => {
+	checkActivityAndRefreshToken(); // Сначала проверить активность и обновить токен
+	// Затем установить интервал для периодической проверки активности пользователя
+	tokenRefreshInterval = setInterval(checkActivityAndRefreshToken, 60000); // Проверка каждую минуту
+};
+
+startTokenRefreshInterval();
 
 export const register = async (userData: RegisterData): Promise<void> => {
 	const { username, email, password } = userData;
@@ -83,19 +115,6 @@ export const getAuthHeaders = () => {
 	}
 
 	return {};
-};
-
-export const startTokenRefreshInterval = () => {
-	clearInterval(tokenRefreshInterval);
-
-	tokenRefreshInterval = setInterval(async () => {
-		try {
-			await refreshAccessToken();
-		} catch (refreshError) {
-			console.error("Refresh error:", refreshError);
-			clearInterval(tokenRefreshInterval);
-		}
-	}, 29 * 60 * 1000);
 };
 
 const refreshAccessToken = async () => {

@@ -7,6 +7,54 @@
 		display: flex;
 		align-items: center;
 	}
+
+	.addedAddresses {
+		margin-bottom: 20px;
+		.adderss {
+			padding: 10px;
+			border: 1px solid $secondaryColor;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			&:not(:last-child) {
+				margin-bottom: 10px;
+			}
+
+			h3 {
+				padding-right: 30px;
+			}
+
+			.addressField {
+				width: 210px;
+				color: $mainColor;
+				font-size: 16px;
+				font-weight: 400;
+				margin-bottom: 0;
+				&:not(:last-child) {
+					padding-bottom: 20px;
+				}
+			}
+			div {
+				display: flex;
+				flex-direction: column;
+
+				&:not(:last-child) {
+					padding-right: 20px;
+				}
+			}
+			button {
+				svg {
+					fill: #727272;
+					width: 24px;
+					height: 24px;
+					cursor: pointer;
+					&:active {
+						fill: red;
+					}
+				}
+			}
+		}
+	}
 	h5 {
 		color: $mainColor;
 		padding-bottom: 9px;

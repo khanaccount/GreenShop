@@ -4,118 +4,112 @@
 	display: flex;
 	justify-content: space-between;
 	margin-top: 36px;
-	.addressBlock {
-		.addAddress {
+
+	.addedAddresses {
+		margin-bottom: 20px;
+		margin-right: 10px;
+		.adderss {
+			padding: 10px;
+			border: 1px solid $secondaryColor;
 			display: flex;
 			align-items: center;
-		}
-		.billingAddress,
-		.differentAddress {
-			color: $mainColor;
-			font-size: 17px;
-			font-weight: 500;
-			line-height: 16px;
-		}
-		.billingAddress {
-			padding-bottom: 21px;
-		}
-		.differentAddress {
-			padding-left: 20px;
-			padding-bottom: 54px;
-		}
-
-		.formText {
-			margin-bottom: 10px;
-			color: $mainColor;
-			font-size: 15px;
-			font-weight: 400;
-			line-height: 15px;
-		}
-
-		input {
-			width: 350px;
-			height: 40px;
-			border-radius: 3px;
-			border: 1px solid #eaeaea;
-			padding: 0 10px;
-			outline: none;
-		}
-		span {
-			color: $spanColor;
-			font-size: 22px;
-			font-weight: 400;
-			line-height: 15px;
-		}
-
-		.inputBlock {
-			display: flex;
+			min-height: 110px;
+			position: relative;
 
 			&:not(:last-child) {
-				padding-bottom: 30px;
+				margin-bottom: 10px;
 			}
-			.firstForm {
-				margin-right: 30px;
-				position: relative;
-				.arrdown,
-				.arrdownActive {
-					cursor: pointer;
-					position: absolute;
-					top: 35px;
-					right: 10px;
+
+			.cyrcle0 {
+				padding-right: 20px;
+			}
+
+			.cyrcle1 {
+				position: absolute;
+				left: 13px;
+			}
+
+			h3 {
+				width: 150px;
+				padding-right: 20px;
+			}
+
+			.addressField {
+				cursor: pointer;
+				width: 100%;
+				color: $mainColor;
+				font-size: 16px;
+				font-weight: 400;
+				margin-bottom: 0;
+				&:not(:last-child) {
+					margin-bottom: 20px;
+				}
+			}
+
+			div {
+				display: flex;
+				flex-direction: column;
+
+				&:not(:last-child) {
+					padding-right: 20px;
+				}
+			}
+			button {
+				svg {
+					fill: #727272;
 					width: 24px;
 					height: 24px;
-				}
-				.arrdownActive {
-					transform: rotate(180deg);
-				}
-			}
-		}
-		.inputBlock {
-			display: flex;
-		}
-
-		.dropdownContent {
-			position: absolute;
-			background-color: #fff;
-			border: 1px solid #ccc;
-			max-height: 200px;
-			overflow-y: auto;
-			z-index: 1;
-			width: 100%;
-		}
-
-		.regionList,
-		.stateList {
-			list-style: none;
-			padding: 0;
-			margin: 0;
-
-			li {
-				padding: 8px 16px;
-				cursor: pointer;
-
-				&:hover {
-					background-color: #f0f0f0;
+					cursor: pointer;
+					&:active {
+						fill: red;
+					}
 				}
 			}
 		}
-		.optional {
-			color: $mainColor;
-			margin-bottom: 10px;
-			font-size: 15px;
-			font-weight: 400;
-			line-height: 15px;
-		}
+	}
 
-		.notes {
-			margin-bottom: 400px;
-			width: 350px;
-			height: 152px;
-			border-radius: 3px;
-			border: 1px solid #eaeaea;
-			padding: 8px;
-			resize: none;
-		}
+	.optional {
+		color: $mainColor;
+		margin-bottom: 10px;
+		font-size: 15px;
+		font-weight: 400;
+		line-height: 15px;
+	}
+
+	.notes {
+		margin-bottom: 400px;
+		width: 350px;
+		height: 152px;
+		border-radius: 3px;
+		border: 1px solid #eaeaea;
+		padding: 8px;
+		resize: none;
+	}
+
+	.newAdresses {
+		color: #fff;
+		font-size: 18px;
+		width: 200px;
+		height: 30px;
+		border-radius: 3px;
+		margin-bottom: 10px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-weight: 500;
+		line-height: 16px;
+		background: $secondaryColor;
+		cursor: pointer;
+	}
+
+	.billingAddress {
+		color: $mainColor;
+		font-size: 18px;
+		font-weight: 500;
+		line-height: 16px;
+	}
+	.billingAddress {
+		padding-bottom: 10px;
 	}
 
 	.order {
@@ -278,7 +272,8 @@
 			h4 {
 				margin-bottom: 19px;
 			}
-			.method {
+			.method,
+			.methodNone {
 				cursor: pointer;
 				border-radius: 3px;
 				border: 1px solid #46a358;
@@ -307,6 +302,16 @@
 					font-weight: 400;
 					line-height: 16px;
 				}
+			}
+			.Cross {
+				padding-left: 11px;
+				padding-bottom: 5px;
+				font-size: 22px;
+				font-weight: 300;
+			}
+			.methodNone {
+				border: 1px solid $smallTextColor;
+				cursor: not-allowed;
 			}
 		}
 
