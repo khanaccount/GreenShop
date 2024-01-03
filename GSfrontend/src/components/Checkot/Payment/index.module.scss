@@ -9,6 +9,7 @@
 		margin-bottom: 20px;
 		margin-right: 10px;
 		.adderss {
+			cursor: pointer;
 			padding: 10px;
 			border: 1px solid $secondaryColor;
 			display: flex;
@@ -35,7 +36,6 @@
 			}
 
 			.addressField {
-				cursor: pointer;
 				width: 100%;
 				color: $mainColor;
 				font-size: 16px;
@@ -86,10 +86,14 @@
 		resize: none;
 	}
 
+	.newAdressesLink {
+		display: inline-block;
+	}
+
 	.newAdresses {
 		color: #fff;
 		font-size: 18px;
-		width: 200px;
+		padding: 0 20px;
 		height: 30px;
 		border-radius: 3px;
 		margin-bottom: 10px;
@@ -315,7 +319,8 @@
 			}
 		}
 
-		.placeOrder {
+		.placeOrder,
+		.placeOrderDisabled {
 			margin-top: 50px;
 
 			color: #fff;
@@ -331,6 +336,12 @@
 			justify-content: center;
 			align-items: center;
 			height: 40px;
+		}
+
+		.placeOrderDisabled {
+			cursor: not-allowed;
+			background: gray;
+			color: $mainColor;
 		}
 	}
 }

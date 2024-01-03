@@ -51,6 +51,7 @@ const OrderQuantitySelector: React.FC = () => {
 		},
 		output: []
 	});
+	const areProductsInCart = orderInfo.output.length > 0;
 
 	useEffect(() => {
 		const savedCoupon = localStorage.getItem("appliedCoupon");
@@ -237,8 +238,10 @@ const OrderQuantitySelector: React.FC = () => {
 					<p className={s.price}>{orderInfo.prices.totalPrice}</p>
 				</div>
 
-				<NavLink to={"/shop/checkout"} className={s.checkout}>
-					Proceed To Checkout
+				<NavLink
+					to={areProductsInCart ? "/shop/checkout" : "/"}
+					className={areProductsInCart ? s.checkout : s.checkoutDisabled}>
+					{areProductsInCart ? "Proceed To Checkout" : "Select product"}
 				</NavLink>
 				<NavLink to={"/"} className={s.continue}>
 					Continue Shopping

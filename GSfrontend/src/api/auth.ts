@@ -15,38 +15,6 @@ interface LoginData {
 const apiBaseUrl = "http://localhost:8000/shop/";
 
 let tokenRefreshInterval: NodeJS.Timeout;
-let lastInteractionTime = Date.now();
-
-const updateLastInteractionTime = () => {
-	lastInteractionTime = Date.now();
-};
-
-document.addEventListener("click", updateLastInteractionTime);
-document.addEventListener("keydown", updateLastInteractionTime);
-
-const checkActivityAndRefreshToken = async () => {
-	const inactivityPeriod = Date.now() - lastInteractionTime;
-	const refreshInterval = 29 * 60 * 1000; // Интервал обновления токена (в миллисекундах)
-
-	if (inactivityPeriod > refreshInterval) {
-		try {
-			await refreshAccessToken();
-			// Обновить время последнего взаимодействия после успешного обновления токена
-			lastInteractionTime = Date.now();
-		} catch (refreshError) {
-			console.error("Refresh error:", refreshError);
-			clearInterval(tokenRefreshInterval);
-		}
-	}
-};
-
-export const startTokenRefreshInterval = () => {
-	checkActivityAndRefreshToken(); // Сначала проверить активность и обновить токен
-	// Затем установить интервал для периодической проверки активности пользователя
-	tokenRefreshInterval = setInterval(checkActivityAndRefreshToken, 60000); // Проверка каждую минуту
-};
-
-startTokenRefreshInterval();
 
 export const register = async (userData: RegisterData): Promise<void> => {
 	const { username, email, password } = userData;
@@ -131,6 +99,7 @@ const refreshAccessToken = async () => {
 
 		if (newAccessToken) {
 			localStorage.setItem("accessToken", newAccessToken);
+			localStorage.setItem("lastTokenRefresh", Date.now().toString()); // Сохранить время последнего обновления токена
 		} else {
 			throw new Error("New access token is missing in the response");
 		}
@@ -139,6 +108,33 @@ const refreshAccessToken = async () => {
 		throw new Error("Failed to refresh access token");
 	}
 };
+
+export const startTokenRefreshInterval = () => {
+	const refreshInterval = 29 * 60 * 1000; // Интервал обновления токена (в миллисекундах)
+	let lastTokenRefresh = localStorage.getItem("lastTokenRefresh");
+
+	if (!lastTokenRefresh) {
+		// Если нет сохраненного времени, установить текущее время
+		lastTokenRefresh = Date.now().toString();
+		localStorage.setItem("lastTokenRefresh", lastTokenRefresh);
+	}
+
+	const timeElapsed = Date.now() - parseInt(lastTokenRefresh, 10);
+	const timeRemaining = refreshInterval - timeElapsed;
+
+	if (timeRemaining < 0) {
+		// Если прошло больше времени, чем интервал обновления токена, обновить токен сразу
+		refreshAccessToken();
+	} else {
+		// Иначе установить таймер для обновления токена через оставшееся время
+		tokenRefreshInterval = setTimeout(() => {
+			refreshAccessToken();
+			startTokenRefreshInterval();
+		}, timeRemaining);
+	}
+};
+
+startTokenRefreshInterval();
 
 export const isUserLoggedIn = (): boolean => {
 	const accessToken = localStorage.getItem("accessToken");

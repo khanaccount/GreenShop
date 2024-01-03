@@ -85,6 +85,7 @@ const Payment: React.FC = () => {
 				console.error("Error response:", error);
 			});
 	};
+
 	const fetchShippingAddresses = () => {
 		const token = getAuthHeaders();
 		axios
@@ -104,6 +105,7 @@ const Payment: React.FC = () => {
 			setSelectedMethod(methodNumber);
 		}
 	};
+
 	const handleAddressClick = (index: number) => {
 		setSelectedAddress(index === selectedAddress ? null : index);
 	};
@@ -137,11 +139,45 @@ const Payment: React.FC = () => {
 			});
 	};
 
+	const handlePlaceOrder = () => {
+		const authHeaders = getAuthHeaders();
+		const requestData = {
+			shippingAddress: selectedAddress + "1"
+		};
+
+		const placeOrderButtonStyle =
+			isAddressSelected && isMethodSelected ? s.placeOrderSelected : s.placeOrder;
+
+		if (placeOrderButtonStyle === s.placeOrderDisabled) {
+			console.log("Button is disabled. Cannot place order.");
+			return;
+		}
+
+		axios
+			.post("http://127.0.0.1:8000/shop/transaction/", requestData, {
+				headers: {
+					Authorization: authHeaders?.headers?.Authorization
+				}
+			})
+			.then((response) => {
+				setShippingAddress(response.data);
+			})
+			.catch((error) => {
+				console.error("Error fetching shipping address data: ", error);
+			});
+	};
+
+	const isAddressSelected = selectedAddress !== null;
+	const isMethodSelected = selectedMethod !== null;
+
+	const placeOrderButtonStyle =
+		isAddressSelected && isMethodSelected ? s.placeOrderSelected : s.placeOrder;
+
 	return (
 		<div className={s.payment}>
 			<div className={s.addressBlock}>
 				<h5 className={s.billingAddress}>Billing Address</h5>
-				<Link to={"/account"}>
+				<Link className={s.newAdressesLink} to={"/account"}>
 					<button className={s.newAdresses}>Add new addresses</button>
 				</Link>
 				<div className={s.addedAddresses}>
@@ -163,7 +199,7 @@ const Payment: React.FC = () => {
 								<p className={s.addressField}>Street Address: {address.streetAddress}</p>
 							</div>
 							<div>
-								<p className={s.addressField}>State : {address.state}</p>
+								<p className={s.addressField}>State: {address.state}</p>
 								<p className={s.addressField}>Phone: {address.phone}</p>
 							</div>
 							<button onClick={() => handleDeleteAddress(address.id)}>
@@ -249,7 +285,11 @@ const Payment: React.FC = () => {
 					</div>
 				</div>
 
-				<button className={s.placeOrder}>Place Order</button>
+				<button
+					onClick={handlePlaceOrder}
+					className={placeOrderButtonStyle ? s.placeOrderDisabled : s.placeOrder}>
+					Place Order
+				</button>
 			</div>
 		</div>
 	);
