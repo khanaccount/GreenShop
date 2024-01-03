@@ -174,7 +174,7 @@
 						transform: translate(-50%, -50%);
 						position: absolute;
 						text-transform: uppercase;
-						color: $smallTextColor;
+						color: $mainColor;
 						font-size: 15px;
 						font-weight: 500;
 						line-height: 16px;
@@ -184,6 +184,9 @@
 						left: 50%;
 						transform: translate(-50%, -50%);
 						position: absolute;
+						circle {
+							stroke: $mainColor;
+						}
 					}
 				}
 				.sizeActive {
@@ -199,9 +202,12 @@
 				.sizeInactive {
 					cursor: not-allowed;
 					pointer-events: none;
+					p {
+						color: $smallTextColor;
+					}
 					svg {
 						circle {
-							stroke: #070707;
+							stroke: #EAEAEA;
 						}
 					}
 				}
