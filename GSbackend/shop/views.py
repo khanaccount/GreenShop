@@ -59,6 +59,7 @@ class CustomerView(APIView):
             "username": customer.username,
             "email": customer.email,
             "cartCount": orderItem.count(),
+            "profileImg": customer.profileImg,
         }
         return Response(output)
 
