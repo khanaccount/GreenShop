@@ -13,6 +13,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("shop/size/", SizeView.as_view()),
     path("shop/customer/", CustomerView.as_view()),
+    path("shop/customer/avatar/", CustomerImgView.as_view()),
     path("shop/product/", ProductView.as_view()),
     path("shop/product/<int:id>/", ProductCardView.as_view()),
     path("shop/product/reviews/<int:id>/", ReviewViews.as_view()),
