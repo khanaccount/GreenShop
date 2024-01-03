@@ -66,6 +66,11 @@ class CustomerView(APIView):
 class CustomerImgView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        customer = request.user
+
+        return Response({"profileImg": customer.profileImg}, status=status.HTTP_200_OK)
+
     def post(self, request):
         # Установка аватарки пользователя
         customer = request.user
