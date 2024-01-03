@@ -140,9 +140,14 @@ const Payment: React.FC = () => {
 	};
 
 	const handlePlaceOrder = () => {
+		if (!isAddressSelected || !isMethodSelected) {
+			alert("Address or Payment Method is not selected. Cannot place order.");
+			return;
+		}
 		const authHeaders = getAuthHeaders();
+		const selectedAddressId = selectedAddress !== null ? shippingAddress[selectedAddress].id : null;
 		const requestData = {
-			shippingAddress: selectedAddress + "1"
+			shippingAddress: selectedAddressId
 		};
 
 		const placeOrderButtonStyle =
@@ -288,7 +293,7 @@ const Payment: React.FC = () => {
 				<button
 					onClick={handlePlaceOrder}
 					className={placeOrderButtonStyle ? s.placeOrderDisabled : s.placeOrder}>
-					Place Order
+					{placeOrderButtonStyle ? "Select address and Payment Method" : "Place Order"}
 				</button>
 			</div>
 		</div>

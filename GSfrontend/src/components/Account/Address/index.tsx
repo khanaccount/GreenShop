@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Delete from "../../OrderQuantitySelector/svg/delete";
-import axios from "axios";
 import { getAuthHeaders } from "../../../api/auth";
+import axios from "axios";
+
+import Delete from "../../OrderQuantitySelector/svg/delete";
 
 import s from "./index.module.scss";
 
@@ -171,6 +172,11 @@ const Address: React.FC = () => {
 		const phone = (document.getElementById("Phone") as HTMLInputElement)?.value;
 		const state = (document.getElementById("State") as HTMLInputElement)?.value;
 
+		if (!firstName || !lastName || !streetAddress || !region || !city || !phone || !state) {
+			alert("Please fill in all required fields");
+			return;
+		}
+
 		const data = {
 			firstName,
 			lastName,
@@ -197,6 +203,13 @@ const Address: React.FC = () => {
 			})
 			.catch((error) => {
 				console.error("Error adding shipping address:", error);
+				if (error.response && error.response.data) {
+					const serverError =
+						error.response.data.error || error.response.data.detail || "Unknown error occurred";
+					alert(serverError);
+				} else {
+					alert("An error occurred while adding the shipping address");
+				}
 			});
 	};
 
@@ -284,17 +297,18 @@ const Address: React.FC = () => {
 			<div className={s.inputBlock}>
 				<form className={s.firstForm}>
 					<label htmlFor="firstName">
-						<p className={s.formText}>
-							First Name <span>*</span>
-						</p>
+						<div className={s.formText}>
+							<p>First Name</p>
+							<span>*</span>
+						</div>
 						<input type="text" id="firstName" name="firstName" />
 					</label>
 				</form>
 				<form className={s.secondForm}>
 					<label htmlFor="lastName">
-						<p className={s.formText}>
-							Last Name <span>*</span>
-						</p>
+						<div className={s.formText}>
+							<p>Last Name</p>
+						</div>
 						<input type="text" id="lastName" name="lastName" />
 					</label>
 				</form>
@@ -303,9 +317,9 @@ const Address: React.FC = () => {
 			<div className={s.inputBlock}>
 				<form className={s.firstForm}>
 					<label htmlFor="Region">
-						<p className={s.formText}>
-							Country / Region <span>*</span>
-						</p>
+						<div className={s.formText}>
+							<p>Country / Region</p>
+						</div>
 						<input
 							onChange={handleRegionInputChange}
 							onClick={toggleRegionDropdown}
@@ -335,9 +349,9 @@ const Address: React.FC = () => {
 
 				<form className={s.secondForm}>
 					<label htmlFor="City">
-						<p className={s.formText}>
-							Town / City <span>*</span>
-						</p>
+						<div className={s.formText}>
+							<p>Town / City</p>
+						</div>
 						<input type="text" id="City" name="City" />
 					</label>
 				</form>
@@ -346,9 +360,9 @@ const Address: React.FC = () => {
 			<div className={s.inputBlock}>
 				<form className={s.firstForm}>
 					<label htmlFor="State">
-						<p className={s.formText}>
-							State <span>*</span>
-						</p>
+						<div className={s.formText}>
+							<p>State</p>
+						</div>
 						<input
 							onChange={handleStateInputChange}
 							onClick={toggleStateDropdown}
@@ -378,9 +392,9 @@ const Address: React.FC = () => {
 				</form>
 				<form className={s.firstForm}>
 					<label htmlFor="streetAddress">
-						<p className={s.formText}>
-							Street Address <span>*</span>
-						</p>
+						<div className={s.formText}>
+							<p>Street Address</p>
+						</div>
 						<input
 							placeholder="House number and street name"
 							id="streetAddress"
@@ -394,7 +408,7 @@ const Address: React.FC = () => {
 			<div className={s.inputBlock}>
 				<form className={s.firstForm}>
 					<label htmlFor="EmailAddress">
-						<p className={s.formText}>Email address</p>
+						<div className={s.formText}>Email address</div>
 						<input
 							value={userData?.email || ""}
 							readOnly
@@ -406,9 +420,9 @@ const Address: React.FC = () => {
 				</form>
 				<form className={s.secondForm}>
 					<label htmlFor="Phone">
-						<p className={s.formText}>
-							Phone Number <span>*</span>
-						</p>
+						<div className={s.formText}>
+							<p>Phone Number</p>
+						</div>
 						<input
 							onKeyDown={handlePhoneKeyDown}
 							onChange={handlePhoneChange}
