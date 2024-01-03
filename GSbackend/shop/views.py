@@ -63,6 +63,37 @@ class CustomerView(APIView):
         return Response(output)
 
 
+class CustomerImgView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Установка аватарки пользователя
+        customer = request.user
+        try:
+            profileImg = request.data["profileImg"]
+            customer.profileImg = profileImg
+            customer.save()
+            return Response({"message": "Successful"}, status=status.HTTP_200_OK)
+        except:
+            return Response(
+                {"error": "Specify the image"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def delete(self, request):
+        # Удаление аватарки пользователя
+        customer = request.user
+
+        if customer.profileImg:
+            return Response(
+                {"error": "The user does not have an image installed"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        else:
+            customer.profileImg = None
+
+        return Response({"message": "Successful"}, status=status.HTTP_200_OK)
+
+
 class ProductView(APIView):
     def get(self, request):
         # Получение списка продуктов и их преобразование в json
