@@ -65,8 +65,12 @@ class CustomerView(APIView):
             "username": customer.username,
             "email": customer.email,
             "cartCount": orderItem.count(),
-            "profileImg": customer.profileImg,
         }
+
+        if customer.profileImg:
+            output["profileImg"] = customer.profileImg.url
+        else:
+            output["profileImg"] = None
         return Response(output)
 
 
