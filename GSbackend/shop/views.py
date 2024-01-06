@@ -15,7 +15,10 @@ from .utils import Util
 
 from django.core.exceptions import ValidationError
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 98af5c325d1e7f5ad2a1270eda9564bfae293f93
 @transaction.atomic
 def createOrder(customer):
     order, created = Order.objects.get_or_create(customer=customer, isCompleted=False)
