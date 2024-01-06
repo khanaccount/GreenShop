@@ -103,7 +103,7 @@ class CustomerImgView(APIView):
         customer = request.user
 
         if customer.profileImg:
-            customer.profileImg = None
+            customer.profileImg.delete()
             customer.save()
         else:
             return Response(
