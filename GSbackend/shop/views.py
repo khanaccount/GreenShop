@@ -15,6 +15,11 @@ from .utils import Util
 from django.core.exceptions import ValidationError
 
 
+def createOrder(customer):
+    order, created = Order.objects.get_or_create(customer=customer, isCompleted=False)
+    return order
+
+
 class CategoryView(APIView):
     def get(self, request):
         # Получение списка размеров и их преобразование в json
@@ -48,9 +53,7 @@ class CustomerView(APIView):
         # Получение данных о текущем пользователе
         customer = request.user
 
-        order, created = Order.objects.get_or_create(
-            customer=request.user, isCompleted=False
-        )
+        order = createOrder(customer)
 
         orderItem = order.orderitem_set.all()
 
@@ -173,12 +176,9 @@ class ProductCardView(APIView):
                 "descriptionInfo": product.descriptionInfo,
             }
         ]
-
-        if request.user.is_authenticated:
-            order, created = Order.objects.get_or_create(
-                customer=request.user, isCompleted=False
-            )
-
+        customer = request.user
+        if customer.is_authenticated:
+            order = createOrder(customer)
             orderItem = OrderItem.objects.filter(order=order, product=product.id)
             print(orderItem.count())
 
@@ -224,9 +224,7 @@ class CartView(RetrieveUpdateDestroyAPIView):
     def get(self, request):
         # Получение данных о корзине нынешнего пользователя
         customer = request.user
-        order, created = Order.objects.get_or_create(
-            customer=customer, isCompleted=False
-        )
+        order = createOrder(customer)
         orderItem = order.orderitem_set.all()
 
         # Преобразование в json
@@ -287,9 +285,7 @@ class OrderItemView(APIView):
         # Добавление новой позиции в заказ
         customer = request.user
         product = Product.objects.get(id=id)
-        order, created = Order.objects.get_or_create(
-            customer=customer, isCompleted=False
-        )
+        order = createOrder(customer)
 
         data = {
             "product": product.pk,
@@ -334,9 +330,9 @@ class OrderItemView(APIView):
 
     def put(self, request, id, *args, **kwargs):
         # Обновление данных о позиции заказа, в частности, о количестве единиц продукта
-        order, created = Order.objects.get_or_create(
-            customer=request.user, isCompleted=False
-        )
+        customer = request.user
+
+        order = createOrder(customer)
 
         try:
             orderItem = OrderItem.objects.get(
@@ -362,9 +358,8 @@ class OrderItemView(APIView):
 
     def delete(self, request, id):
         # Удаление позиции из заказа
-        order, created = Order.objects.get_or_create(
-            customer=request.user, isCompleted=False
-        )
+        customer = request.user
+        order = createOrder(customer)
 
         try:
             orderItem = OrderItem.objects.get(
@@ -391,6 +386,7 @@ class ShippingAddressView(APIView):
 
     def get(self, request):
         # Получение списка адресов доставки пользователя
+        customer = request.user
         output = [
             {
                 "id": output.id,
@@ -403,13 +399,14 @@ class ShippingAddressView(APIView):
                 "region": output.region,
                 "city": output.city,
             }
-            for output in ShippingAddress.objects.filter(customer=request.user)
+            for output in ShippingAddress.objects.filter(customer=customer)
         ]
         return Response(output)
 
     def post(self, request):
         # Получение списка адресов доставки пользователя
-        shipping_addresses = ShippingAddress.objects.filter(customer=request.user)
+        customer = request.user
+        shipping_addresses = ShippingAddress.objects.filter(customer=customer)
 
         if shipping_addresses.count() < 3:
             serializer = ShippingAdressSerializer(data=request.data)
@@ -434,7 +431,7 @@ class ShippingAddressView(APIView):
                         status=status.HTTP_400_BAD_REQUEST,
                     )
 
-                serializer.save(customer=request.user)
+                serializer.save(customer=customer)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except ValidationError as e:
                 return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
@@ -626,6 +623,8 @@ class TransactionViews(APIView):
 
     def get(self, request):
         # Получение данных о транзакциях пользователя и их преобразование в json
+
+        customer = request.user
         output = [
             {
                 "order": OrderSerializer(output.order).data,
@@ -633,7 +632,7 @@ class TransactionViews(APIView):
                     output.shippingAddress
                 ).data,
             }
-            for output in Order.objects.filter(customer=request.user)
+            for output in Order.objects.filter(customer=customer)
         ]
         return Response(output)
 
@@ -712,12 +711,13 @@ class ReviewViews(APIView):
 
     def post(self, request, id):
         # Добавление нового отзыва к продукту
+        customer = request.user
         serializer = ReviewSerializer(data=request.data)
         product = Product.objects.get(id=id)
-        review = Review.objects.filter(customer=request.user, product=id)
+        review = Review.objects.filter(customer=customer, product=id)
         if review.count() == 0:
             if serializer.is_valid(raise_exception=True):
-                serializer.save(customer=request.user, product=product)
+                serializer.save(customer=customer, product=product)
 
                 product.update_reviews_info()
 
@@ -730,14 +730,15 @@ class ReviewViews(APIView):
 
     def delete(self, request, id):
         # Удаление отзыва пользователя о продукте
+        customer = request.user
         try:
-            review = Review.objects.get(customer=request.user, product=id)
+            review = Review.objects.get(customer=customer, product=id)
         except:
             return Response(
                 {"error": "Review not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
-        if not request.user == review.customer:
+        if not customer == review.customer:
             return Response(
                 {"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN
             )
@@ -756,8 +757,9 @@ class FavouritesViews(APIView):
     def get(self, request, id):
         # Добавление товара в избранное
 
+        customer = request.user
         try:
-            favourite = Favourite.objects.get(customer=request.user, product=id)
+            favourite = Favourite.objects.get(customer=customer, product=id)
             return Response(
                 {"message": "Product in favourite"}, status=status.HTTP_200_OK
             )
@@ -832,7 +834,8 @@ class FavouritesGetViews(APIView):
 
     def get(self, request):
         # Получение всех избранных товаров
-        favourites = Favourite.objects.filter(customer=request.user)
+        customer = request.user
+        favourites = Favourite.objects.filter(customer=customer)
 
         output = [
             {"product": self.productData(output.product)} for output in favourites
@@ -852,10 +855,9 @@ class CouponViews(APIView):
                 {"error": "Incorrect coupon"}, status=status.HTTP_404_NOT_FOUND
             )
 
+        customer = request.user
         try:
-            order, created = Order.objects.get_or_create(
-                customer=request.user, isCompleted=False
-            )
+            order = createOrder(customer)
         except:
             return Response({"error": "error"}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -877,10 +879,9 @@ class CouponViews(APIView):
             )
 
     def delete(self, request):
+        customer = request.user
         try:
-            order, create = Order.objects.get_or_create(
-                customer=request.user, isCompleted=False
-            )
+            order = createOrder(customer)
         except:
             return Response({"error": "error"}, status=status.HTTP_404_NOT_FOUND)
 
