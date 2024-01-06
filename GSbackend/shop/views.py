@@ -14,6 +14,8 @@ from .utils import Util
 
 from django.core.exceptions import ValidationError
 
+from datetime import datetime
+
 
 class CategoryView(APIView):
     def get(self, request):
@@ -638,9 +640,12 @@ class TransactionViews(APIView):
 
     def post(self, request):
         # Создание новой транзакции
+
+        customer = request.user
+
         try:
             shippingAddress = ShippingAddress.objects.get(
-                customer=request.user, id=request.data["shippingAddress"]
+                customer=customer, id=request.data["shippingAddress"]
             )
         except:
             return Response(
@@ -649,7 +654,7 @@ class TransactionViews(APIView):
             )
 
         try:
-            order = Order.objects.get(isCompleted=False, customer=request.user)
+            order = Order.objects.get(isCompleted=False, customer=customer)
             order.isCompleted = True
             order.save()
 
@@ -662,7 +667,35 @@ class TransactionViews(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save(shippingAddress=shippingAddress, order=order)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        transaction = Transaction.objects.get(
+            shippingAddress=shippingAddress, order=order
+        )
+
+        orderData = {
+            "id": order.id,
+            "date": transaction.date.strftime("%d %b, %Y"),
+            "totalPrice": order.totalPrice,
+            "shippingPrice": order.shippingPrice,
+            "paymentMethod": transaction.paymentMethod.name,
+        }
+
+        orderItemData = [
+            {
+                "id": orderItem.product.id,
+                "name": orderItem.product.name,
+                "mainImg": orderItem.product.mainImg,
+                "sku": orderItem.product.sku,
+                "quantity": orderItem.quantity,
+                "subtotal": "${:.2f}".format(
+                    orderItem.quantity * orderItem.product.salePrice
+                ),
+            }
+            for orderItem in OrderItem.objects.filter(order=order)
+        ]
+
+        data = {"orderData": orderData, "orderItemData": orderItemData}
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class ReviewViews(APIView):
