@@ -187,6 +187,7 @@ const Payment: React.FC = () => {
             })
             .then((response) => {
                 setShippingAddress(response.data);
+                window.location.reload();
             })
             .catch((error) => {
                 console.error("Error fetching shipping address data: ", error);
@@ -209,60 +210,64 @@ const Payment: React.FC = () => {
                     <button className={s.newAdresses}>Add new addresses</button>
                 </Link>
                 <div className={s.addedAddresses}>
-                    {shippingAddress.map((address, index) => (
-                        <div
-                            onClick={() => handleAddressClick(index)}
-                            className={s.adderss}
-                            key={index}
-                        >
-                            <img
-                                className={s.cyrcle0}
-                                src="/img/payment/cyrcle0.svg"
-                                alt="cyrcle"
-                            />
-                            {selectedAddress === index && (
+                    {Array.isArray(shippingAddress) &&
+                        shippingAddress.length > 0 &&
+                        shippingAddress.map((address, index) => (
+                            <div
+                                onClick={() => handleAddressClick(index)}
+                                className={s.adderss}
+                                key={index}
+                            >
                                 <img
-                                    className={s.cyrcle1}
-                                    src="/img/payment/cyrcle1.svg"
+                                    className={s.cyrcle0}
+                                    src="/img/payment/cyrcle0.svg"
                                     alt="cyrcle"
                                 />
-                            )}
-                            <h3>Shipping Address {index + 1}</h3>
+                                {selectedAddress === index && (
+                                    <img
+                                        className={s.cyrcle1}
+                                        src="/img/payment/cyrcle1.svg"
+                                        alt="cyrcle"
+                                    />
+                                )}
+                                <h3>Shipping Address {index + 1}</h3>
 
-                            <div>
-                                <p className={s.addressField}>
-                                    First Name: {address.firstName}
-                                </p>
-                                <p className={s.addressField}>
-                                    Last Name: {address.lastName}
-                                </p>
+                                <div>
+                                    <p className={s.addressField}>
+                                        First Name: {address.firstName}
+                                    </p>
+                                    <p className={s.addressField}>
+                                        Last Name: {address.lastName}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className={s.addressField}>
+                                        Country / Region: {address.region}
+                                    </p>
+                                    <p className={s.addressField}>
+                                        Town / City: span {address.city}
+                                    </p>
+                                    <p className={s.addressField}>
+                                        Street Address: {address.streetAddress}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className={s.addressField}>
+                                        State: {address.state}
+                                    </p>
+                                    <p className={s.addressField}>
+                                        Phone: {address.phone}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() =>
+                                        handleDeleteAddress(address.id)
+                                    }
+                                >
+                                    <Delete />
+                                </button>
                             </div>
-                            <div>
-                                <p className={s.addressField}>
-                                    Country / Region: {address.region}
-                                </p>
-                                <p className={s.addressField}>
-                                    Town / City: span {address.city}
-                                </p>
-                                <p className={s.addressField}>
-                                    Street Address: {address.streetAddress}
-                                </p>
-                            </div>
-                            <div>
-                                <p className={s.addressField}>
-                                    State: {address.state}
-                                </p>
-                                <p className={s.addressField}>
-                                    Phone: {address.phone}
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => handleDeleteAddress(address.id)}
-                            >
-                                <Delete />
-                            </button>
-                        </div>
-                    ))}
+                        ))}
                 </div>
                 <p className={s.optional}>Order notes (optional)</p>
                 <form>
