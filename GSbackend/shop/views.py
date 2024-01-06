@@ -674,8 +674,8 @@ class TransactionViews(APIView):
         orderData = {
             "id": order.id,
             "date": transaction.date.strftime("%d %b, %Y"),
-            "totalPrice": order.totalPrice,
-            "shippingPrice": order.shippingPrice,
+            "totalPrice": "${:.2f}".format(order.totalPrice),
+            "shippingPrice": "${:.2f}".format(order.shippingPrice),
             "paymentMethod": transaction.paymentMethod.name,
         }
 
