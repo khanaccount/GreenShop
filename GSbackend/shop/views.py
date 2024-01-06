@@ -14,8 +14,6 @@ from .utils import Util
 
 from django.core.exceptions import ValidationError
 
-from datetime import datetime
-
 
 class CategoryView(APIView):
     def get(self, request):
@@ -49,9 +47,11 @@ class CustomerView(APIView):
     def get(self, request):
         # Получение данных о текущем пользователе
         customer = request.user
-        order, created = Order.objects.get_or_create(
-            customer=customer, isCompleted=False
-        )
+        order = Order.objects.filter(customer=customer, isCompleted=False).last()
+
+        if order is None:
+            # Если заказа нет, создайте новый
+            order = Order.objects.create(customer=customer, isCompleted=False)
 
         orderItem = order.orderitem_set.all()
 
@@ -663,39 +663,47 @@ class TransactionViews(APIView):
                 {"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
-        serializer = TransactionSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(shippingAddress=shippingAddress, order=order)
+        orderItem = OrderItem.objects.filter(order=order)
 
-        transaction = Transaction.objects.get(
-            shippingAddress=shippingAddress, order=order
-        )
+        if orderItem is None:
+            return Response(
+                {"error": "There are no product to order in the shopping cart"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        else:
+            serializer = TransactionSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(shippingAddress=shippingAddress, order=order)
 
-        orderData = {
-            "id": order.id,
-            "date": transaction.date.strftime("%d %b, %Y"),
-            "totalPrice": "${:.2f}".format(order.totalPrice),
-            "shippingPrice": "${:.2f}".format(order.shippingPrice),
-            "paymentMethod": transaction.paymentMethod.name,
-        }
+            transaction = Transaction.objects.get(
+                shippingAddress=shippingAddress, order=order
+            )
 
-        orderItemData = [
-            {
-                "id": orderItem.product.id,
-                "name": orderItem.product.name,
-                "mainImg": orderItem.product.mainImg,
-                "sku": orderItem.product.sku,
-                "quantity": orderItem.quantity,
-                "subtotal": "${:.2f}".format(
-                    orderItem.quantity * orderItem.product.salePrice
-                ),
+            orderData = {
+                "id": order.id,
+                "date": transaction.date.strftime("%d %b, %Y"),
+                "totalPrice": "${:.2f}".format(order.totalPrice),
+                "shippingPrice": "${:.2f}".format(order.shippingPrice),
+                "paymentMethod": transaction.paymentMethod.name,
             }
-            for orderItem in OrderItem.objects.filter(order=order)
-        ]
 
-        data = {"orderData": orderData, "orderItemData": orderItemData}
+            orderItemData = [
+                {
+                    "id": orderItem.product.id,
+                    "name": orderItem.product.name,
+                    "mainImg": orderItem.product.mainImg,
+                    "sku": orderItem.product.sku,
+                    "quantity": orderItem.quantity,
+                    "subtotal": "${:.2f}".format(
+                        orderItem.quantity * orderItem.product.salePrice
+                    ),
+                }
+                for orderItem in OrderItem.objects.filter(order=order)
+            ]
 
-        return Response(data, status=status.HTTP_200_OK)
+            data = {"orderData": orderData, "orderItemData": orderItemData}
+
+            return Response(data, status=status.HTTP_200_OK)
 
 
 class ReviewViews(APIView):
