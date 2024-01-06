@@ -166,6 +166,7 @@ const Payment: React.FC = () => {
                 : null;
         const requestData = {
             shippingAddress: selectedAddressId,
+            paymentMethod: selectedMethod,
         };
 
         const placeOrderButtonStyle =
@@ -338,16 +339,27 @@ const Payment: React.FC = () => {
                             />
                         )}
 
-                        <img
-                            className={s.acceptedMethods}
-                            src="/img/footer/bottom/accept.png"
-                            alt="acceptMethods"
-                        />
-                    </div>
-                    <div className={s.methodNone}>
-                        <p className={s.Cross}>x</p>
-
                         <h3>Cash on delivery</h3>
+                    </div>
+
+                    <div
+                        className={s.method}
+                        onClick={() => handleMethodClick(2)}
+                    >
+                        <img
+                            className={s.cyrcle0}
+                            src="/img/payment/cyrcle0.svg"
+                            alt="cyrcle"
+                        />
+                        {selectedMethod === 2 && (
+                            <img
+                                className={s.cyrcle1}
+                                src="/img/payment/cyrcle1.svg"
+                                alt="cyrcle"
+                            />
+                        )}
+
+                        <h3>Dorect bank transfer</h3>
                     </div>
                     <div
                         className={s.method}
@@ -366,7 +378,11 @@ const Payment: React.FC = () => {
                             />
                         )}
 
-                        <h3>Dorect bank transfer</h3>
+                        <img
+                            className={s.acceptedMethods}
+                            src="/img/footer/bottom/accept.png"
+                            alt="acceptMethods"
+                        />
                     </div>
                 </div>
 
