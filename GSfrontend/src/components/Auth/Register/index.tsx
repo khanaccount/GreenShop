@@ -5,9 +5,14 @@ import { register } from "../../../api/auth";
 interface RegisterProps {
 	passwordVisible: boolean;
 	handleTogglePasswordVisibility: () => void;
+	onRegisterSuccess: () => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ passwordVisible, handleTogglePasswordVisibility }) => {
+const Register: React.FC<RegisterProps> = ({
+	passwordVisible,
+	handleTogglePasswordVisibility,
+	onRegisterSuccess
+}) => {
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -28,6 +33,7 @@ const Register: React.FC<RegisterProps> = ({ passwordVisible, handleTogglePasswo
 
 				setUsernameError(false);
 				setEmailError(false);
+				onRegisterSuccess();
 			} catch (error) {
 				alert(error);
 			}

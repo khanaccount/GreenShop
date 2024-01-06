@@ -24,11 +24,17 @@ export const register = async (userData: RegisterData): Promise<void> => {
 	}
 
 	try {
-		await axios.post(`${apiBaseUrl}registration/`, {
+		const response = await axios.post(`${apiBaseUrl}registration/`, {
 			username,
 			email,
 			password
 		});
+
+		if (response.status === 201) {
+			alert(
+				"Your account has been created. Please confirm your account through the email provided."
+			);
+		}
 	} catch (error) {
 		if (
 			axios.isAxiosError(error) &&
@@ -67,7 +73,12 @@ export const login = async (userData: LoginData): Promise<void> => {
 		}
 	} catch (error) {
 		console.error("Login error:", error);
-		throw new Error("Login failed");
+
+		if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
+			alert("No active accounts were found with the specified information.");
+		} else {
+			throw new Error("Login failed");
+		}
 	}
 };
 

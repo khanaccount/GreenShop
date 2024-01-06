@@ -55,8 +55,11 @@ const Header: React.FC = () => {
 	};
 	const handleLoginSuccess = () => {
 		setAuthModalVisible(false);
+		setActiveMethod("login");
 		fetchUserData();
 	};
+
+	console.log(activeMethod);
 
 	return (
 		<div className={s.header}>
@@ -136,6 +139,7 @@ const Header: React.FC = () => {
 							)}
 							{activeMethod === "register" && (
 								<Register
+									onRegisterSuccess={handleLoginSuccess}
 									passwordVisible={passwordVisible}
 									handleTogglePasswordVisibility={handleTogglePasswordVisibility}
 								/>
