@@ -47,11 +47,10 @@ class CustomerView(APIView):
     def get(self, request):
         # Получение данных о текущем пользователе
         customer = request.user
-        order = Order.objects.filter(customer=customer, isCompleted=False).last()
 
-        if order is None:
-            # Если заказа нет, создайте новый
-            order = Order.objects.create(customer=customer, isCompleted=False)
+        order, created = Order.objects.get_or_create(
+            customer=request.user, isCompleted=False
+        )
 
         orderItem = order.orderitem_set.all()
 
@@ -657,6 +656,8 @@ class TransactionViews(APIView):
             order = Order.objects.get(isCompleted=False, customer=customer)
             order.isCompleted = True
             order.save()
+
+            Order.objects.create(isCompleted=False, customer=customer)
 
         except:
             return Response(
