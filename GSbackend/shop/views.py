@@ -100,12 +100,13 @@ class CustomerImgView(APIView):
         customer = request.user
 
         if customer.profileImg:
+            customer.profileImg = None
+            customer.save()
+        else:
             return Response(
                 {"error": "The user does not have an image installed"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        else:
-            customer.profileImg = None
 
         return Response({"message": "Successful"}, status=status.HTTP_200_OK)
 
