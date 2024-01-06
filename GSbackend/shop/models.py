@@ -63,6 +63,10 @@ class PaymentMethod(models.Model):
         return self.name
 
 
+def upload_to(instance, filename):
+    return "profile_images/{filename}".format(filename=filename)
+
+
 class Customer(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         max_length=100,
@@ -86,7 +90,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         ],
     )
     email = models.EmailField(max_length=50, unique=True)
-    profileImg = models.CharField(max_length=250, blank=True, null=True)
+    profileImg = models.ImageField(blank=True, null=True, upload_to=upload_to)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
