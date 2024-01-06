@@ -23,8 +23,8 @@ const Details: React.FC = () => {
         const file = e.target.files?.[0];
         if (file) {
             try {
-                const formData = new FormData();
-                formData.append("avatar", file);
+                const profileImg = new FormData();
+                profileImg.append("profileImg", file);
 
                 const token = getAuthHeaders();
                 const config = {
@@ -36,7 +36,7 @@ const Details: React.FC = () => {
 
                 const response = await axios.post(
                     "http://127.0.0.1:8000/shop/customer/avatar/",
-                    formData,
+                    profileImg,
                     config
                 );
 

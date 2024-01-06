@@ -15,10 +15,6 @@ from .utils import Util
 
 from django.core.exceptions import ValidationError
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 6a4bc6af5591032646a061703630936b1aa37afe
 @transaction.atomic
 def createOrder(customer):
     order, created = Order.objects.get_or_create(customer=customer, isCompleted=False)
@@ -488,7 +484,7 @@ class RegistrationView(APIView):
             password1 = request.data["password"]
             password2 = request.data["confirmPassword"]
             if password1 == password2:
-                if len(password1) < 8:
+                if len(password1) >= 8:
                     serializer.is_valid(raise_exception=True)
                     serializer.save()
                 else:
