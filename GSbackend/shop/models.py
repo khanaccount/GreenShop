@@ -215,6 +215,7 @@ class Order(models.Model):
     )
     couponDiscount = models.IntegerField(default=1)
     isCompleted = models.BooleanField(default=False, blank=False)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.id)
@@ -274,6 +275,7 @@ class Transaction(models.Model):
         ShippingAddress, on_delete=models.CASCADE, null=True
     )
     isCompleted = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.id)

@@ -481,8 +481,21 @@ class RegistrationView(APIView):
         # Регистрация нового пользователя
         serializer = RegistrationSerializer(data=request.data)
 
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        try:
+            password1 = request.data["password"]
+            password2 = request.data["confirmPassword"]
+            if password1 == password2:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+            else:
+                return Response(
+                    {"error": "Passwords don't match"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except:
+            return Response(
+                {"error": "Enter the password"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         customer = Customer.objects.get(username=serializer.data["username"])
         tokens = RefreshToken.for_user(customer).access_token
@@ -550,23 +563,61 @@ class VerifyEmail(APIView):
 #             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
+class CustomerChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def retrieve(self, request, *args, **kwargs):
-        serializer = CustomerEditSerializer(request.user)
+    def post(self, request):
+        # Смена пароля пользователя
+        customer = request.user
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            currentPassword = request.data["currentPassword"]
+            password1 = request.data["password"]
+            password2 = request.data["confirmPassword"]
+        except:
+            return Response(
+                {"error": "Fill in all the fields"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-    def update(self, request, *args, **kwargs):
-        # Обновление данных о текущем пользователе
-        serializer = CustomerEditSerializer(
-            request.user, data=request.data, partial=True
-        )
+        if customer.check_password(currentPassword):
+            if password1 == password2:
+                if customer.check_password(password1):
+                    return Response(
+                        {"error": "The new password is already in use"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                customer.set_password(password1)
+                customer.save()
+                return Response(
+                    {"message": "Password changed"}, status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": "Enter the password"}, status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"error": "Incorrect user password"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+# class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def retrieve(self, request, *args, **kwargs):
+#         serializer = CustomerEditSerializer(request.user)
+
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+
+#     def update(self, request, *args, **kwargs):
+#         # Обновление данных о текущем пользователе
+#         serializer = CustomerEditSerializer(
+#             request.user, data=request.data, partial=True
+#         )
+
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TransactionViews(APIView):
