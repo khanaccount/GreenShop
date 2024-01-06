@@ -44,6 +44,7 @@ const Details: React.FC = () => {
                     const profileImgLink = response.data.profileImg;
                     setImageSrc(profileImgLink);
                     alert("Image uploaded successfully");
+                    window.location.reload();
                 }
             } catch (error) {
                 console.error("Error uploading image: ", error);
