@@ -9,12 +9,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.http import Http404
+from django.db import transaction
 
 from .utils import Util
 
 from django.core.exceptions import ValidationError
 
-
+@transaction.atomic
 def createOrder(customer):
     order, created = Order.objects.get_or_create(customer=customer, isCompleted=False)
     return order

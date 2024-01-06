@@ -187,7 +187,6 @@ const Payment: React.FC = () => {
             })
             .then((response) => {
                 setShippingAddress(response.data);
-                window.location.reload();
             })
             .catch((error) => {
                 console.error("Error fetching shipping address data: ", error);
@@ -270,7 +269,7 @@ const Payment: React.FC = () => {
                         ))}
                 </div>
                 <p className={s.optional}>Order notes (optional)</p>
-                <form>
+                <form className={s.optionalForm}>
                     <textarea
                         className={s.notes}
                         id="textInput"
