@@ -9,12 +9,14 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.http import Http404
+from django.db import transaction
 
 from .utils import Util
 
 from django.core.exceptions import ValidationError
 
 
+@transaction.atomic
 def createOrder(customer):
     order, created = Order.objects.get_or_create(customer=customer, isCompleted=False)
     return order
@@ -483,8 +485,14 @@ class RegistrationView(APIView):
             password1 = request.data["password"]
             password2 = request.data["confirmPassword"]
             if password1 == password2:
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
+                if len(password1) < 8:
+                    serializer.is_valid(raise_exception=True)
+                    serializer.save()
+                else:
+                    return Response(
+                        {"error": "The password is too short"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
             else:
                 return Response(
                     {"error": "Passwords don't match"},
@@ -579,16 +587,22 @@ class CustomerChangePasswordView(APIView):
 
         if customer.check_password(currentPassword):
             if password1 == password2:
-                if customer.check_password(password1):
+                if len(password1) < 8:
+                    if customer.check_password(password1):
+                        return Response(
+                            {"error": "The new password is already in use"},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                    customer.set_password(password1)
+                    customer.save()
                     return Response(
-                        {"error": "The new password is already in use"},
+                        {"message": "Password changed"}, status=status.HTTP_200_OK
+                    )
+                else:
+                    return Response(
+                        {"error": "The password is too short"},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
-                customer.set_password(password1)
-                customer.save()
-                return Response(
-                    {"message": "Password changed"}, status=status.HTTP_200_OK
-                )
             else:
                 return Response(
                     {"error": "Enter the password"}, status=status.HTTP_400_BAD_REQUEST

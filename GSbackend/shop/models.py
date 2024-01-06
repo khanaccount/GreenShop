@@ -286,6 +286,9 @@ class Transaction(models.Model):
     paymentMethod = models.ForeignKey(
         PaymentMethod, on_delete=models.CASCADE, default=1, blank=True, null=True
     )
+    transactionId = models.CharField(
+        max_length=200, blank=True, null=True, default=None
+    )
 
     def __str__(self):
         return str(self.id)
