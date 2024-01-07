@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "shop",
-    "drf_yasg",
 ]
 
 MIDDLEWARE = [
