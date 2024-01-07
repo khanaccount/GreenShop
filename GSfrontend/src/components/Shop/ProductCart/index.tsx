@@ -269,9 +269,7 @@ const ProductCart: React.FC = () => {
                 .get(`http://127.0.0.1:8000/shop/product/${id}/`, authHeaders)
                 .then((response) => {
                     setProduct(response.data[0]);
-                    setSelectedImage(
-                        `http://127.0.0.1:8000/${response.data[0].mainImg}`
-                    );
+                    setSelectedImage(`/${response.data[0].mainImg}`);
 
                     const sizesFromResponse = response.data[0].size || [];
                     setAvailableSizes(sizesFromResponse);
@@ -341,20 +339,17 @@ const ProductCart: React.FC = () => {
                     <div className={s.smallImgBlock}>
                         <div
                             className={
-                                selectedImage ===
-                                `http://127.0.0.1:8000/${product.mainImg}`
+                                selectedImage === `/${product.mainImg}`
                                     ? s.bgImgSmallActive
                                     : s.bgImgSmall
                             }
                             onClick={() =>
-                                handleImageClick(
-                                    `http://127.0.0.1:8000/${product.mainImg}`
-                                )
+                                handleImageClick(`/${product.mainImg}`)
                             }
                         >
                             <img
                                 className={s.smallImg}
-                                src={`http://127.0.0.1:8000/${product.mainImg}`}
+                                src={`/${product.mainImg}`}
                             />
                         </div>
 
