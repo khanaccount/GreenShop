@@ -65,6 +65,7 @@ const Details: React.FC = () => {
             });
             setImageSrc(null);
             alert("Avatar deleted successfully");
+            window.location.reload();
         } catch (error) {
             console.error("Error deleting avatar: ", error);
             alert("Error deleting avatar. Please try again later.");
