@@ -126,7 +126,7 @@ class ProductView(APIView):
                 "rating": output.rating,
                 "size": SizeSerializer(output.size, many=True).data,
                 "categories": CategorySerializer(output.categories).data,
-                "mainImg": output.mainImg,
+                "mainImg": output.mainImg.url,
                 "newArriwals": output.newArriwals,
             }
             for output in Product.objects.all()
@@ -177,7 +177,7 @@ class ProductCardView(APIView):
                 "size": size,
                 "categories": CategorySerializer(product.categories).data,
                 "sku": product.sku,
-                "mainImg": product.mainImg,
+                "mainImg": product.mainImg.url,
                 "reviews": reviews,
                 "shortDescriptionInfo": product.shortDescriptionInfo,
                 "descriptionInfo": product.descriptionInfo,
@@ -242,7 +242,7 @@ class CartView(RetrieveUpdateDestroyAPIView):
                 "name": ProductSerializer(output.product).data.get("name"),
                 "price": ProductSerializer(output.product).data.get("salePrice"),
                 "quantity": output.quantity,
-                "mainImg": ProductSerializer(output.product).data.get("mainImg"),
+                "mainImg": ProductSerializer(output.product).data.get("mainImg").url,
                 "totalPrice": "${:.2f}".format(
                     output.quantity * output.product.salePrice
                 ),
@@ -919,7 +919,7 @@ class FavouritesGetViews(APIView):
             "salePrice": data["salePrice"],
             "discount": data["discount"],
             "discountPercentage": data["discountPercentage"],
-            "mainImg": data["mainImg"],
+            "mainImg": data["mainImg"].url,
         }
         return dataOutput
 
@@ -1004,7 +1004,7 @@ class ProductCarousel(APIView):
                 "salePrice": "${:.2f}".format(output.salePrice),
                 "discount": output.discount,
                 "discountPercentage": "{}%".format(output.discountPercentage),
-                "mainImg": output.mainImg,
+                "mainImg": output.mainImg.url,
             }
             for output in products
         ]
