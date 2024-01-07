@@ -67,6 +67,10 @@ def upload_to(instance, filename):
     return "profile_images/{filename}".format(filename=filename)
 
 
+def upload_to_product(instance, filename):
+    return "product_images/{filename}".format(filename=filename)
+
+
 class Customer(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         max_length=100,
@@ -124,7 +128,7 @@ class Product(models.Model):
         Category, on_delete=models.CASCADE, default=1, blank=True, null=True
     )
     sku = models.CharField(max_length=13, unique=True, editable=False)
-    mainImg = models.CharField(max_length=200)
+    mainImg = models.ImageField(blank=True, null=True, upload_to=upload_to_product)
     newArriwals = models.BooleanField(default=1)
     shortDescriptionInfo = models.TextField(max_length=1000, null=True)
     descriptionInfo = models.TextField(null=True)
