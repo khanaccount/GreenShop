@@ -104,6 +104,13 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 
+class EmailChangeRequest(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    newEmail = models.EmailField()
+    confirmationKey = models.CharField(max_length=40)
+    isConfirmed = models.BooleanField(default=False)
+
+
 class Product(models.Model):
     name = models.CharField(max_length=50)
     mainPrice = models.FloatField()

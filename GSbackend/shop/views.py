@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from .models import *
 from .serializer import *
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
@@ -14,6 +14,7 @@ from django.db import transaction
 from .utils import Util
 
 from django.core.exceptions import ValidationError
+
 
 @transaction.atomic
 def createOrder(customer):
@@ -488,23 +489,25 @@ class RegistrationView(APIView):
         try:
             password1 = request.data["password"]
             password2 = request.data["confirmPassword"]
-            if password1 == password2:
-                if len(password1) >= 8:
-                    serializer.is_valid(raise_exception=True)
-                    serializer.save()
-                else:
-                    return Response(
-                        {"error": "The password is too short"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-            else:
-                return Response(
-                    {"error": "Passwords don't match"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+
         except:
             return Response(
                 {"error": "Enter the password"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if password1 == password2:
+            if len(password1) >= 8:
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+            else:
+                return Response(
+                    {"error": "The password is too short"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            return Response(
+                {"error": "Passwords don't match"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         customer = Customer.objects.get(username=serializer.data["username"])
@@ -615,6 +618,76 @@ class CustomerChangePasswordView(APIView):
             return Response(
                 {"error": "Incorrect user password"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class CustomerEmailChangeRequestView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = EmailChangeRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        newEmail = serializer.validated_data["newEmail"]
+        customer = request.user
+        token = RefreshToken.for_user(customer).access_token
+
+        emailChangeRequest = EmailChangeRequest.objects.create(
+            customer=customer,
+            newEmail=newEmail,
+            confirmationKey=token,
+        )
+
+        current_site = get_current_site(request).domain
+        relative_link = reverse("confirm-change-email-verify")
+
+        absurl = (
+            "http://" + current_site + relative_link + "?confirmationKey=" + str(token)
+        )
+        email_body = (
+            "Hi "
+            + customer.username
+            + " Use the link below to verify change your email: \n\n\n"
+            + absurl
+        )
+
+        data = {
+            "email_body": email_body,
+            "to_email": newEmail,
+            "email_subject": "Verify change your email",
+        }
+
+        Util.send_email(data=data)
+
+        return Response(
+            {
+                "message": "Email change request submitted. Check your email for confirmation instructions."
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class CustomerConfirmEmailChangeView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        confirmationKey = request.GET.get("confirmationKey")
+
+        try:
+            emailChangeRequest = EmailChangeRequest.objects.get(
+                confirmationKey=confirmationKey, isConfirmed=False
+            )
+        except:
+            return Response(
+                {"error": "Invalid confirmation link"}, status=status.HTTP_404_NOT_FOUND
+            )
+        customer = emailChangeRequest.customer
+        customer.email = emailChangeRequest.newEmail
+        customer.save()
+        emailChangeRequest.isConfirmed = True
+        emailChangeRequest.save()
+        return Response(
+            {"message": "Email change confirmed successfully."},
+            status=status.HTTP_200_OK,
+        )
 
 
 # class CustomerRetrieveUpdateView(RetrieveUpdateAPIView):

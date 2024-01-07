@@ -118,25 +118,29 @@ class EmailVerificationSerializer(serializers.ModelSerializer):
         fields = ["token"]
 
 
-class CustomerEditSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(min_length=8, max_length=128, write_only=True)
+# class CustomerEditSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(min_length=8, max_length=128, write_only=True)
 
-    class Meta:
-        model = Customer
-        fields = ("email", "password")
+#     class Meta:
+#         model = Customer
+#         fields = ("email", "password")
 
-    def update(self, instance, validated_data):
-        password = validated_data.pop("password", None)
+#     def update(self, instance, validated_data):
+#         password = validated_data.pop("password", None)
 
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
+#         for key, value in validated_data.items():
+#             setattr(instance, key, value)
 
-        if password is not None:
-            instance.set_password(password)
+#         if password is not None:
+#             instance.set_password(password)
 
-        instance.save()
+#         instance.save()
 
-        return instance
+#         return instance
+
+
+class EmailChangeRequestSerializer(serializers.Serializer):
+    newEmail = serializers.EmailField()
 
 
 class TransactionSerializer(serializers.ModelSerializer):
