@@ -126,7 +126,7 @@ class ProductView(APIView):
                 "rating": output.rating,
                 "size": SizeSerializer(output.size, many=True).data,
                 "categories": CategorySerializer(output.categories).data,
-                "mainImg": output.mainImg,
+                "mainImg": output.mainImg.url,
                 "newArriwals": output.newArriwals,
             }
             for output in Product.objects.all()
