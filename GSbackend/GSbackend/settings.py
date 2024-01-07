@@ -67,11 +67,11 @@ REST_FRAMEWORK = {
     "NON_FIELD_ERRORS_KEY": "error",
 }
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+# ]
 
 ROOT_URLCONF = "GSbackend.urls"
 
