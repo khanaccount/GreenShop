@@ -3,7 +3,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from shop.views import *
-from django.views.generic import TemplateView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -12,7 +11,6 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", TemplateView.as_view(template_name="index.html")),
     path("shop/size/", SizeView.as_view()),
     path("shop/customer/", CustomerView.as_view()),
     path("shop/customer/changePassword/", CustomerChangePasswordView.as_view()),

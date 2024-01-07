@@ -10,7 +10,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.http import Http404
 from django.db import transaction
-from django.shortcuts import render
 
 from .utils import Util
 
